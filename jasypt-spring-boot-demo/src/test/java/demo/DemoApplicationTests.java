@@ -9,6 +9,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(classes = DemoApplication.class)
 public class DemoApplicationTests {
 
+	static {
+		System.setProperty("jasypt.encryptor.password", "password");
+	}
+
 	@Test
 	public void contextLoads() {
 	}

@@ -1,6 +1,9 @@
 package demo;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +11,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 /**
  * Sample Boot application that showcases easy integration of Jasypt encryption by
@@ -20,7 +25,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @SpringBootApplication
 @EnableEncryptableProperties
-@PropertySource(name="EncryptedProperties", value = "encrypted.properties")
+@PropertySource(name="EncryptedProperties", value = "classpath:encrypted.properties")
 public class DemoApplication implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoApplication.class);
@@ -29,9 +34,27 @@ public class DemoApplication implements CommandLineRunner {
     ApplicationContext appCtx;
 
     public static void main(String[] args) {
+        //try commenting the following line out and run the app from the command line passing the password as
+        //a command line argument: java -jar target/jasypt-spring-boot-demo-0.0.1-SNAPSHOT.jar --jasypt.encryptor.password=password
         System.setProperty("jasypt.encryptor.password", "password");
         SpringApplication.run(DemoApplication.class, args);
     }
+
+//Uncomment this code block for custom StringEncryptor configuration
+//    @Bean
+//    static public StringEncryptor stringEncryptor() {
+//        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+//        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+//        config.setPassword("password");
+//        config.setAlgorithm("PBEWithMD5AndDES");
+//        config.setKeyObtentionIterations("1000");
+//        config.setPoolSize("1");
+//        config.setProviderName("SunJCE");
+//        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+//        config.setStringOutputType("base64");
+//        encryptor.setConfig(config);
+//        return encryptor;
+//    }
 
     @Override
     public void run(String... args) throws Exception {

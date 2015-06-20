@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
  *
  * @author Ulises Bocchio
  */
-public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> {
+public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
     private final PropertySource<T> delegate;
     private final StringEncryptor encryptor;
 
@@ -27,10 +27,6 @@ public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> {
 
     @Override
     public Object getProperty(String name) {
-        String value = (String) delegate.getProperty(name);
-        if(PropertyValueEncryptionUtils.isEncryptedValue(value)) {
-            value = PropertyValueEncryptionUtils.decrypt(value, encryptor);
-        }
-        return value;
+        return getProperty(encryptor, delegate, name);
     }
 }

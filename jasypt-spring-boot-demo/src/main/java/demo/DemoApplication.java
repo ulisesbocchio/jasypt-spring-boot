@@ -1,5 +1,6 @@
 package demo;
 
+import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * Sample Boot application that showcases easy integration of Jasypt encryption by
@@ -21,6 +27,7 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @EnableEncryptableProperties
 @PropertySource(name="EncryptedProperties", value = "classpath:encrypted.properties")
+@EnableConfigurationProperties(ItemConfig.class)
 public class DemoApplication implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoApplication.class);
@@ -32,6 +39,8 @@ public class DemoApplication implements CommandLineRunner {
         //try commenting the following line out and run the app from the command line passing the password as
         //a command line argument: java -jar target/jasypt-spring-boot-demo-0.0.1-SNAPSHOT.jar --jasypt.encryptor.password=password
         System.setProperty("jasypt.encryptor.password", "password");
+        //Enable proxy mode for intercepting encrypted properties
+        //System.setProperty("jasypt.encryptor.proxyPropertySources", "true");
         SpringApplication.run(DemoApplication.class, args);
     }
 
@@ -55,6 +64,8 @@ public class DemoApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         MyService service = appCtx.getBean(MyService.class);
         LOG.info("MyService's secret: {}", service.getSecret());
+        ItemConfig itemConfig = appCtx.getBean(ItemConfig.class);
+        LOG.info("ItemConfig: {}", itemConfig);
         LOG.info("Done!");
     }
 }

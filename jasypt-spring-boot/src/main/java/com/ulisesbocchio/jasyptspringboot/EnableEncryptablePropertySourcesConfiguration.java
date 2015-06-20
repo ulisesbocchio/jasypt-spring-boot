@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 
@@ -52,13 +54,16 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  */
 @Configuration
-public class EnableEncryptablePropertySourcesConfiguration {
+public class EnableEncryptablePropertySourcesConfiguration implements EnvironmentAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesConfiguration.class);
+    private ConfigurableEnvironment environment;
 
     @Bean
-    public static EnableEncryptablePropertySourcesPostProcessor enableEncryptablePropertySourcesPostProcessor() {
-        return new EnableEncryptablePropertySourcesPostProcessor();
+    public EnableEncryptablePropertySourcesPostProcessor enableEncryptablePropertySourcesPostProcessor() {
+        boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
+        InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
+        return new EnableEncryptablePropertySourcesPostProcessor(environment, interceptionMode);
     }
 
     @Bean
@@ -78,7 +83,7 @@ public class EnableEncryptablePropertySourcesConfiguration {
     }
 
     private String getProperty(Environment environment, String key, String defaultValue) {
-        if(!propertyExists(environment, key)) {
+        if (!propertyExists(environment, key)) {
             LOG.info("Encryptor config not found for property {}, using default value: {}", key, defaultValue);
         }
         return environment.getProperty(key, defaultValue);
@@ -89,9 +94,14 @@ public class EnableEncryptablePropertySourcesConfiguration {
     }
 
     private String getRequiredProperty(Environment environment, String key) {
-        if(!propertyExists(environment, key)) {
+        if (!propertyExists(environment, key)) {
             throw new IllegalStateException(String.format("Required Encryption configuration property missing: %s", key));
         }
         return environment.getProperty(key);
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = (ConfigurableEnvironment) environment;
     }
 }

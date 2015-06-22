@@ -74,9 +74,14 @@ If no custom StringEncryptor is found in the Spring Context, one is created auto
       <tr>
           <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>
       </tr>
+      <tr>
+          <td>jasypt.encryptor.proxyPropertySources</td><td>False</td><td>false</td>
+      </tr>
   </table>
 
 The only property required is the encryption password, the rest could be left to use default values. While all this properties could be declared in a properties file, the encryptor password should not be stored in a property file, it should rather be passed as system property, command line argument, or environment variable and as far as its name is `jasypt.encryptor.password` it'll work.<br/>
+
+The last property, `jasypt.encryptor.proxyPropertySources` is used to indicate `jasyp-spring-boot` how property values are going to be intercepted for decryption. The default value, `false` uses custom wrapper implementations of `PropertySource`, `EnumerablePropertySource`, and `MapPropertySource`. When `true` is specify for this property, the interception mechanism will use CGLib proxies on each specific `PropertySource` implementation. This may be useful on some scenarios where the type of the original `PropertySource` must be preserved. 
 
 For custom configuration of the encryptor and the source of the encryptor password you can always define your own StringEncryptor bean in your Spring Context, and the default encryptor will be ignored. For instance:
 

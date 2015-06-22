@@ -65,7 +65,7 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
         if (propertySource instanceof MapPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, encryptor);
         } else if (propertySource instanceof EnumerablePropertySource) {
-            encryptablePropertySource = (PropertySource<T>) new EncryptableEnumerablePropertySourceWrapper<>((EnumerablePropertySource) propertySource, encryptor);
+            encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<T>((EnumerablePropertySource) propertySource, encryptor);
         } else {
             encryptablePropertySource = new EncryptablePropertySourceWrapper<>(propertySource, encryptor);
         }

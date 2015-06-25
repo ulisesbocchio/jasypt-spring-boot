@@ -2,9 +2,9 @@
 **[Jasypt](http://jasypt.org)** integration for String boot
 
 ## What to do First?
-Download and build a release artifact with maven and deploy it to your Maven repository since this library
+Download and build a release artifact of `jasypt-spring-boot` (and optionally `jasypt-spring-boot-starter`) with maven and deploy it to your Maven repository since this library
 is not in Maven Central or any other public repo.
-Then add the dependency to your project:
+Then add this dependency to your project if you plan to enable the Jasypt using Annotations:
 
 ```xml
     <dependency>
@@ -13,8 +13,17 @@ Then add the dependency to your project:
             <version>1.0</version>
     </dependency>
 ```
+Or if you plan to use Auto Configuration and only this one:
+
+```xml
+    <dependency>
+            <groupId>com.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>1.0</version>
+    </dependency>
+```
 ## How this Works?
-First add @EnableEncryptableProperties to you Configuration class. For instance:
+Simply add @EnableEncryptableProperties to you Configuration class. For instance:
 
 ```java
     @SpringBootApplication
@@ -23,6 +32,10 @@ First add @EnableEncryptableProperties to you Configuration class. For instance:
         ...
     }
 ```
+**Or** 
+
+If you use Auto Configuration (i.e. using annotations @SpringBootApplication  or @EnableAutoConfiguration) just make sure `jasypt-spring-boot-starter` is in your classpath and you don't need to add any extra annotation. Please just use one of the methods described and not both.
+
 
 This will trigger some configuration to be loaded that basically does 2 things:
 

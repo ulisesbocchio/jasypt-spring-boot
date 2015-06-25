@@ -26,7 +26,7 @@
 	<dependencies>
         <dependency>
             <groupId>com.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot</artifactId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 		<dependency>

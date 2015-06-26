@@ -26,7 +26,7 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 @SpringBootApplication
 @PropertySource(name="EncryptedProperties", value = "classpath:encrypted.properties")
-//Uncomment this if not using jasypt-spring-boot-starter
+//Uncomment this if not using jasypt-spring-boot-starter (use jasypt-spring-boot) dependency in pom instead
 //@EnableEncryptableProperties
 @EnableConfigurationProperties(ItemConfig.class)
 public class DemoApplication implements CommandLineRunner {

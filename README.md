@@ -13,7 +13,7 @@ Then add this dependency to your project if you plan to enable the Jasypt using 
             <version>1.0</version>
     </dependency>
 ```
-Or if you plan to use Auto Configuration and only this one:
+Or if you plan to use Auto Configuration add only this one:
 
 ```xml
     <dependency>

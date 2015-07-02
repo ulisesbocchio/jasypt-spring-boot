@@ -1,4 +1,6 @@
 # jasypt-spring-boot
+
+[![Join the chat at https://gitter.im/ulisesbocchio/jasypt-spring-boot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 **[Jasypt](http://jasypt.org)** integration for String boot
 
 [![Build Status](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot)

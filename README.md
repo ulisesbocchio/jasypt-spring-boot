@@ -1,6 +1,8 @@
 # jasypt-spring-boot
 **[Jasypt](http://jasypt.org)** integration for String boot
 
+[![Build Status](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot)
+
 ## What to do First?
 Download and build a release artifact of `jasypt-spring-boot` (and optionally `jasypt-spring-boot-starter`) with maven and deploy it to your Maven repository since this library
 is not in Maven Central or any other public repo.

@@ -6,6 +6,9 @@
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.2-SNAPSHOT</version>
+    <name>Jasypt Spring Boot Parent</name>
+    <description>Jasypt Spring Boot Parent</description>
+    <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +24,19 @@
         <module>jasypt-spring-boot-demo</module>
         <module>jasypt-spring-boot-demo-tomcat-ssl</module>
     </modules>
+
+    <issueManagement>
+        <url>https://github.com/ulisesbocchio/jasypt-spring-boot/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <scm>
         <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>

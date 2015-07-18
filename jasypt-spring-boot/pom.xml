@@ -10,6 +10,8 @@
 
     <artifactId>jasypt-spring-boot</artifactId>
     <packaging>jar</packaging>
+    <name>Jasypt Spring Boot</name>
+    <description>Jasypt Spring Boot</description>
 
     <dependencies>
         <dependency>

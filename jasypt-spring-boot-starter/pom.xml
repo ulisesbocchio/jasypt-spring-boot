@@ -9,6 +9,8 @@
 
     <artifactId>jasypt-spring-boot-starter</artifactId>
     <packaging>jar</packaging>
+    <name>Jasypt Spring Boot Starter</name>
+    <description>Jasypt Spring Boot Starter</description>
 
     <dependencies>
         <dependency>

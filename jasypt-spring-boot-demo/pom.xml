@@ -10,6 +10,8 @@
 
     <artifactId>jasypt-spring-boot-demo</artifactId>
     <packaging>jar</packaging>
+    <name>Jasypt Spring Boot Demo</name>
+    <description>Jasypt Spring Boot Demo</description>
 
 	<properties>
 		<start-class>demo.DemoApplication</start-class>

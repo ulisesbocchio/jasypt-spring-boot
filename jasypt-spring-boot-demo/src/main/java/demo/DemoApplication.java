@@ -1,6 +1,6 @@
 package demo;
 
-import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
+
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
 import org.slf4j.Logger;
@@ -11,13 +11,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.style.ToStringCreator;
-import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * Sample Boot application that showcases easy integration of Jasypt encryption by
@@ -28,8 +24,8 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author Ulises Bocchio
  */
 @SpringBootApplication
-@PropertySource(name="EncryptedProperties", value = "classpath:encrypted.properties")
-@EncryptablePropertySource(name="EncryptedProperties2", value = "classpath:encrypted2.properties")
+@PropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties")
+@EncryptablePropertySource(name = "EncryptedProperties2", value = "classpath:encrypted2.properties")
 @Import(TestConfig.class)
 //Uncomment this if not using jasypt-spring-boot-starter (use jasypt-spring-boot) dependency in pom instead
 @EnableEncryptableProperties

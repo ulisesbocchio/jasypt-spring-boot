@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<!-- Your own application should inherit from spring-boot-starter-parent -->
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-samples</artifactId>
-		<version>1.3.0.BUILD-SNAPSHOT</version>
-	</parent>
-	<artifactId>spring-boot-sample-tomcat-ssl</artifactId>
-	<name>Spring Boot Tomcat Sample</name>
-	<description>Spring Boot Tomcat SSL Sample</description>
-	<url>http://projects.spring.io/spring-boot/</url>
-	<organization>
-		<name>Pivotal Software, Inc.</name>
-		<url>http://www.spring.io</url>
-	</organization>
-	<properties>
-		<main.basedir>${basedir}/../..</main.basedir>
+
+    <parent>
+        <groupId>com.ulisesbocchio</groupId>
+        <artifactId>jasypt-spring-boot-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jasypt-spring-boot-demo-tomcat-ssl</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <start-class>sample.tomcat.SampleTomcatSslApplication</start-class>
 	</properties>
+
 	<dependencies>
         <dependency>
             <groupId>com.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+            <version>4.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -48,6 +42,7 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
+            <version>1.5</version>
 		</dependency>
 	</dependencies>
 	<build>

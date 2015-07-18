@@ -77,6 +77,7 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
         LOG.info("Post-processing PropertySource instances");
         MutablePropertySources propSources = environment.getPropertySources();
         StreamSupport.stream(propSources.spliterator(), false)
+                .filter(ps -> !(ps instanceof EncryptablePropertySource))
                 .map(s -> makeEncryptable(s, beanFactory))
                 .collect(toList())
                 .forEach(ps -> propSources.replace(ps.getName(), ps));

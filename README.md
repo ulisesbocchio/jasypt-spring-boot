@@ -1,53 +1,77 @@
 # jasypt-spring-boot
-**[Jasypt](http://jasypt.org)** integration for String boot
+**[Jasypt](http://jasypt.org)** integration for Spring boot
 
 [![Build Status](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.ulisesbocchio/jasypt-spring-boot/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.ulisesbocchio/jasypt-spring-boot)
 
+Jasypt Spring Boot provides Encryption support for property sources in Spring Boot Applications.<br/>
+There are 3 ways to integrate `jasypt-spring-boot` in your project:
+
+- Simply adding the starter jar `jasypt-spring-boot-starter` to your classpath if using `@SpringBootApplication` or `@EnableAutoConfiguration` will enable encryptable properties across the entire Spring Environment
+- Adding `jasypt-spring-boot` to your classpath and adding `@EnableEncryptableProperties` to your main Configuration class to enable encryptable properties across the entire Spring Environment
+- Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
+
 ## What to do First?
-Download and build a release artifact of `jasypt-spring-boot` (and optionally `jasypt-spring-boot-starter`) with maven and deploy it to your Maven repository since this library
-is not in Maven Central or any other public repo.
-Then add this dependency to your project if you plan to enable the Jasypt using Annotations:
+Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!<br/>
+Use one of the following 3 methods (briefly explained above):
 
-```xml
-    <dependency>
-            <groupId>com.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.0</version>
-    </dependency>
-```
-Or if you plan to use Auto Configuration add only this one:
+1. Simply add the starter jar dependency to your project if your Spring Boot application uses `@SpringBootApplication` or `@EnableAutoConfiguration` and encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties):
 
-```xml
+	```xml
     <dependency>
-            <groupId>com.ulisesbocchio</groupId>
+            <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.0</version>
+            <version>1.2</version>
     </dependency>
-```
-## How this Works?
-Simply add @EnableEncryptableProperties to you Configuration class. For instance:
+	```
+2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project and encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties):
+	
+	```xml
+    <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot</artifactId>
+            <version>1.2</version>
+    </dependency>
+	```
 
-```java
-    @SpringBootApplication
+	And then add `@EnableEncryptableProperties` to you Configuration class. For instance:
+
+	```java
+    @Configuration
     @EnableEncryptableProperties
     public class MyApplication {
         ...
     }
-```
-**Or** 
+	```
+3. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations and you don't want to enable encryptable properties across the entire Spring Environment, there's a third option. First add the following dependency to your project:
+	
+	```xml
+    <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot</artifactId>
+            <version>1.2</version>
+    </dependency>
+	```
+	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
+	
+	```java
+	@Configuration
+	@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties", ignoreResourceNotFound = false)
+	public class MyApplication {
+		...
+	}
+	```
 
-If you use Auto Configuration (i.e. using annotations @SpringBootApplication  or @EnableAutoConfiguration) just make sure `jasypt-spring-boot-starter` is in your classpath and you don't need to add any extra annotation. Please just use one of the methods described and not both.
-
+## How this Works?
 
 This will trigger some configuration to be loaded that basically does 2 things:
 
 1. It registers a Spring post processor that decorates all PropertySource objects contained in the Spring Environment so that thet are "encryption aware" and detect when properties are encrypted following jasypt's property convention.
-2. It defines a a default StringEncryptor that can be configured through regular properties, system properties, or command line arguments.
+2. It defines a default `StringEncryptor` that can be configured through regular properties, system properties, or command line arguments.
 
 ## Where do I put my encrypted properties?
-You can define encrypted properties in any of the PropertySource contained in the Environment. For instance, using the @PropertySource annotation:
+When using METHODS 1 and 2 you can define encrypted properties in any of the PropertySource contained in the Environment. For instance, using the @PropertySource annotation:
 
 ```java
     @SpringBootApplication
@@ -62,10 +86,11 @@ And your encrypted.properties file would look something like this:
 ```properties
 	secret.property=ENC(nrmZtkF7T0kjG/VodDvBw93Ct8EgjCA+)
 ```
-Now when you do `environment.getProperty("secret.property")` or use `@Value("${secret.property}")` what you get is the decrypted version of secret.property.
+Now when you do `environment.getProperty("secret.property")` or use `@Value("${secret.property}")` what you get is the decrypted version of `secret.property`.<br/>
+When using METHOD 3 (`@EncryptablePropertySource`) then you can access the encrypted properties the same way, the only difference is that you must put the properties in the resource that was declared within the `@EncryptablePropertySource` annotation so that the properties can be decrypted properly.
 
 ## Encryption Configuration
-If no custom StringEncryptor is found in the Spring Context, one is created automatically that can be configured through the following properties (System, properties file, command line arguments, environment variable, etc.):
+Jasypt uses an `StringEncryptor` to decrypt properties. For all 3 methods, if no custom `StringEncryptor` is found in the Spring Context, one is created automatically that can be configured through the following properties (System, properties file, command line arguments, environment variable, etc.):
 
 <table border="1">
       <tr>
@@ -98,7 +123,7 @@ If no custom StringEncryptor is found in the Spring Context, one is created auto
 
 The only property required is the encryption password, the rest could be left to use default values. While all this properties could be declared in a properties file, the encryptor password should not be stored in a property file, it should rather be passed as system property, command line argument, or environment variable and as far as its name is `jasypt.encryptor.password` it'll work.<br/>
 
-The last property, `jasypt.encryptor.proxyPropertySources` is used to indicate `jasyp-spring-boot` how property values are going to be intercepted for decryption. The default value, `false` uses custom wrapper implementations of `PropertySource`, `EnumerablePropertySource`, and `MapPropertySource`. When `true` is specify for this property, the interception mechanism will use CGLib proxies on each specific `PropertySource` implementation. This may be useful on some scenarios where the type of the original `PropertySource` must be preserved. 
+The last property, `jasypt.encryptor.proxyPropertySources` is used to indicate `jasyp-spring-boot` how property values are going to be intercepted for decryption. The default value, `false` uses custom wrapper implementations of `PropertySource`, `EnumerablePropertySource`, and `MapPropertySource`. When `true` is specified for this property, the interception mechanism will use CGLib proxies on each specific `PropertySource` implementation. This may be useful on some scenarios where the type of the original `PropertySource` must be preserved. 
 
 For custom configuration of the encryptor and the source of the encryptor password you can always define your own StringEncryptor bean in your Spring Context, and the default encryptor will be ignored. For instance:
 

@@ -8,6 +8,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.*;
 
 import java.util.stream.StreamSupport;
@@ -23,7 +24,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Ulises Bocchio
  */
-public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactoryPostProcessor, Ordered {
+public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactoryPostProcessor, PriorityOrdered {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesPostProcessor.class);
 
@@ -85,6 +86,6 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }

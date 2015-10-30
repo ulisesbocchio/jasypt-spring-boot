@@ -3,15 +3,17 @@ package demo;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
@@ -30,6 +32,7 @@ import org.springframework.core.env.Environment;
 //Uncomment this if not using jasypt-spring-boot-starter (use jasypt-spring-boot) dependency in pom instead
 @EnableEncryptableProperties
 @EnableConfigurationProperties(ItemConfig.class)
+@ImportResource("classpath:/testConfig.xml")
 public class DemoApplication implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoApplication.class);
@@ -43,7 +46,7 @@ public class DemoApplication implements CommandLineRunner {
         System.setProperty("jasypt.encryptor.password", "password");
         //Enable proxy mode for intercepting encrypted properties
         //System.setProperty("jasypt.encryptor.proxyPropertySources", "true");
-        SpringApplication.run(DemoApplication.class, args);
+        new SpringApplicationBuilder().sources(DemoApplication.class).run(args);
     }
 
 //Uncomment this code block for custom StringEncryptor configuration
@@ -70,6 +73,8 @@ public class DemoApplication implements CommandLineRunner {
         LOG.info("ItemConfig: {}", itemConfig);
         Environment env = appCtx.getEnvironment();
         LOG.info("Secret from @EncryptablePropertySource annotation: {}", env.getProperty("secret2.property"));
+        SimpleBean simpleBean = appCtx.getBean(SimpleBean.class);
+        LOG.info("XML Context SimpleBean value: {}", simpleBean.getValue());
         LOG.info("Done!");
     }
 }

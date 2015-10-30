@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.ulisesbocchio</groupId>
         <artifactId>jasypt-spring-boot-parent</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.4</version>
     </parent>
 
     <artifactId>jasypt-spring-boot-starter</artifactId>

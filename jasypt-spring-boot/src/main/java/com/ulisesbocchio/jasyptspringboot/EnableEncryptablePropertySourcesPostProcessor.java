@@ -15,9 +15,14 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
+import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
+import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
+import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
+import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
+
 /**
  * <p>{@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
- * with {@link EncryptablePropertySourceWrapper} and defines a default {@link StringEncryptor} for decrypting properties
+ * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link StringEncryptor} for decrypting properties
  * that can be configured through the same properties it wraps.</p>
  * <p>
  * <p>It takes the lowest precedence so it does not interfere with Spring Boot's own post processors</p>

@@ -1,4 +1,6 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringboot.aop;
+
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;

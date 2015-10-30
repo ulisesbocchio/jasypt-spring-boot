@@ -1,4 +1,6 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringboot.wrapper;
+
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.properties.PropertyValueEncryptionUtils;

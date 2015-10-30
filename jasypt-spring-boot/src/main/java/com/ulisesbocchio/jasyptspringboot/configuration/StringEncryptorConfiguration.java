@@ -1,4 +1,4 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;

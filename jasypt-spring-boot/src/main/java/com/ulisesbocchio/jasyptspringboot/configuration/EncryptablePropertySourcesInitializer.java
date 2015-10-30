@@ -1,7 +1,9 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
+
 import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +16,6 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -24,14 +25,12 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePropertySource;
-import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -44,7 +43,7 @@ public class EncryptablePropertySourcesInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertySourcesInitializer.class);
 
     @Bean
-    public static BeanFactoryPostProcessor encrytablePropertySourceAnnotationPostProcessor() {
+    public static BeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
         return new EncryptablePropertySourceAnnotationBeanFactoryPostProcessor();
     }
 

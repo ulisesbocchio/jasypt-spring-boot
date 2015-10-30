@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import java.util.function.Supplier;
-
 /**
  * @author Ulises Bocchio
  */
@@ -22,19 +20,22 @@ public class StringEncryptorConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(StringEncryptor.class)
-    public StringEncryptor stringEncryptor(Environment environment) {
-        return new LazyStringEncryptor(() -> {
-          PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
-          SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-          config.setPassword(getRequiredProperty(environment, "jasypt.encryptor.password"));
-          config.setAlgorithm(getProperty(environment, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
-          config.setKeyObtentionIterations(getProperty(environment, "jasypt.encryptor.keyObtentionIterations", "1000"));
-          config.setPoolSize(getProperty(environment, "jasypt.encryptor.poolSize", "1"));
-          config.setProviderName(getProperty(environment, "jasypt.encryptor.providerName", "SunJCE"));
-          config.setSaltGeneratorClassName(getProperty(environment, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
-          config.setStringOutputType(getProperty(environment, "jasypt.encryptor.stringOutputType", "base64"));
-          encryptor.setConfig(config);
-          return encryptor;
+    public StringEncryptor stringEncryptor(final Environment environment) {
+        return new LazyStringEncryptor(new Supplier<StringEncryptor>() {
+          @Override
+          public StringEncryptor get() {
+            PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+            SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+            config.setPassword(getRequiredProperty(environment, "jasypt.encryptor.password"));
+            config.setAlgorithm(getProperty(environment, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
+            config.setKeyObtentionIterations(getProperty(environment, "jasypt.encryptor.keyObtentionIterations", "1000"));
+            config.setPoolSize(getProperty(environment, "jasypt.encryptor.poolSize", "1"));
+            config.setProviderName(getProperty(environment, "jasypt.encryptor.providerName", "SunJCE"));
+            config.setSaltGeneratorClassName(getProperty(environment, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
+            config.setStringOutputType(getProperty(environment, "jasypt.encryptor.stringOutputType", "base64"));
+            encryptor.setConfig(config);
+            return encryptor;
+          }
         });
     }
 
@@ -80,13 +81,21 @@ public class StringEncryptorConfiguration {
       private T value;
 
       private SingletonSupplier(final Supplier<T> original) {
-        this.singleton = () -> {
-          synchronized (original) {
-            if(value == null) {
-              value = original.get();
-              singleton = () -> value;
+        this.singleton = new Supplier<T>() {
+          @Override
+          public T get() {
+            synchronized (original) {
+              if(value == null) {
+                value = original.get();
+                singleton = new Supplier<T>() {
+                  @Override
+                  public T get() {
+                    return value;
+                  }
+                };
+              }
+              return value;
             }
-            return value;
           }
         };
       }
@@ -95,5 +104,9 @@ public class StringEncryptorConfiguration {
       public T get() {
         return singleton.get();
       }
+    }
+
+    private static interface Supplier<T> {
+      T get();
     }
 }

@@ -9,11 +9,16 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
-import org.springframework.core.env.*;
+import org.springframework.core.env.CommandLinePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 
-import java.util.stream.StreamSupport;
-
-import static java.util.stream.Collectors.toList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>{@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
@@ -77,11 +82,16 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         LOG.info("Post-processing PropertySource instances");
         MutablePropertySources propSources = environment.getPropertySources();
-        StreamSupport.stream(propSources.spliterator(), false)
-                .filter(ps -> !(ps instanceof EncryptablePropertySource))
-                .map(s -> makeEncryptable(s, beanFactory))
-                .collect(toList())
-                .forEach(ps -> propSources.replace(ps.getName(), ps));
+        List<PropertySource> encryptablePropSources = new ArrayList<>();
+        for (PropertySource ps : propSources) {
+          if(!(ps instanceof EncryptablePropertySource)) {
+            PropertySource eps = makeEncryptable(ps, beanFactory);
+            encryptablePropSources.add(eps);
+          }
+        }
+        for(PropertySource eps : encryptablePropSources) {
+          propSources.replace(eps.getName(), eps);
+        }
     }
 
     @Override

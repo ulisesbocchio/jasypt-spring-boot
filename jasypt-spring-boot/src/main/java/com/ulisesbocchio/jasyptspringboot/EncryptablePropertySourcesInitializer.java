@@ -2,11 +2,13 @@ package com.ulisesbocchio.jasyptspringboot;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
+
 import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -14,7 +16,6 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -30,9 +31,9 @@ import org.springframework.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * @author Ulises Bocchio
@@ -56,8 +57,10 @@ public class EncryptablePropertySourcesInitializer {
             ApplicationContext ac = new StaticApplicationContext();//Figure out how to get this from beanFactory
             StringEncryptor encryptor = beanFactory.getBean(StringEncryptor.class);
             MutablePropertySources propertySources = env.getPropertySources();
-            Stream<AnnotationAttributes> encryptablePropertiesMetadata = getEncryptablePropertiesMetadata(beanFactory);
-            encryptablePropertiesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, encryptor, propertySources));
+            List<AnnotationAttributes> encryptablePropertiesMetadata = getEncryptablePropertiesMetadata(beanFactory);
+            for (AnnotationAttributes annotationAttributes : encryptablePropertiesMetadata) {
+              loadEncryptablePropertySource(annotationAttributes, env, ac, encryptor, propertySources);
+            }
         }
 
         private static void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ApplicationContext ac, StringEncryptor encryptor, MutablePropertySources propertySources) throws BeansException {
@@ -95,22 +98,34 @@ public class EncryptablePropertySourcesInitializer {
             return rps;
         }
 
-        private static Stream<AnnotationAttributes> getEncryptablePropertiesMetadata(ConfigurableListableBeanFactory beanFactory) {
-            Stream<AnnotationAttributes> source = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySource.class);
-            Stream<AnnotationAttributes> sources = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySources.class)
-                    .flatMap(map -> Arrays.stream((AnnotationAttributes[]) map.get("value")));
-            return Stream.concat(source, sources);
-
+        private static List<AnnotationAttributes> getEncryptablePropertiesMetadata(ConfigurableListableBeanFactory beanFactory) {
+          List<AnnotationAttributes> source = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySource.class);
+          List<AnnotationAttributes> sources = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySources.class);
+          List<AnnotationAttributes> flatSources = new ArrayList<>();
+          for (AnnotationAttributes annotationAttributes : sources) {
+            if(annotationAttributes.containsKey("value")) {
+              flatSources.addAll(Arrays.asList((AnnotationAttributes[]) annotationAttributes.get("value")));
+            }
+          }
+          List<AnnotationAttributes> concat = new ArrayList<>(source);
+          concat.addAll(flatSources);
+          return concat;
         }
 
-        private static Stream<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation) {
-            return Arrays.stream(bf.getBeanNamesForAnnotation(annotation))
-                    .map(bf::getBeanDefinition)
-                    .filter(bd -> bd instanceof AnnotatedGenericBeanDefinition)
-                    .map(bd -> (AnnotatedGenericBeanDefinition) bd)
-                    .map(AnnotatedGenericBeanDefinition::getMetadata)
-                    .filter(md -> md.hasAnnotation(annotation.getName()))
-                    .map(md -> (AnnotationAttributes) md.getAnnotationAttributes(annotation.getName()));
+        private static List<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation) {
+          List<AnnotationAttributes> annotationAttributes = new ArrayList<>();
+          for (String beanName : bf.getBeanNamesForAnnotation(annotation)) {
+            BeanDefinition bd = bf.getBeanDefinition(beanName);
+            if(bd instanceof AnnotatedGenericBeanDefinition) {
+              AnnotatedGenericBeanDefinition abd = (AnnotatedGenericBeanDefinition) bd;
+              AnnotationMetadata metadata = abd.getMetadata();
+              if (metadata.hasAnnotation(annotation.getName())) {
+                AnnotationAttributes attributes = (AnnotationAttributes) metadata.getAnnotationAttributes(annotation.getName());
+                annotationAttributes.add(attributes);
+              }
+            }
+          }
+          return annotationAttributes;
         }
     }
 }

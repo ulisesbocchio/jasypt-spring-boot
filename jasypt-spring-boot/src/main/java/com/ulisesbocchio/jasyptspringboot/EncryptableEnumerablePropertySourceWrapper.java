@@ -21,7 +21,7 @@ public class EncryptableEnumerablePropertySourceWrapper<T> extends EnumerablePro
 
     @Override
     public Object getProperty(String name) {
-        return getProperty(encryptor, delegate, name);
+        return new DefaultMethods<T>().getProperty(encryptor, delegate, name);
     }
 
     @Override

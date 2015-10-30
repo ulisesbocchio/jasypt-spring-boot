@@ -13,7 +13,7 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(EncryptablePropertySources.class)
+//@Repeatable(EncryptablePropertySources.class)
 @Import(EncryptablePropertySourcesInitializer.class)
 public @interface EncryptablePropertySource {
     /**

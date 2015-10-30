@@ -23,6 +23,6 @@ public class EncryptableMapPropertySourceWrapper extends MapPropertySource imple
 
     @Override
     public Object getProperty(String name) {
-        return getProperty(encryptor, delegate, name);
+        return new DefaultMethods().getProperty(encryptor, delegate, name);
     }
 }

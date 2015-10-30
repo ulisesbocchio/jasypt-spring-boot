@@ -27,6 +27,6 @@ public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> imple
 
     @Override
     public Object getProperty(String name) {
-        return getProperty(encryptor, delegate, name);
+        return new DefaultMethods<T>().getProperty(encryptor, delegate, name);
     }
 }

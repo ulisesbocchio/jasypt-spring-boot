@@ -167,7 +167,7 @@ or in YAML
 ```
 jasypt:
     encryptor:
-        password: {${JASYPT_ENCRYPTOR_PASSWORD:}
+        password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 ```
 basically what this does is to define the `jasypt.encryptor.password` property pointing to a different property `JASYPT_ENCRYPTOR_PASSWORD` that you can set with an Environment Variable, and you can also override via System Properties. This technique can also be used to translate property name/values for any other library you need.
 This is also available in the Demo app. So you can run the Demo app like this:

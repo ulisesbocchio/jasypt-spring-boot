@@ -7,3 +7,7 @@ itemConfig:
 
     - name: item2
       value: 2
+
+jasypt:
+    encryptor:
+        password: ${JASYPT_ENCRYPTOR_PASSWORD:}

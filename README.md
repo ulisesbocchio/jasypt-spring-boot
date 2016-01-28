@@ -158,3 +158,20 @@ Run it like this:
 	java -Djasypt.encryptor.password=password -jar target/jasypt-spring-boot-demo-0.0.1-SNAPSHOT.jar
 ```
 And you'll be passing the encryption password as a System property.
+
+If you need to pass this property as an Environment Variable you can accomplish this by creating application.properties or application.yml and adding:
+```
+jasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD:}
+```
+or in YAML
+```
+jasypt:
+    encryptor:
+        password: {${JASYPT_ENCRYPTOR_PASSWORD:}
+```
+basically what this does is to define the `jasypt.encryptor.password` property pointing to a different property `JASYPT_ENCRYPTOR_PASSWORD` that you can set with an Environment Variable, and you can also override via System Properties. This technique can also be used to translate property name/values for any other library you need.
+This is also available in the Demo app. So you can run the Demo app like this:
+
+```
+JASYPT_ENCRYPTOR_PASSWORD=password java -jar target/jasypt-spring-boot-demo-1.5-SNAPSHOT.jar
+```

@@ -5,11 +5,15 @@ import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NamedBean;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ConfigurationCondition;
 import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import java.util.function.Supplier;
 
@@ -23,11 +27,12 @@ public class StringEncryptorConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(StringEncryptorConfiguration.class);
 
     @ConditionalOnMissingBean(name = ENCRYPTOR_BEAN_PLACEHOLDER)
+    @Conditional(OnMissionEncryptorBean.class)
     @Bean(name = ENCRYPTOR_BEAN_PLACEHOLDER)
     public StringEncryptor stringEncryptor(Environment environment) {
-        String encrytorBeanName = environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
+        String encryptorBeanName = environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
         LOG.info("String Encryptor custom Bean not found with name '{}'. Initializing String Encryptor based on properties with name '{}'",
-                 encrytorBeanName, encrytorBeanName);
+                 encryptorBeanName, encryptorBeanName);
         return new LazyStringEncryptor(() -> {
             PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
             SimpleStringPBEConfig config = new SimpleStringPBEConfig();
@@ -41,6 +46,18 @@ public class StringEncryptorConfiguration {
             encryptor.setConfig(config);
             return encryptor;
         });
+    }
+
+    private static class OnMissionEncryptorBean implements ConfigurationCondition {
+        @Override
+        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+            return !context.getBeanFactory().containsBean(context.getEnvironment().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER));
+        }
+
+        @Override
+        public ConfigurationPhase getConfigurationPhase() {
+            return ConfigurationPhase.REGISTER_BEAN;
+        }
     }
 
     private String getProperty(Environment environment, String key, String defaultValue) {

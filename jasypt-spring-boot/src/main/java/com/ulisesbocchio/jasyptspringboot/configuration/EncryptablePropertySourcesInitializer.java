@@ -1,5 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import static com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorConfiguration.ENCRYPTOR_BEAN_PLACEHOLDER;
+
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
@@ -11,17 +13,17 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -43,25 +45,25 @@ public class EncryptablePropertySourcesInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertySourcesInitializer.class);
 
     @Bean
-    public static BeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
+    public BeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
         return new EncryptablePropertySourceAnnotationBeanFactoryPostProcessor();
     }
 
-    private static class EncryptablePropertySourceAnnotationBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+    private static class EncryptablePropertySourceAnnotationBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
         @Override
         public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
             ConfigurableEnvironment env = beanFactory.getBean(ConfigurableEnvironment.class);
-            ApplicationContext ac = new StaticApplicationContext();//Figure out how to get this from beanFactory
-            StringEncryptor encryptor = beanFactory.getBean(StringEncryptor.class);
+            ResourceLoader ac = new DefaultResourceLoader();
+            StringEncryptor encryptor = beanFactory.getBean(env.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER), StringEncryptor.class);
             MutablePropertySources propertySources = env.getPropertySources();
             Stream<AnnotationAttributes> encryptablePropertiesMetadata = getEncryptablePropertiesMetadata(beanFactory);
             encryptablePropertiesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, encryptor, propertySources));
         }
 
-        private static void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ApplicationContext ac, StringEncryptor encryptor, MutablePropertySources propertySources) throws BeansException {
+        private static void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, StringEncryptor encryptor, MutablePropertySources propertySources) throws BeansException {
             try {
-                PropertySource ps = createPropertySource(encryptablePropertySource, env, ac, encryptor);
+                PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, encryptor);
                 if(ps != null) {
                     propertySources.addLast(ps);
                 }
@@ -110,6 +112,11 @@ public class EncryptablePropertySourcesInitializer {
                     .map(AnnotatedGenericBeanDefinition::getMetadata)
                     .filter(md -> md.hasAnnotation(annotation.getName()))
                     .map(md -> (AnnotationAttributes) md.getAnnotationAttributes(annotation.getName()));
+        }
+
+        @Override
+        public int getOrder() {
+            return Ordered.LOWEST_PRECEDENCE;
         }
     }
 }

@@ -4,6 +4,9 @@ package demo;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
 
+import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
@@ -49,21 +53,21 @@ public class DemoApplication implements CommandLineRunner {
         new SpringApplicationBuilder().sources(DemoApplication.class).run(args);
     }
 
-//Uncomment this code block for custom StringEncryptor configuration
-//    @Bean
-//    static public StringEncryptor stringEncryptor() {
-//        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
-//        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-//        config.setPassword("password");
-//        config.setAlgorithm("PBEWithMD5AndDES");
-//        config.setKeyObtentionIterations("1000");
-//        config.setPoolSize("1");
-//        config.setProviderName("SunJCE");
-//        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
-//        config.setStringOutputType("base64");
-//        encryptor.setConfig(config);
-//        return encryptor;
-//    }
+    //Uncomment this code block for custom StringEncryptor configuration
+    @Bean(name="encryptorBean")
+    static public StringEncryptor stringEncryptor() {
+        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+        config.setPassword("password");
+        config.setAlgorithm("PBEWithMD5AndDES");
+        config.setKeyObtentionIterations("1000");
+        config.setPoolSize("1");
+        config.setProviderName("SunJCE");
+        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+        config.setStringOutputType("base64");
+        encryptor.setConfig(config);
+        return encryptor;
+    }
 
     @Override
     public void run(String... args) throws Exception {

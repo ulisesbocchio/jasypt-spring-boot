@@ -10,4 +10,5 @@ itemConfig:
 
 jasypt:
     encryptor:
+        bean: encryptorBean
         password: ${JASYPT_ENCRYPTOR_PASSWORD:}

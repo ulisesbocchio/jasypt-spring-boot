@@ -1,0 +1,14 @@
+itemConfig:
+  configurationName: my configuration
+  password: ENC(nrmZtkF7T0kjG/VodDvBw93Ct8EgjCA+)
+  items:
+    - name: item1
+      value: 1
+
+    - name: item2
+      value: 2
+
+jasypt:
+    encryptor:
+        bean: encryptorBean
+        password: ${JASYPT_ENCRYPTOR_PASSWORD:}

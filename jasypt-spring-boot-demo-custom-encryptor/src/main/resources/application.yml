@@ -1,0 +1,6 @@
+jasypt:
+    encryptor:
+        bean: encryptorBean
+
+secret:
+    property: ENC(nrmZtkF7T0kjG/VodDvBw93Ct8EgjCA+)

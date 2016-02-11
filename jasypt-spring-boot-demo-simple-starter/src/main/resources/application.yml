@@ -2,3 +2,6 @@ jasypt:
     encryptor:
         bean: encryptorBean
         password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+
+secret2:
+    property: ENC(nrmZtkF7T0kjG/VodDvBw93Ct8EgjCA+)

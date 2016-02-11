@@ -48,7 +48,7 @@ import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapp
  *
  * @author Ulises Bocchio
  */
-public class EnableEncryptablePropertySourcesPostProcessor implements BeanDefinitionRegistryPostProcessor, ApplicationListener<ApplicationEvent>, Ordered {
+public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactoryPostProcessor, ApplicationListener<ApplicationEvent>, Ordered {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesPostProcessor.class);
 
@@ -119,21 +119,6 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanDefini
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
-    }
-
-    @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-        DefaultListableBeanFactory bf = (DefaultListableBeanFactory) registry;
-        Stream.of(bf.getBeanDefinitionNames())
-            //Look for beans with placeholders name format: '${placeholder}' or '${placeholder:defaultValue}'
-            .filter(name -> name.matches("\\$\\{[\\w\\.-]+(?>:[\\w\\.-]+)?\\}"))
-            .forEach(placeholder -> {
-                String actualName = environment.resolveRequiredPlaceholders(placeholder);
-                BeanDefinition bd = bf.getBeanDefinition(placeholder);
-                bf.removeBeanDefinition(placeholder);
-                bf.registerBeanDefinition(actualName, bd);
-                LOG.debug("Registering new name '{}' for Bean definition with placeholder name: {}", actualName, placeholder);
-            });
     }
 
     @Override

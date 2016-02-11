@@ -25,8 +25,6 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 @EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties")
 @Import(TestConfig.class)
-//Uncomment this if not using jasypt-spring-boot-starter (use jasypt-spring-boot) dependency in pom instead
-@EnableEncryptableProperties
 public class SimpleDemoApplication implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleDemoApplication.class);

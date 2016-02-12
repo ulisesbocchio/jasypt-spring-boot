@@ -57,12 +57,23 @@ Use one of the following 3 methods (briefly explained above):
 	
 	```java
 	@Configuration
-	@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties", ignoreResourceNotFound = false)
+	@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties")
 	public class MyApplication {
 		...
 	}
 	```
+Conviniently, theres also a `@EncryptablePropertySources` annotation that one could use to group annotations of type `@EncryptablePropertySource` like this:
 
+```java
+	@Configuration
+	@EncryptablePropertySources({@EncryptablePropertySource("classpath:encrypted.properties"),
+	                             @EncryptablePropertySource("classpath:encrypted2.properties")})
+	public class MyApplication {
+		...
+	}
+```
+	
+	
 ## How this Works?
 
 This will trigger some configuration to be loaded that basically does 2 things:

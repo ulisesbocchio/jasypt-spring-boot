@@ -56,20 +56,14 @@ import org.springframework.core.env.PropertySource;
  */
 @Configuration
 @Import(StringEncryptorConfiguration.class)
-public class EnableEncryptablePropertySourcesConfiguration implements EnvironmentAware {
+public class EnableEncryptablePropertySourcesConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesConfiguration.class);
-    private ConfigurableEnvironment environment;
 
     @Bean
-    public EnableEncryptablePropertySourcesPostProcessor enableEncryptablePropertySourcesPostProcessor() {
+    public static EnableEncryptablePropertySourcesPostProcessor enableEncryptablePropertySourcesPostProcessor(ConfigurableEnvironment environment) {
         boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
         InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
         return new EnableEncryptablePropertySourcesPostProcessor(environment, interceptionMode);
-    }
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = (ConfigurableEnvironment) environment;
     }
 }

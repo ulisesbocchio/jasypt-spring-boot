@@ -35,7 +35,7 @@ public class StringEncryptorConfiguration {
 
     @Conditional(OnMissingEncryptorBean.class)
     @Bean
-    public BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(Environment environment) {
+    public static BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(Environment environment) {
         return new BeanNamePlaceholderRegistryPostProcessor(environment);
     }
 

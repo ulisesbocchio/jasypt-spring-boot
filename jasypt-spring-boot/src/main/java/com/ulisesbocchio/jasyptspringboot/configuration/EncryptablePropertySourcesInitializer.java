@@ -55,7 +55,7 @@ public class EncryptablePropertySourcesInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertySourcesInitializer.class);
 
     @Bean
-    public EncryptablePropertySourceAnnotationBeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
+    public static EncryptablePropertySourceAnnotationBeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
         return new EncryptablePropertySourceAnnotationBeanFactoryPostProcessor();
     }
 

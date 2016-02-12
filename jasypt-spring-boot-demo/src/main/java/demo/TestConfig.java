@@ -7,6 +7,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ulises Bocchio
  */
 @Configuration
-@EncryptablePropertySource(name = "caca", value = "caca.properties")
+@EncryptablePropertySource(name = "caca", value = "classpath:caca.properties", ignoreResourceNotFound = true)
 public class TestConfig {
 }

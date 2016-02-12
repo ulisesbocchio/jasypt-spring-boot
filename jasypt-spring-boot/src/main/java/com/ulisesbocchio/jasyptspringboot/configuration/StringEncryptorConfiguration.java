@@ -11,17 +11,17 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ConfigurationCondition;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.Ordered;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import java.lang.reflect.Type;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 public class StringEncryptorConfiguration {
 
     public static final String ENCRYPTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.bean:jasyptStringEncryptor}";
+
     private static final Logger LOG = LoggerFactory.getLogger(StringEncryptorConfiguration.class);
 
     @Conditional(OnMissionEncryptorBean.class)
@@ -80,6 +81,7 @@ public class StringEncryptorConfiguration {
     }
 
     private static class OnMissionEncryptorBean implements ConfigurationCondition {
+
         @Override
         public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
             return !context.getBeanFactory().containsBean(context.getEnvironment().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER));
@@ -125,6 +127,10 @@ public class StringEncryptorConfiguration {
         }
     }
 
+    /**
+     * String encryptor that delays pulling configuration properties to configure the encryptor until the moment when the first encrypted property is retrieved. Thus allowing for late retrieval of
+     * configuration when all property sources have been established, and avoids missing configuration properties errors when no encrypted properties are present in configuration files.
+     */
     private static final class LazyStringEncryptor implements StringEncryptor {
 
         private final Supplier<StringEncryptor> supplier;
@@ -144,26 +150,32 @@ public class StringEncryptorConfiguration {
         }
     }
 
+    /**
+     * Singleton initializer class that uses an internal supplier to supply the singleton instance. The supplier originally checks whether the instanceSupplier
+     */
     private static final class SingletonSupplier<T> implements Supplier<T> {
 
-        private Supplier<T> singleton;
-        private T value;
+        private boolean initialized = false;
+        private volatile Supplier<T> instanceSupplier;
 
         private SingletonSupplier(final Supplier<T> original) {
-            this.singleton = () -> {
+            this.instanceSupplier = () -> {
                 synchronized (original) {
-                    if (value == null) {
-                        value = original.get();
-                        singleton = () -> value;
+                    if (!initialized) {
+                        final T singletonInstance = original.get();
+                        instanceSupplier = () -> {
+                            return singletonInstance;
+                        };
+                        initialized = true;
                     }
-                    return value;
+                    return instanceSupplier.get();
                 }
             };
         }
 
         @Override
         public T get() {
-            return singleton.get();
+            return instanceSupplier.get();
         }
     }
 }

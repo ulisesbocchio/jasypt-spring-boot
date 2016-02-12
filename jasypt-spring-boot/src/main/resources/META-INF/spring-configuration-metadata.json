@@ -61,6 +61,13 @@
             "description": "Specify the form in which String output will be encoded. {@code \"base64\"} or {@code \"hexadecimal\"}.\n Default Value is {@code \"base64\"}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getStringOutputType()",
             "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
             "defaultValue": "base64"
+        },
+        {
+            "name": "jasypt.encryptor.bean",
+            "type": "java.lang.String",
+            "description": "Specify the name of bean to override jasypt-spring-boot's default properties based {@link org.jasypt.encryption.StringEncryptor}.\n Default Value is {@code \"jasyptStringEncryptor\"}.",
+            "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.EncryptablePropertySourcesConfigurationProperties",
+            "defaultValue": "jasyptStringEncryptor"
         }
     ]
 }

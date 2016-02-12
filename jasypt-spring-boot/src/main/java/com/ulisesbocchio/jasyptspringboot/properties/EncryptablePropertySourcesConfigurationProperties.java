@@ -18,11 +18,25 @@ public class EncryptablePropertySourcesConfigurationProperties {
    */
   private Boolean proxyPropertySources = false;
 
+  /**
+   * Specify the name of bean to override jasypt-spring-boot's default properties based {@link org.jasypt.encryption.StringEncryptor}.
+   * Default Value is {@code jasyptStringEncryptor}.
+   */
+  private String bean = "jasyptStringEncryptor";
+
   public Boolean getProxyPropertySources() {
     return proxyPropertySources;
   }
 
   public void setProxyPropertySources(Boolean proxyPropertySources) {
     this.proxyPropertySources = proxyPropertySources;
+  }
+
+  public String getBean() {
+    return bean;
+  }
+
+  public void setBean(String bean) {
+    this.bean = bean;
   }
 }

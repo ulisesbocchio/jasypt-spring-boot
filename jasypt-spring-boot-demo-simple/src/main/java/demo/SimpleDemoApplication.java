@@ -3,6 +3,7 @@ package demo;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
+import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ import org.springframework.core.env.Environment;
  * @author Ulises Bocchio
  */
 @SpringBootApplication
-@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties")
+@EncryptablePropertySources({@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:encrypted.properties"),
+                             @EncryptablePropertySource(name = "IgnoredResource_FileDoesNotExist", value = "classpath:does_not_exists.properties", ignoreResourceNotFound = true)})
 @Import(TestConfig.class)
 public class SimpleDemoApplication implements CommandLineRunner {
 

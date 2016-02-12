@@ -10,13 +10,18 @@ import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ScannedGenericBeanDefinition;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -33,7 +38,12 @@ import org.springframework.util.StringUtils;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Ulises Bocchio
@@ -45,7 +55,7 @@ public class EncryptablePropertySourcesInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertySourcesInitializer.class);
 
     @Bean
-    public BeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
+    public EncryptablePropertySourceAnnotationBeanFactoryPostProcessor encryptablePropertySourceAnnotationPostProcessor() {
         return new EncryptablePropertySourceAnnotationBeanFactoryPostProcessor();
     }
 
@@ -66,6 +76,9 @@ public class EncryptablePropertySourcesInitializer {
                 PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, encryptor);
                 if(ps != null) {
                     propertySources.addLast(ps);
+                    LOG.info("Created Encryptable Property Source '{}' from locations: {}", ps.getName(), Arrays.asList(encryptablePropertySource.getStringArray("value")));
+                } else {
+                    LOG.info("Ignoring NOT FOUND Encryptable Property Source '{}' from locations: {}", encryptablePropertySource.getString("name"), Arrays.asList(encryptablePropertySource.getStringArray("value")));
                 }
             } catch (Exception e) {
                 throw new ApplicationContextException("Exception Creating PropertySource", e);
@@ -91,6 +104,7 @@ public class EncryptablePropertySourcesInitializer {
                     if (!ignoreResourceNotFound) {
                         throw ex;
                     }
+                    rps = null;
                 }
             }
             return rps;
@@ -99,17 +113,16 @@ public class EncryptablePropertySourcesInitializer {
         private static Stream<AnnotationAttributes> getEncryptablePropertiesMetadata(ConfigurableListableBeanFactory beanFactory) {
             Stream<AnnotationAttributes> source = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySource.class);
             Stream<AnnotationAttributes> sources = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySources.class)
-                    .flatMap(map -> Arrays.stream((AnnotationAttributes[]) map.get("value")));
+                .flatMap(map -> Arrays.stream((AnnotationAttributes[]) map.get("value")));
             return Stream.concat(source, sources);
-
         }
 
         private static Stream<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation) {
             return Arrays.stream(bf.getBeanNamesForAnnotation(annotation))
                     .map(bf::getBeanDefinition)
-                    .filter(bd -> bd instanceof AnnotatedGenericBeanDefinition)
-                    .map(bd -> (AnnotatedGenericBeanDefinition) bd)
-                    .map(AnnotatedGenericBeanDefinition::getMetadata)
+                    .filter(bd -> bd instanceof AnnotatedBeanDefinition)
+                    .map(bd -> (AnnotatedBeanDefinition) bd)
+                    .map(AnnotatedBeanDefinition::getMetadata)
                     .filter(md -> md.hasAnnotation(annotation.getName()))
                     .map(md -> (AnnotationAttributes) md.getAnnotationAttributes(annotation.getName()));
         }

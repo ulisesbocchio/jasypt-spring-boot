@@ -16,12 +16,10 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ConfigurationCondition;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import java.lang.reflect.Type;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -35,13 +33,13 @@ public class StringEncryptorConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StringEncryptorConfiguration.class);
 
-    @Conditional(OnMissionEncryptorBean.class)
+    @Conditional(OnMissingEncryptorBean.class)
     @Bean
     public BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(Environment environment) {
         return new BeanNamePlaceholderRegistryPostProcessor(environment);
     }
 
-    @Conditional(OnMissionEncryptorBean.class)
+    @Conditional(OnMissingEncryptorBean.class)
     @Bean(name = ENCRYPTOR_BEAN_PLACEHOLDER)
     public StringEncryptor stringEncryptor(Environment environment) {
         String encryptorBeanName = environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
@@ -80,7 +78,11 @@ public class StringEncryptorConfiguration {
         return environment.getProperty(key);
     }
 
-    private static class OnMissionEncryptorBean implements ConfigurationCondition {
+    /**
+     * Condition that checks whether the StringEncryptor specified by placeholder: {@link #ENCRYPTOR_BEAN_PLACEHOLDER} exists.
+     * ConditionalOnMissingBean does not support placeholder resolution.
+     */
+    private static class OnMissingEncryptorBean implements ConfigurationCondition {
 
         @Override
         public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -93,6 +95,10 @@ public class StringEncryptorConfiguration {
         }
     }
 
+    /**
+     * Bean Definition Registry Post Processor that looks for placeholders in bean names and resolves them, re-defining those beans
+     * with the new names.
+     */
     private static class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, Ordered {
 
         private Environment environment;
@@ -152,6 +158,7 @@ public class StringEncryptorConfiguration {
 
     /**
      * Singleton initializer class that uses an internal supplier to supply the singleton instance. The supplier originally checks whether the instanceSupplier
+     * has been initialized or not, but after initialization the instance supplier is changed to avoid extra logic execution.
      */
     private static final class SingletonSupplier<T> implements Supplier<T> {
 

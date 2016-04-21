@@ -174,6 +174,8 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
     }
 ```
 
+**Note:** Notice that bean is declared `static`. This is necessary for the one of this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
+
 ## Demo App
 The [jasypt-spring-boot-demo](jasypt-spring-boot-demo) folder contains a working Spring Boot app example.
 The Demo app explicitly sets a System property with the encryption password before the app in runned. To have a little more realistic scenario try removing the line where the system property is set, build the app with maven, and the run:

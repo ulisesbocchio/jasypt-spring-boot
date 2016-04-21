@@ -174,7 +174,7 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
     }
 ```
 
-**Note:** Notice that bean is declared `static`. This is necessary for the one of this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
+**Note:** Notice the bean is declared `static`. This is necessary for this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
 
 ## Demo App
 The [jasypt-spring-boot-demo](jasypt-spring-boot-demo) folder contains a working Spring Boot app example.

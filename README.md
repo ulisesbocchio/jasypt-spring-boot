@@ -25,7 +25,7 @@ Use one of the following 3 methods (briefly explained above):
             <version>1.6</version>
     </dependency>
 	```
-2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project and encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties):
+2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
 	
 	```xml
     <dependency>
@@ -44,6 +44,8 @@ Use one of the following 3 methods (briefly explained above):
         ...
     }
 	```
+ And encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties)
+
 3. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations and you don't want to enable encryptable properties across the entire Spring Environment, there's a third option. First add the following dependency to your project:
 	
 	```xml
@@ -78,7 +80,7 @@ Conviniently, theres also a `@EncryptablePropertySources` annotation that one co
 
 This will trigger some configuration to be loaded that basically does 2 things:
 
-1. It registers a Spring post processor that decorates all PropertySource objects contained in the Spring Environment so that thet are "encryption aware" and detect when properties are encrypted following jasypt's property convention.
+1. It registers a Spring post processor that decorates all PropertySource objects contained in the Spring Environment so they are "encryption aware" and detect when properties are encrypted following jasypt's property convention.
 2. It defines a default `StringEncryptor` that can be configured through regular properties, system properties, or command line arguments.
 
 ## Where do I put my encrypted properties?
@@ -171,6 +173,8 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
         ...
     }
 ```
+
+**Note:** Notice the bean is declared `static`. This is necessary for this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
 
 ## Demo App
 The [jasypt-spring-boot-demo](jasypt-spring-boot-demo) folder contains a working Spring Boot app example.

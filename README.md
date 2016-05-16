@@ -75,7 +75,39 @@ Conviniently, theres also a `@EncryptablePropertySources` annotation that one co
 	}
 ```
 	
-	
+## Custom Environment
+As of version 1.7, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: `EncryptableEnvironment` that can be used with `SpringApplicationBuilder`
+to define the custom environment this way:
+
+```java
+new SpringApplicationBuilder()
+    .environment(new EncryptableEnvironment(new StandardServletEnvironment()))
+    .sources(YourApplicationClass.class).run(args);
+
+```
+
+This method would only require using a dependency for `jasypt-spring-boot`. Notice that `EncryptableEnvironment` is just a wrapper, so you have to provide the actual Environment implementation, in this case `StandardServletEnvironment`. No starter jar dependency is required. While this method is not the recommended one since it has some limitations (explained below) it is useful for early access of encrypted properties on bootstrap. While not required in most scenarios could be useful when customizing Spring Boot's init behavior or integrating with certain capabilities that are configured very early, such as Logging configuration. For a concrete example, this method of enabling encryptable properties is the only one that works with Spring Properties replacement in `logback-spring.xml` files, using the `springProperty` tag. For instance:
+
+```xml
+<springProperty name="user" source="db.user"/>
+<springProperty name="password" source="db.password"/>
+<appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource
+            class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>org.postgresql.Driver</driverClass>
+            <url>jdbc:postgresql://localhost:5432/simple</url>
+            <user>${user}</user>
+            <password>${password}</password>
+        </connectionSource>
+    </appender>
+```
+
+This mechanism could be used for instance (as shown) to initialize Database Logging Appender that require sensitive credentials to be passed.
+ 
+### Limitations
+Using this method, StringEncryptor configuration is limited to System Properties or System Environment variables out of the box. And, decryption of properties is **ONLY** available for `String` properties.
+Alternatively, if a custom `StringEncryptor` is needed to be provided, a second constructor `EncryptableEnvironment(ConfigurableEnvironment, StringEncryptor)` is available for that purpose.
+
 ## How this Works?
 
 This will trigger some configuration to be loaded that basically does 2 things:

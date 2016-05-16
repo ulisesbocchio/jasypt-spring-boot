@@ -76,8 +76,7 @@ Conviniently, theres also a `@EncryptablePropertySources` annotation that one co
 ```
 	
 ## Custom Environment
-As of version 1.7, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: `EncryptableEnvironment` that can be used with `SpringApplicationBuilder`
-to define the custom environment this way:
+As of version 1.7, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: `EncryptableEnvironment` that can be used with `SpringApplicationBuilder` to define the custom environment this way:
 
 ```java
 new SpringApplicationBuilder()

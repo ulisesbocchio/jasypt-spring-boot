@@ -1,9 +1,7 @@
 package demo;
 
 
-import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
-import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
-
+import com.ulisesbocchio.jasyptspringboot.environment.EncryptableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.StandardEnvironment;
 
 /**
  * Sample Boot application that showcases easy integration of Jasypt encryption by
@@ -38,7 +37,9 @@ public class SimpleStarterDemoApplication implements CommandLineRunner {
         //System.setProperty("jasypt.encryptor.password", "password");
         //Enable proxy mode for intercepting encrypted properties
         //System.setProperty("jasypt.encryptor.proxyPropertySources", "true");
-        new SpringApplicationBuilder().sources(SimpleStarterDemoApplication.class).run(args);
+        new SpringApplicationBuilder()
+                .environment(new EncryptableEnvironment(new StandardEnvironment()))
+                .sources(SimpleStarterDemoApplication.class).run(args);
     }
 
     @Override

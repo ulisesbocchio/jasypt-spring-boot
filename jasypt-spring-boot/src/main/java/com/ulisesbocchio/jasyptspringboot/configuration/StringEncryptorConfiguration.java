@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import com.ulisesbocchio.jasyptspringboot.encryptor.LazyStringEncryptor;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
@@ -20,6 +21,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -33,6 +35,20 @@ public class StringEncryptorConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StringEncryptorConfiguration.class);
 
+    public static final Function<Environment, StringEncryptor> DEFAULT_LAZY_ENCRYPTOR_FACTORY = e -> {
+        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+        config.setPassword(getRequiredProperty(e, "jasypt.encryptor.password"));
+        config.setAlgorithm(getProperty(e, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
+        config.setKeyObtentionIterations(getProperty(e, "jasypt.encryptor.keyObtentionIterations", "1000"));
+        config.setPoolSize(getProperty(e, "jasypt.encryptor.poolSize", "1"));
+        config.setProviderName(getProperty(e, "jasypt.encryptor.providerName", "SunJCE"));
+        config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
+        config.setStringOutputType(getProperty(e, "jasypt.encryptor.stringOutputType", "base64"));
+        encryptor.setConfig(config);
+        return encryptor;
+    };
+
     @Conditional(OnMissingEncryptorBean.class)
     @Bean
     public static BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(Environment environment) {
@@ -45,33 +61,21 @@ public class StringEncryptorConfiguration {
         String encryptorBeanName = environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
         LOG.info("String Encryptor custom Bean not found with name '{}'. Initializing String Encryptor based on properties with name '{}'",
                  encryptorBeanName, encryptorBeanName);
-        return new LazyStringEncryptor(() -> {
-            PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
-            SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-            config.setPassword(getRequiredProperty(environment, "jasypt.encryptor.password"));
-            config.setAlgorithm(getProperty(environment, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
-            config.setKeyObtentionIterations(getProperty(environment, "jasypt.encryptor.keyObtentionIterations", "1000"));
-            config.setPoolSize(getProperty(environment, "jasypt.encryptor.poolSize", "1"));
-            config.setProviderName(getProperty(environment, "jasypt.encryptor.providerName", "SunJCE"));
-            config.setSaltGeneratorClassName(getProperty(environment, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
-            config.setStringOutputType(getProperty(environment, "jasypt.encryptor.stringOutputType", "base64"));
-            encryptor.setConfig(config);
-            return encryptor;
-        });
+        return new LazyStringEncryptor(DEFAULT_LAZY_ENCRYPTOR_FACTORY, environment);
     }
 
-    private String getProperty(Environment environment, String key, String defaultValue) {
+    private static String getProperty(Environment environment, String key, String defaultValue) {
         if (!propertyExists(environment, key)) {
             LOG.info("Encryptor config not found for property {}, using default value: {}", key, defaultValue);
         }
         return environment.getProperty(key, defaultValue);
     }
 
-    private boolean propertyExists(Environment environment, String key) {
+    private static boolean propertyExists(Environment environment, String key) {
         return environment.getProperty(key) != null;
     }
 
-    private String getRequiredProperty(Environment environment, String key) {
+    private static String getRequiredProperty(Environment environment, String key) {
         if (!propertyExists(environment, key)) {
             throw new IllegalStateException(String.format("Required Encryption configuration property missing: %s", key));
         }
@@ -130,59 +134,6 @@ public class StringEncryptorConfiguration {
         @Override
         public int getOrder() {
             return Ordered.LOWEST_PRECEDENCE - 1;
-        }
-    }
-
-    /**
-     * String encryptor that delays pulling configuration properties to configure the encryptor until the moment when the first encrypted property is retrieved. Thus allowing for late retrieval of
-     * configuration when all property sources have been established, and avoids missing configuration properties errors when no encrypted properties are present in configuration files.
-     */
-    private static final class LazyStringEncryptor implements StringEncryptor {
-
-        private final Supplier<StringEncryptor> supplier;
-
-        private LazyStringEncryptor(final Supplier<StringEncryptor> encryptorFactory) {
-            supplier = new SingletonSupplier<>(encryptorFactory);
-        }
-
-        @Override
-        public String encrypt(String message) {
-            return supplier.get().encrypt(message);
-        }
-
-        @Override
-        public String decrypt(String encryptedMessage) {
-            return supplier.get().decrypt(encryptedMessage);
-        }
-    }
-
-    /**
-     * Singleton initializer class that uses an internal supplier to supply the singleton instance. The supplier originally checks whether the instanceSupplier
-     * has been initialized or not, but after initialization the instance supplier is changed to avoid extra logic execution.
-     */
-    private static final class SingletonSupplier<T> implements Supplier<T> {
-
-        private boolean initialized = false;
-        private volatile Supplier<T> instanceSupplier;
-
-        private SingletonSupplier(final Supplier<T> original) {
-            this.instanceSupplier = () -> {
-                synchronized (original) {
-                    if (!initialized) {
-                        final T singletonInstance = original.get();
-                        instanceSupplier = () -> {
-                            return singletonInstance;
-                        };
-                        initialized = true;
-                    }
-                    return instanceSupplier.get();
-                }
-            };
-        }
-
-        @Override
-        public T get() {
-            return instanceSupplier.get();
         }
     }
 }

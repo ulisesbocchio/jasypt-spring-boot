@@ -3,4 +3,19 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org.springframework.context.annotation.ConfigurationClassEnhancer" level="ERROR"/>
     <logger name="com.ulisesbocchio.jasyptspringboot" level="ALL"/>
+
+    <springProperty name="destination" source="secret2.property"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - ${destination} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="demo" level="debug"
+            additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
 </configuration>

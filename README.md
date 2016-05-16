@@ -92,14 +92,14 @@ This method would only require using a dependency for `jasypt-spring-boot`. Noti
 <springProperty name="user" source="db.user"/>
 <springProperty name="password" source="db.password"/>
 <appender name="db" class="ch.qos.logback.classic.db.DBAppender">
-        <connectionSource
-            class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-            <driverClass>org.postgresql.Driver</driverClass>
-            <url>jdbc:postgresql://localhost:5432/simple</url>
-            <user>${user}</user>
-            <password>${password}</password>
-        </connectionSource>
-    </appender>
+    <connectionSource
+        class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+        <driverClass>org.postgresql.Driver</driverClass>
+        <url>jdbc:postgresql://localhost:5432/simple</url>
+        <user>${user}</user>
+        <password>${password}</password>
+    </connectionSource>
+</appender>
 ```
 
 This mechanism could be used for instance (as shown) to initialize Database Logging Appender that require sensitive credentials to be passed.

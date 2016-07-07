@@ -243,3 +243,7 @@ JASYPT_ENCRYPTOR_PASSWORD=password java -jar target/jasypt-spring-boot-demo-1.5-
 
 ## Other Demo Apps
 While [jasypt-spring-boot-demo](jasypt-spring-boot-demo) is a comprehensive Demo that showcases all possible ways to encrypt/decrypt properties, there are other multiple Demos that demo isolated scenarios. 
+
+## Flattr
+
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?fid=9zegzy&url=https%3A%2F%2Fgithub.com%2Fulisesbocchio)

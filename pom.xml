@@ -5,14 +5,14 @@
     <groupId>com.github.ulisesbocchio</groupId>
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.5-java7-SNAPSHOT</version>
+    <version>1.5-java6-SNAPSHOT</version>
     <name>Jasypt Spring Boot Parent</name>
     <description>Jasypt Spring Boot Parent</description>
     <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.7</java.version>
+        <java.version>1.6</java.version>
         <spring.boot.version>1.2.4.RELEASE</spring.boot.version>
         <jasypt.version>1.9.2</jasypt.version>
         <maven.compiler.version>3.3</maven.compiler.version>

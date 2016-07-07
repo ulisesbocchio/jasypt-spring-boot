@@ -61,7 +61,7 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
         proxyFactory.setTargetClass(propertySource.getClass());
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.setTarget(propertySource);
-        proxyFactory.addAdvice(new EncryptablePropertySourceMethodInterceptor<>(encryptor));
+        proxyFactory.addAdvice(new EncryptablePropertySourceMethodInterceptor<Object>(encryptor));
         return (PropertySource<T>) proxyFactory.getProxy();
     }
 
@@ -73,7 +73,7 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
         } else if (propertySource instanceof EnumerablePropertySource) {
             encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<T>((EnumerablePropertySource) propertySource, encryptor);
         } else {
-            encryptablePropertySource = new EncryptablePropertySourceWrapper<>(propertySource, encryptor);
+            encryptablePropertySource = new EncryptablePropertySourceWrapper<T>(propertySource, encryptor);
         }
         return encryptablePropertySource;
     }
@@ -82,7 +82,7 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         LOG.info("Post-processing PropertySource instances");
         MutablePropertySources propSources = environment.getPropertySources();
-        List<PropertySource> encryptablePropSources = new ArrayList<>();
+        List<PropertySource> encryptablePropSources = new ArrayList<PropertySource>();
         for (PropertySource ps : propSources) {
           if(!(ps instanceof EncryptablePropertySource)) {
             PropertySource eps = makeEncryptable(ps, beanFactory);

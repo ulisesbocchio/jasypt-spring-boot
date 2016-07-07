@@ -1,7 +1,10 @@
 package com.ulisesbocchio.jasyptspringboot;
 
-import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
-import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
+import java.io.FileNotFoundException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
@@ -29,11 +32,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.io.FileNotFoundException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource;
+import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
 
 /**
  * @author Ulises Bocchio
@@ -87,8 +87,12 @@ public class EncryptablePropertySourcesInitializer {
                     rps = (StringUtils.hasText(name) ?
                             new ResourcePropertySource(name, resource) : new ResourcePropertySource(resource));
                     rps = new EncryptableMapPropertySourceWrapper(rps, encryptor);
-                }
-                catch (IllegalArgumentException | FileNotFoundException ex) {
+                } catch (IllegalArgumentException ex) {
+                    // from resolveRequiredPlaceholders
+                    if (!ignoreResourceNotFound) {
+                        throw ex;
+                    }
+                } catch (FileNotFoundException ex) {
                     // from resolveRequiredPlaceholders
                     if (!ignoreResourceNotFound) {
                         throw ex;
@@ -101,19 +105,19 @@ public class EncryptablePropertySourcesInitializer {
         private static List<AnnotationAttributes> getEncryptablePropertiesMetadata(ConfigurableListableBeanFactory beanFactory) {
           List<AnnotationAttributes> source = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySource.class);
           List<AnnotationAttributes> sources = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySources.class);
-          List<AnnotationAttributes> flatSources = new ArrayList<>();
+          List<AnnotationAttributes> flatSources = new ArrayList<AnnotationAttributes>();
           for (AnnotationAttributes annotationAttributes : sources) {
             if(annotationAttributes.containsKey("value")) {
               flatSources.addAll(Arrays.asList((AnnotationAttributes[]) annotationAttributes.get("value")));
             }
           }
-          List<AnnotationAttributes> concat = new ArrayList<>(source);
+          List<AnnotationAttributes> concat = new ArrayList<AnnotationAttributes>(source);
           concat.addAll(flatSources);
           return concat;
         }
 
         private static List<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation) {
-          List<AnnotationAttributes> annotationAttributes = new ArrayList<>();
+          List<AnnotationAttributes> annotationAttributes = new ArrayList<AnnotationAttributes>();
           for (String beanName : bf.getBeanNamesForAnnotation(annotation)) {
             BeanDefinition bd = bf.getBeanDefinition(beanName);
             if(bd instanceof AnnotatedGenericBeanDefinition) {

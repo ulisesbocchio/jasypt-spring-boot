@@ -61,7 +61,7 @@ public class StringEncryptorConfiguration {
         private final Supplier<StringEncryptor> supplier;
 
         private LazyStringEncryptor(final Supplier<StringEncryptor> encryptorFactory) {
-          supplier = new SingletonSupplier<>(encryptorFactory);
+          supplier = new SingletonSupplier<StringEncryptor>(encryptorFactory);
         }
 
         @Override

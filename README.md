@@ -22,7 +22,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -31,7 +31,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
     </dependency>
 	```
 
@@ -52,7 +52,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -208,8 +208,9 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
 **Note:** Notice the bean is declared `static`. This is necessary for this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
 
 ## Demo App
-The [jasypt-spring-boot-demo](jasypt-spring-boot-demo) folder contains a working Spring Boot app example.
-The Demo app explicitly sets a System property with the encryption password before the app in runned. To have a little more realistic scenario try removing the line where the system property is set, build the app with maven, and the run:
+The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.
+The main [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) Demo app explicitly sets a System property with the encryption password before the app runs.
+To have a little more realistic scenario try removing the line where the system property is set, build the app with maven, and the run:
 
 ```
 	java -jar target/jasypt-spring-boot-demo-0.0.1-SNAPSHOT.jar --jasypt.encryptor.password=password

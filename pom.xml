@@ -24,11 +24,6 @@
     <modules>
         <module>jasypt-spring-boot</module>
         <module>jasypt-spring-boot-starter</module>
-        <module>jasypt-spring-boot-demo</module>
-        <module>jasypt-spring-boot-demo-tomcat-ssl</module>
-        <module>jasypt-spring-boot-demo-simple</module>
-        <module>jasypt-spring-boot-demo-simple-starter</module>
-        <module>jasypt-spring-boot-demo-custom-encryptor</module>
     </modules>
 
     <issueManagement>

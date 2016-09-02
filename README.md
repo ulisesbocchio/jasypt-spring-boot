@@ -22,7 +22,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -64,7 +64,7 @@ Use one of the following 3 methods (briefly explained above):
 		...
 	}
 	```
-Conviniently, theres also a `@EncryptablePropertySources` annotation that one could use to group annotations of type `@EncryptablePropertySource` like this:
+Conveniently, there's also a `@EncryptablePropertySources` annotation that one could use to group annotations of type `@EncryptablePropertySource` like this:
 
 ```java
 	@Configuration
@@ -74,6 +74,8 @@ Conviniently, theres also a `@EncryptablePropertySources` annotation that one co
 		...
 	}
 ```
+
+Also, note that as of version 1.8, `@EncryptablePropertySource` supports YAML files
 	
 ## Custom Environment
 As of version 1.7, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: `EncryptableEnvironment` that can be used with `SpringApplicationBuilder` to define the custom environment this way:

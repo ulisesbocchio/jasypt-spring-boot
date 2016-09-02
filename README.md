@@ -31,7 +31,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
     </dependency>
 	```
 

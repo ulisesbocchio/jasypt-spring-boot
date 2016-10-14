@@ -25,6 +25,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -94,7 +95,7 @@ public class EncryptablePropertySourcesInitializer {
         }
 
         private static String generateName(String name) {
-            return name != null ? name : "EncryptedPropertySource#" + System.currentTimeMillis();
+            return !StringUtils.isEmpty(name) ? name : "EncryptedPropertySource#" + System.currentTimeMillis();
         }
 
         private static Stream<AnnotationAttributes> getEncryptablePropertiesMetadata(ConfigurableListableBeanFactory beanFactory) {

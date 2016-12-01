@@ -24,6 +24,8 @@ public class EncryptablePropertySourcesConfigurationProperties {
    */
   private String bean = "jasyptStringEncryptor";
 
+  private String propertyFinder = "jasyptPropertyFinder";
+
   public Boolean getProxyPropertySources() {
     return proxyPropertySources;
   }
@@ -38,5 +40,17 @@ public class EncryptablePropertySourcesConfigurationProperties {
 
   public void setBean(String bean) {
     this.bean = bean;
+  }
+
+  /**
+   * Specify the name of bean to override jasypt-spring-boot's default properties based {@link JasyptPropertyFinder}.
+   * Default Value is {@code jasyptPropertyFinder}.
+   */
+  public String getPropertyFinder() {
+    return propertyFinder;
+  }
+
+  public void setPropertyFinder(String propertyFinder) {
+    this.propertyFinder = propertyFinder;
   }
 }

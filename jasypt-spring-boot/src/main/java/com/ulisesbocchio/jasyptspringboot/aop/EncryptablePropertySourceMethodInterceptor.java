@@ -1,7 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-
+import com.ulisesbocchio.jasyptspringboot.properties.PropertyFinder;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jasypt.encryption.StringEncryptor;
@@ -13,18 +13,30 @@ import org.springframework.core.env.PropertySource;
 public class EncryptablePropertySourceMethodInterceptor<T> implements MethodInterceptor, EncryptablePropertySource<T> {
 
     private final StringEncryptor encryptor;
+    private final PropertyFinder propertyFinder;
 
-    public EncryptablePropertySourceMethodInterceptor(StringEncryptor encryptor) {
+    public EncryptablePropertySourceMethodInterceptor(StringEncryptor encryptor, PropertyFinder propertyFinder) {
         this.encryptor = encryptor;
+        this.propertyFinder = propertyFinder;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Object returnValue = invocation.proceed();
-        if(isGetPropertyCall(invocation)) {
+        if (isGetPropertyCall(invocation)) {
             return getProperty(encryptor, getPropertySource(invocation), getNameArgument(invocation));
         }
         return returnValue;
+    }
+
+    @Override
+    public boolean isEncryptedValue(String stringValue) {
+        return propertyFinder.isEncryptedValue(stringValue);
+    }
+
+    @Override
+    public String decrypt(String encodedValue, StringEncryptor encryptor) {
+        return propertyFinder.decrypt(encodedValue, encryptor);
     }
 
     @SuppressWarnings("unchecked")

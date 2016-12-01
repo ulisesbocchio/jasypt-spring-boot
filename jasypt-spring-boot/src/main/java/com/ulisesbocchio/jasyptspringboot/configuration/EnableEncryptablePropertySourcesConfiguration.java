@@ -2,13 +2,11 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EnableEncryptablePropertySourcesPostProcessor;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
-
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.config.StringPBEConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -55,7 +53,7 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  */
 @Configuration
-@Import(StringEncryptorConfiguration.class)
+@Import({StringEncryptorConfiguration.class, PropertyFinderConfiguration.class, PlaceHolderInitialisation.class})
 public class EnableEncryptablePropertySourcesConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesConfiguration.class);

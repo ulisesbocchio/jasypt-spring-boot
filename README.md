@@ -194,7 +194,7 @@ Notice that the bean name is required, as `jasypt-spring-boot` detects custom St
 
 ``` jasyptStringEncryptor ```
 
-But one can also override this by defining property:
+But one can also override this by defining the property:
 
 ``` jasypt.encryptor.bean ```
 
@@ -203,6 +203,61 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
 ```java
     @Bean("encryptorBean")
     static public StringEncryptor stringEncryptor() {
+        ...
+    }
+```
+
+**Note:** Notice the bean is declared `static`. This is necessary for this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
+
+
+## <a name="customPropertyFinder"></a>Use you own Custom Property Finder
+If the format of your encrypted properties do not follow the Jasypt format of ENC(xxx) you can always define your own PropertyFinder bean in your Spring Context, and the default JasyptPropertyFinder will be ignored. For instance:
+
+```java
+    @Bean(name = "jasyptPropertyFinder")
+    static public PropertyFinder propertyFinder() {
+        return new MyPropertyFinder();
+    }
+
+    static class MyPropertyFinder implements PropertyFinder {
+        private static final String ENCRYPTED_VALUE_PREFIX = "ENC[";
+        private static final String ENCRYPTED_VALUE_SUFFIX = "]";
+
+        @Override
+        public boolean isEncryptedValue(String stringValue) {
+            if (stringValue == null) {
+                return false;
+            }
+            final String trimmedValue = stringValue.trim();
+            return trimmedValue.startsWith(ENCRYPTED_VALUE_PREFIX) && trimmedValue.endsWith(ENCRYPTED_VALUE_SUFFIX);
+        }
+
+        @Override
+        public String decrypt(String encodedValue, StringEncryptor encryptor) {
+            return encryptor.decrypt(getInnerEncryptedValue(encodedValue.trim()));
+        }
+
+        private String getInnerEncryptedValue(final String value) {
+            return value.substring(ENCRYPTED_VALUE_PREFIX.length(), (value.length() - ENCRYPTED_VALUE_SUFFIX.length()));
+        }
+    }
+```
+You need to provide an implementation of a method that extracts out the inner encrypted value before passing it along to the provided StringEncryptor implementation. 
+The example subclass above should be sufficient for most use cases.
+
+Note that the bean name is required, as `jasypt-spring-boot` detects custom Property Finders by name as of version `1.9`. The default bean name is:
+
+``` jasyptPropertyFinder ```
+
+But one can also override this by defining the property:
+
+``` jasypt.encryptor.propertyFinder ```
+
+So for instance, if you define `jasypt.encryptor.propertyFinder=finderBean` then you would define your custom finder with that name:
+
+```java
+    @Bean(name = "finderBean")
+    static public PropertyFinder propertyFinder() {
         ...
     }
 ```

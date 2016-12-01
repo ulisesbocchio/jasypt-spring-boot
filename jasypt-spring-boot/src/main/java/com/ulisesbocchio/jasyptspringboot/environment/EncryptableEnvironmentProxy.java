@@ -5,6 +5,8 @@ import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorConfiguration;
 import com.ulisesbocchio.jasyptspringboot.encryptor.LazyStringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.properties.JasyptPropertyFinder;
+import com.ulisesbocchio.jasyptspringboot.properties.PropertyFinder;
 import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +32,13 @@ public class EncryptableEnvironmentProxy implements ConfigurableEnvironment {
     private MutablePropertySources propertySources;
 
     public EncryptableEnvironmentProxy(ConfigurableEnvironment delegate) {
-        this(delegate, discoverEncryptor(delegate));
+        this(delegate, discoverEncryptor(delegate), discoverPropertyFinder());
     }
 
-    public EncryptableEnvironmentProxy(ConfigurableEnvironment delegate, StringEncryptor encryptor) {
+    public EncryptableEnvironmentProxy(ConfigurableEnvironment delegate, StringEncryptor encryptor, PropertyFinder propertyFinder) {
         super();
         this.delegate = delegate;
-        propertySources = makeEncryptable(delegate.getPropertySources(), delegate, encryptor);
+        propertySources = makeEncryptable(delegate.getPropertySources(), delegate, encryptor, propertyFinder);
         propertyResolver = new PropertySourcesPropertyResolver(propertySources);
     }
 
@@ -44,27 +46,31 @@ public class EncryptableEnvironmentProxy implements ConfigurableEnvironment {
         return new LazyStringEncryptor(StringEncryptorConfiguration.DEFAULT_LAZY_ENCRYPTOR_FACTORY, delegate);
     }
 
-    private MutablePropertySources makeEncryptable(MutablePropertySources propertySources, Environment environment, StringEncryptor encryptor) {
-        StreamSupport.stream(propertySources.spliterator(), false)
-                .filter(ps -> !(ps instanceof EncryptablePropertySource))
-                .map(s -> makeEncryptable(s, environment, encryptor))
-                .collect(toList())
-                .forEach(ps -> propertySources.replace(ps.getName(), ps));
-        return proxy(propertySources, environment, encryptor);
+    private static PropertyFinder discoverPropertyFinder() {
+        return new JasyptPropertyFinder();
     }
 
-    private MutablePropertySources proxy(MutablePropertySources propertySources, Environment environment, StringEncryptor encryptor) {
+    private MutablePropertySources makeEncryptable(MutablePropertySources propertySources, Environment environment, StringEncryptor encryptor, PropertyFinder propertyFinder) {
+        StreamSupport.stream(propertySources.spliterator(), false)
+                .filter(ps -> !(ps instanceof EncryptablePropertySource))
+                .map(s -> makeEncryptable(s, environment, encryptor, propertyFinder))
+                .collect(toList())
+                .forEach(ps -> propertySources.replace(ps.getName(), ps));
+        return proxy(propertySources, environment, encryptor, propertyFinder);
+    }
+
+    private MutablePropertySources proxy(MutablePropertySources propertySources, Environment environment, StringEncryptor encryptor, PropertyFinder propertyFinder) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTargetClass(MutablePropertySources.class);
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.setTarget(propertySources);
-        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(ps -> makeEncryptable(ps, environment, encryptor)));
+        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(ps -> makeEncryptable(ps, environment, encryptor, propertyFinder)));
         return (MutablePropertySources) proxyFactory.getProxy();
     }
 
-    private <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource, Environment environment, StringEncryptor encryptor) {
+    private <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource, Environment environment, StringEncryptor encryptor, PropertyFinder propertyFinder) {
         PropertySource<T> encryptablePropertySource = getInterceptionMode(environment) == InterceptionMode.PROXY
-                ? proxyPropertySource(propertySource, encryptor) : instantiatePropertySource(propertySource, encryptor);
+                ? proxyPropertySource(propertySource, encryptor, propertyFinder) : instantiatePropertySource(propertySource, encryptor, propertyFinder);
         LOG.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
                 AopUtils.isAopProxy(encryptablePropertySource) ? "AOP Proxy" : encryptablePropertySource.getClass().getSimpleName());
         return encryptablePropertySource;

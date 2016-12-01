@@ -6,32 +6,19 @@ import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ConfigurationCondition;
-import org.springframework.core.Ordered;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+
+import static com.ulisesbocchio.jasyptspringboot.configuration.PlaceHolderInitialisation.ENCRYPTOR_BEAN_PLACEHOLDER;
 
 /**
  * @author Ulises Bocchio
  */
 @Configuration
 public class StringEncryptorConfiguration {
-
-    public static final String ENCRYPTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.bean:jasyptStringEncryptor}";
 
     private static final Logger LOG = LoggerFactory.getLogger(StringEncryptorConfiguration.class);
 
@@ -50,17 +37,11 @@ public class StringEncryptorConfiguration {
     };
 
     @Conditional(OnMissingEncryptorBean.class)
-    @Bean
-    public static BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(Environment environment) {
-        return new BeanNamePlaceholderRegistryPostProcessor(environment);
-    }
-
-    @Conditional(OnMissingEncryptorBean.class)
-    @Bean(name = ENCRYPTOR_BEAN_PLACEHOLDER)
+    @Bean(name = PlaceHolderInitialisation.ENCRYPTOR_BEAN_PLACEHOLDER)
     public StringEncryptor stringEncryptor(Environment environment) {
         String encryptorBeanName = environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
         LOG.info("String Encryptor custom Bean not found with name '{}'. Initializing String Encryptor based on properties with name '{}'",
-                 encryptorBeanName, encryptorBeanName);
+                encryptorBeanName, encryptorBeanName);
         return new LazyStringEncryptor(DEFAULT_LAZY_ENCRYPTOR_FACTORY, environment);
     }
 
@@ -83,7 +64,7 @@ public class StringEncryptorConfiguration {
     }
 
     /**
-     * Condition that checks whether the StringEncryptor specified by placeholder: {@link #ENCRYPTOR_BEAN_PLACEHOLDER} exists.
+     * Condition that checks whether the StringEncryptor specified by placeholder: {@link PlaceHolderInitialisation#ENCRYPTOR_BEAN_PLACEHOLDER} exists.
      * ConditionalOnMissingBean does not support placeholder resolution.
      */
     private static class OnMissingEncryptorBean implements ConfigurationCondition {
@@ -99,41 +80,4 @@ public class StringEncryptorConfiguration {
         }
     }
 
-    /**
-     * Bean Definition Registry Post Processor that looks for placeholders in bean names and resolves them, re-defining those beans
-     * with the new names.
-     */
-    private static class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, Ordered {
-
-        private Environment environment;
-
-        private BeanNamePlaceholderRegistryPostProcessor(Environment environment) {
-            this.environment = environment;
-        }
-
-        @Override
-        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-            DefaultListableBeanFactory bf = (DefaultListableBeanFactory) registry;
-            Stream.of(bf.getBeanDefinitionNames())
-                //Look for beans with placeholders name format: '${placeholder}' or '${placeholder:defaultValue}'
-                .filter(name -> name.matches("\\$\\{[\\w\\.-]+(?>:[\\w\\.-]+)?\\}"))
-                .forEach(placeholder -> {
-                    String actualName = environment.resolveRequiredPlaceholders(placeholder);
-                    BeanDefinition bd = bf.getBeanDefinition(placeholder);
-                    bf.removeBeanDefinition(placeholder);
-                    bf.registerBeanDefinition(actualName, bd);
-                    LOG.debug("Registering new name '{}' for Bean definition with placeholder name: {}", actualName, placeholder);
-                });
-        }
-
-        @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
-        }
-
-        @Override
-        public int getOrder() {
-            return Ordered.LOWEST_PRECEDENCE - 1;
-        }
-    }
 }

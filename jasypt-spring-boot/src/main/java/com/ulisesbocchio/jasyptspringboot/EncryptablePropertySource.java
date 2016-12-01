@@ -12,11 +12,11 @@ import org.springframework.core.env.PropertySource;
 public interface EncryptablePropertySource<T> {
     public default Object getProperty(StringEncryptor encryptor, PropertySource<T> source, String name) {
         Object value = source.getProperty(name);
-        if(value instanceof String) {
+        if (value instanceof String) {
             String stringValue = String.valueOf(value);
-            if(PropertyValueEncryptionUtils.isEncryptedValue(stringValue)) {
+            if (isEncryptedValue(stringValue)) {
                 try {
-                    value = PropertyValueEncryptionUtils.decrypt(stringValue, encryptor);
+                    value = this.decrypt(stringValue, encryptor);
                 } catch (EncryptionOperationNotPossibleException e) {
                     throw new DecryptionException("Decryption of Properties failed,  make sure encryption/decryption " +
                             "passwords match", e);
@@ -25,4 +25,10 @@ public interface EncryptablePropertySource<T> {
         }
         return value;
     }
+
+    default boolean isEncryptedValue(String stringValue) {
+        return PropertyValueEncryptionUtils.isEncryptedValue(stringValue);
+    }
+
+    String decrypt(final String encodedValue, final StringEncryptor encryptor);
 }

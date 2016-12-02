@@ -22,13 +22,12 @@ public class PropertyFinderConfiguration {
     @Bean(name = PROPERTY_FINDER_BEAN_PLACEHOLDER)
     public PropertyFinder propertyFinder(Environment environment) {
         String propertyFinderBeanName = environment.resolveRequiredPlaceholders(PROPERTY_FINDER_BEAN_PLACEHOLDER);
-        LOG.info("Property Finder custom Bean not found with name '{}'. Initializing default JasyptPropertyFinder",
-                propertyFinderBeanName);
+        LOG.info("Property Finder custom Bean not found with name '{}'. Initializing default JasyptPropertyFinder", propertyFinderBeanName);
         return new JasyptPropertyFinder();
     }
 
     /**
-     * Condition that checks whether the StringEncryptor specified by placeholder: {@link PlaceHolderInitialisation#PROPERTY_FINDER_BEAN_PLACEHOLDER} exists.
+     * Condition that checks whether the PropertyFinder specified by placeholder: {@link PlaceHolderInitialisation#PROPERTY_FINDER_BEAN_PLACEHOLDER} exists.
      * ConditionalOnMissingBean does not support placeholder resolution.
      */
     private static class OnMissingPropertyFinderBean implements ConfigurationCondition {

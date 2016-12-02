@@ -251,9 +251,9 @@ Note that the bean name is required, as `jasypt-spring-boot` detects custom Prop
 
 But one can also override this by defining the property:
 
-``` jasypt.encryptor.propertyFinder ```
+``` jasypt.propertyFinder.bean ```
 
-So for instance, if you define `jasypt.encryptor.propertyFinder=finderBean` then you would define your custom finder with that name:
+So for instance, if you define `jasypt.propertyFinder.bean=finderBean` then you would define your custom finder with that name:
 
 ```java
     @Bean(name = "finderBean")

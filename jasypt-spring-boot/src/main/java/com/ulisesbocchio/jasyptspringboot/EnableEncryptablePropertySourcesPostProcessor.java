@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot;
 
+import com.ulisesbocchio.jasyptspringboot.properties.PropertyFinder;
 import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,8 @@ import java.util.stream.StreamSupport;
 
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.instantiatePropertySource;
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.proxyPropertySource;
-import static com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorConfiguration.ENCRYPTOR_BEAN_PLACEHOLDER;
+import static com.ulisesbocchio.jasyptspringboot.configuration.PlaceHolderInitialisation.ENCRYPTOR_BEAN_PLACEHOLDER;
+import static com.ulisesbocchio.jasyptspringboot.configuration.PlaceHolderInitialisation.PROPERTY_FINDER_BEAN_PLACEHOLDER;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -50,8 +52,9 @@ public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactor
 
     private <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource, ConfigurableListableBeanFactory registry) {
         StringEncryptor encryptor = registry.getBean(environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER), StringEncryptor.class);
+        PropertyFinder propertyFinder = registry.getBean(environment.resolveRequiredPlaceholders(PROPERTY_FINDER_BEAN_PLACEHOLDER), PropertyFinder.class);
         PropertySource<T> encryptablePropertySource = interceptionMode == InterceptionMode.PROXY
-                ? proxyPropertySource(propertySource, encryptor) : instantiatePropertySource(propertySource, encryptor);
+                ? proxyPropertySource(propertySource, encryptor, propertyFinder) : instantiatePropertySource(propertySource, encryptor, propertyFinder);
         LOG.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
                 AopUtils.isAopProxy(encryptablePropertySource) ? "AOP Proxy" : encryptablePropertySource.getClass().getSimpleName());
         return encryptablePropertySource;

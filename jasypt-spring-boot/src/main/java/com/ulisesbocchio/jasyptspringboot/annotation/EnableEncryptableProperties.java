@@ -1,7 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.annotation;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertySourcesConfiguration;
-import com.ulisesbocchio.jasyptspringboot.EnableEncryptablePropertySourcesPostProcessor;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -44,13 +44,13 @@ import java.lang.annotation.Target;
  * </p>
  *
  * @author Ulises Bocchio
- * @see EnableEncryptablePropertySourcesConfiguration
- * @see EnableEncryptablePropertySourcesPostProcessor
+ * @see EnableEncryptablePropertiesConfiguration
+ * @see EnableEncryptablePropertiesBeanFactoryPostProcessor
  * @see EncryptablePropertySourceWrapper
  * @see org.springframework.context.annotation.PropertySource
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(EnableEncryptablePropertySourcesConfiguration.class)
+@Import(EnableEncryptablePropertiesConfiguration.class)
 public @interface EnableEncryptableProperties {
 }

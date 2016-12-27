@@ -1,6 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertySourcesConfiguration;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Import;
  * @author Ulises Bocchio
  */
 @Configuration
-@Import(EnableEncryptablePropertySourcesConfiguration.class)
+@Import(EnableEncryptablePropertiesConfiguration.class)
 public class JasyptSpringBootAutoConfiguration {
 }

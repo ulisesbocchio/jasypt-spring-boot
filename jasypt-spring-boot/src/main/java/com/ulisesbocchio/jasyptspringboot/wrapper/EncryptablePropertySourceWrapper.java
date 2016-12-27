@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 
 import org.jasypt.encryption.StringEncryptor;
@@ -17,18 +18,23 @@ import org.springframework.util.Assert;
  */
 public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
     private final PropertySource<T> delegate;
-    private final StringEncryptor encryptor;
+    EncryptablePropertyResolver resolver;
 
-    public EncryptablePropertySourceWrapper(PropertySource<T> delegate, StringEncryptor encryptor) {
+    public EncryptablePropertySourceWrapper(PropertySource<T> delegate, EncryptablePropertyResolver resolver) {
         super(delegate.getName(), delegate.getSource());
         Assert.notNull(delegate, "PropertySource delegate cannot be null");
-        Assert.notNull(encryptor, "StringEncryptor cannot be null");
+        Assert.notNull(resolver, "EncryptablePropertyResolver cannot be null");
         this.delegate = delegate;
-        this.encryptor = encryptor;
+        this.resolver = resolver;
     }
 
     @Override
     public Object getProperty(String name) {
-        return getProperty(encryptor, delegate, name);
+        return getProperty(resolver, delegate, name);
+    }
+
+    @Override
+    public PropertySource<T> getDelegate() {
+        return delegate;
     }
 }

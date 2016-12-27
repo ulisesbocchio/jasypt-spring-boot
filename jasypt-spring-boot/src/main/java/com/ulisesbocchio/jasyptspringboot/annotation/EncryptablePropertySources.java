@@ -1,6 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.annotation;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertySourcesInitializer;
+import com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertySourceConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(EncryptablePropertySourcesInitializer.class)
+@Import(EncryptablePropertySourceConfiguration.class)
 public @interface EncryptablePropertySources {
     EncryptablePropertySource[] value();
 }

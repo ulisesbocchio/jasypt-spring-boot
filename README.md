@@ -311,6 +311,8 @@ Notice that by overriding `EncryptablePropertyResolver`, any other configuration
 `EncryptablePropertyDetector` and `StringEncryptor` will stop working since the Default resolver is what uses them. You'd have to
 wire all that stuff yourself. Fortunately, you don't have to override this bean in most cases, the previous options should suffice.
 
+But as you can see in the implementation, there detection and decryption of the encrypted properties are internal to `MyEncryptablePropertyResolver`
+
 ## Demo App
 The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.
 The main [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) Demo app explicitly sets a System property with the encryption password before the app runs.

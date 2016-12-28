@@ -1,13 +1,14 @@
 package com.ulisesbocchio.jasyptspringboot.environment;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorConfiguration;
-import com.ulisesbocchio.jasyptspringboot.encryptor.LazyStringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
+import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
+import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
+import com.ulisesbocchio.jasyptspringboot.resolver.DefaultPropertyResolver;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.properties.PropertyValueEncryptionUtils;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MissingRequiredPropertiesException;
-import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.*;
 
 import java.util.Map;
 
@@ -17,20 +18,31 @@ import java.util.Map;
 public class EncryptableEnvironment implements ConfigurableEnvironment {
 
     private final ConfigurableEnvironment delegate;
-    private StringEncryptor encryptor;
+    private final EncryptablePropertyResolver resolver;
 
     public EncryptableEnvironment(ConfigurableEnvironment delegate) {
         this(delegate, discoverEncryptor(delegate));
     }
 
+    public EncryptableEnvironment(ConfigurableEnvironment delegate, EncryptablePropertyDetector detector) {
+        this(delegate, new DefaultPropertyResolver(discoverEncryptor(delegate), detector));
+    }
+
     public EncryptableEnvironment(ConfigurableEnvironment delegate, StringEncryptor encryptor) {
-        super();
+        this(delegate, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()));
+    }
+
+    public EncryptableEnvironment(ConfigurableEnvironment delegate, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+        this(delegate, new DefaultPropertyResolver(encryptor, detector));
+    }
+
+    public EncryptableEnvironment(ConfigurableEnvironment delegate, EncryptablePropertyResolver resolver) {
         this.delegate = delegate;
-        this.encryptor = encryptor;
+        this.resolver = resolver;
     }
 
     private static StringEncryptor discoverEncryptor(ConfigurableEnvironment delegate) {
-        return new LazyStringEncryptor(StringEncryptorConfiguration.DEFAULT_LAZY_ENCRYPTOR_FACTORY, delegate);
+        return new DefaultLazyEncryptor(delegate);
     }
 
     @Override
@@ -134,10 +146,7 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
     }
 
     private String maybeDecrypt(String property) {
-        if (PropertyValueEncryptionUtils.isEncryptedValue(property)) {
-            return PropertyValueEncryptionUtils.decrypt(property, encryptor);
-        }
-        return property;
+        return resolver.resolvePropertyValue(property);
     }
 
     @Override
@@ -145,6 +154,7 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
         return maybeDecrypt(delegate.getProperty(key, defaultValue));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getProperty(String key, Class<T> targetType) {
         T property = delegate.getProperty(key, targetType);
@@ -154,6 +164,7 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
         return property;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
         T property = delegate.getProperty(key, targetType, defaultValue);
@@ -174,6 +185,7 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException {
         T property = delegate.getRequiredProperty(key, targetType);
         if (property != null && targetType == String.class) {

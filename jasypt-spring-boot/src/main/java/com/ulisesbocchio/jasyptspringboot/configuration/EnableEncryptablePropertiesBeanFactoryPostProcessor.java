@@ -1,6 +1,8 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringboot.configuration;
 
-import org.jasypt.encryption.StringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
+import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -19,39 +21,39 @@ import java.util.stream.StreamSupport;
 
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.instantiatePropertySource;
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.proxyPropertySource;
-import static com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorConfiguration.ENCRYPTOR_BEAN_PLACEHOLDER;
+import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_PLACEHOLDER;
 import static java.util.stream.Collectors.toList;
 
 /**
  * <p>{@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
  * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link
- * StringEncryptor} for decrypting properties
+ * EncryptablePropertyResolver} for decrypting properties
  * that can be configured through the same properties it wraps.</p>
  * <p>
  * <p>It takes the lowest precedence so it does not interfere with Spring Boot's own post processors</p>
  *
  * @author Ulises Bocchio
  */
-public class EnableEncryptablePropertySourcesPostProcessor implements BeanFactoryPostProcessor, ApplicationListener<ApplicationEvent>, Ordered {
+public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationListener<ApplicationEvent>, Ordered {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertySourcesPostProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertiesBeanFactoryPostProcessor.class);
 
     private ConfigurableEnvironment environment;
     private InterceptionMode interceptionMode;
 
-    public EnableEncryptablePropertySourcesPostProcessor() {
+    public EnableEncryptablePropertiesBeanFactoryPostProcessor() {
         this.interceptionMode = InterceptionMode.PROXY;
     }
 
-    public EnableEncryptablePropertySourcesPostProcessor(ConfigurableEnvironment environment, InterceptionMode interceptionMode) {
+    public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, InterceptionMode interceptionMode) {
         this.environment = environment;
         this.interceptionMode = interceptionMode;
     }
 
     private <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource, ConfigurableListableBeanFactory registry) {
-        StringEncryptor encryptor = registry.getBean(environment.resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER), StringEncryptor.class);
+        EncryptablePropertyResolver resolver = registry.getBean(environment.resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER), EncryptablePropertyResolver.class);
         PropertySource<T> encryptablePropertySource = interceptionMode == InterceptionMode.PROXY
-                ? proxyPropertySource(propertySource, encryptor) : instantiatePropertySource(propertySource, encryptor);
+                ? proxyPropertySource(propertySource, resolver) : instantiatePropertySource(propertySource, resolver);
         LOG.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
                 AopUtils.isAopProxy(encryptablePropertySource) ? "AOP Proxy" : encryptablePropertySource.getClass().getSimpleName());
         return encryptablePropertySource;

@@ -25,8 +25,8 @@ import org.springframework.core.env.StandardEnvironment;
 public class EncryptablePropertyResolverConfiguration {
 
     private static final String ENCRYPTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.bean:jasyptStringEncryptor}";
-    private static final String DETECTOR_BEAN_PLACEHOLDER = "${encryptable.property.detector.bean:encryptablePropertyDetector}";
-    public static final String RESOLVER_BEAN_PLACEHOLDER = "${encryptable.property.resolver.bean:encryptablePropertyResolver}";
+    private static final String DETECTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.detector-bean:encryptablePropertyDetector}";
+    public static final String RESOLVER_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.resolver-bean:encryptablePropertyResolver}";
 
     private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertyResolverConfiguration.class);
 
@@ -52,8 +52,8 @@ public class EncryptablePropertyResolverConfiguration {
     @ConditionalOnMissingBean
     @Bean(name = DETECTOR_BEAN_PLACEHOLDER)
     public EncryptablePropertyDetector encryptablePropertyDetector(@SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy) {
-        String prefix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encrypted.property.prefix:ENC(}");
-        String suffix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encrypted.property.suffix:)}");
+        String prefix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.prefix:ENC(}");
+        String suffix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.suffix:)}");
         return new DefaultPropertyDetector(prefix, suffix);
     }
 

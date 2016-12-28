@@ -22,7 +22,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -31,7 +31,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
     </dependency>
 	```
 
@@ -52,7 +52,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -176,7 +176,7 @@ For custom configuration of the encryptor and the source of the encryptor passwo
 
 ```java
     @Bean("jasyptStringEncryptor")
-    static public StringEncryptor stringEncryptor() {
+    public StringEncryptor stringEncryptor() {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword("password");
@@ -202,12 +202,114 @@ So for instance, if you define `jasypt.encryptor.bean=encryptorBean` then you wo
 
 ```java
     @Bean("encryptorBean")
-    static public StringEncryptor stringEncryptor() {
+    public StringEncryptor stringEncryptor() {
         ...
     }
 ```
 
-**Note:** Notice the bean is declared `static`. This is necessary for this library's `BeanDefinitionRegistryPostProcessor` to find the custom bean. 
+## Custom Property Detector, Prefix, Suffix and/or Resolver
+
+As of `jasypt-spring-boot-1.10` there are new extensions points. `EncryptablePropertySource` now uses `EncryptablePropertyResolver` to resolve all properties:
+
+```java
+public interface EncryptablePropertyResolver {
+    String resolvePropertyValue(String value);
+}
+```
+
+Implementations of this interface are responsible of both **detecting** and **decrypting** properties. The default implementation, `DefaultPropertyResolver` uses the before mentioned
+`StringEncryptor` and a new `EncryptablePropertyDetector`.
+
+### Provide a Custom `EncryptablePropertyDetector`
+
+You can override the default implementation by providing a Bean of type `EncryptablePropertyDetector` with name `encryptablePropertyDetector` or if you wanna provide
+your own bean name, override property `jasypt.encryptor.property.detector-bean` and specify the name you wanna give the bean. When providing this, you'll be responsible for
+detecting encrypted properties.
+Example:
+
+```java
+private static class MyEncryptablePropertyDetector implements EncryptablePropertyDetector {
+    @Override
+    public boolean isEncrypted(String value) {
+        if (value != null) {
+            return value.startsWith("ENC@");
+        }
+        return false;
+    }
+
+    @Override
+    public String unwrapEncryptedValue(String value) {
+        return value.substring("ENC@".length());
+    }
+}
+```
+
+```java
+@Bean(name = "encryptablePropertyDetector")
+    public EncryptablePropertyDetector encryptablePropertyDetector() {
+        return new MyEncryptablePropertyDetector();
+    }
+```
+
+### Provide a Custom Encrypted Property `prefix` and `suffix`
+
+If all you want to do is to have different prefix/suffix for encrypted properties, you can keep using all the default implementations
+and just override the following properties in `application.properties` (or `application.yml`):
+
+```YAML
+jasypt:
+  encryptor:
+    property:
+      prefix: "ENC@["
+      suffix: "]"
+```
+
+### Provide a Custom `EncryptablePropertyResolver`
+
+You can override the default implementation by providing a Bean of type `EncryptablePropertyResolver` with name `encryptablePropertyResolver` or if you wanna provide
+your own bean name, override property `jasypt.encryptor.property.resolver-bean` and specify the name you wanna give the bean. When providing this, you'll be responsible for
+detecting and decrypting encrypted properties.
+Example:
+
+```java
+    class MyEncryptablePropertyResolver implements EncryptablePropertyResolver {
+    
+    
+        private final PooledPBEStringEncryptor encryptor;
+    
+        public MyEncryptablePropertyResolver(char[] password) {
+            this.encryptor = new PooledPBEStringEncryptor();
+            SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+            config.setPasswordCharArray(password);
+            config.setAlgorithm("PBEWithMD5AndDES");
+            config.setKeyObtentionIterations("1000");
+            config.setPoolSize(1);
+            config.setProviderName("SunJCE");
+            config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+            config.setStringOutputType("base64");
+            encryptor.setConfig(config);
+        }
+    
+        @Override
+        public String resolvePropertyValue(String value) {
+            if (value != null && value.startsWith("{cipher}")) {
+                return encryptor.decrypt(value.substring("{cipher}".length()));
+            }
+            return value;
+        }
+    }
+```
+
+```java
+@Bean(name="encryptablePropertyResolver")
+    EncryptablePropertyResolver encryptablePropertyResolver(@Value("${jasypt.encryptor.password}") String password) {
+        return new MyEncryptablePropertyResolver(password.toCharArray());
+    }
+```
+
+Notice that by overriding `EncryptablePropertyResolver`, any other configuration or overrides you may have for prefixes, suffixes, 
+`EncryptablePropertyDetector` and `StringEncryptor` will stop working since the Default resolver is what uses them. You'd have to
+wire all that stuff yourself. Fortunately, you don't have to override this bean in most cases, the previous options should suffice.
 
 ## Demo App
 The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.

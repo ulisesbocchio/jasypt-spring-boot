@@ -70,12 +70,12 @@ public class JasyptEncryptorConfigurationProperties {
     /**
      * The name of the {@link java.security.Provider} implementation
      * to be used by the encryptor for obtaining the encryption algorithm.
-     * Default Value is {@code "SunJCE"}.
+     * Default Value is {@code null}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getProviderName()
      */
-    private String providerName = "SunJCE";
+    private String providerName = null;
 
     /**
      * A {@link org.jasypt.salt.SaltGenerator} implementation to be used by the

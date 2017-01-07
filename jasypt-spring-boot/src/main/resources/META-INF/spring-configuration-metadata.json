@@ -43,10 +43,9 @@
         {
             "name": "jasypt.encryptor.providerName",
             "type": "java.lang.String",
-            "description": "The name of the {@link java.security.Provider} implementation\n to be used by the encryptor for obtaining the encryption algorithm.\n Default Value is {@code \"SunJCE\"}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getProviderName()",
+            "description": "The name of the {@link java.security.Provider} implementation\n to be used by the encryptor for obtaining the encryption algorithm.\n Default Value is {@code null}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getProviderName()",
             "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
-            "defaultValue": "SunJCE"
-        },
+            "defaultValue":null        },
         {
             "name": "jasypt.encryptor.proxyPropertySources",
             "type": "java.lang.Boolean",

@@ -22,7 +22,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.2</version>
+            <version>1.5-java7</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project and encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties):
@@ -31,7 +31,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.2</version>
+            <version>1.5-java7</version>
     </dependency>
 	```
 
@@ -108,7 +108,7 @@ Jasypt uses an `StringEncryptor` to decrypt properties. For all 3 methods, if no
       <tr>
           <td>jasypt.encryptor.poolSize</td><td>False</td><td>1</td>
       </tr><tr>
-          <td>jasypt.encryptor.providerName</td><td>False</td><td>SunJCE</td>
+          <td>jasypt.encryptor.providerName</td><td>False</td><td><code>-</code> - the default JVM provider will be used</td>
       </tr>
       <tr>
           <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>

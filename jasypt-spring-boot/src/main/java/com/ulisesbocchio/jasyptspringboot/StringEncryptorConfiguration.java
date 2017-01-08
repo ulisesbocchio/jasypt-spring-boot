@@ -30,7 +30,8 @@ public class StringEncryptorConfiguration {
             config.setAlgorithm(getProperty(environment, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
             config.setKeyObtentionIterations(getProperty(environment, "jasypt.encryptor.keyObtentionIterations", "1000"));
             config.setPoolSize(getProperty(environment, "jasypt.encryptor.poolSize", "1"));
-            config.setProviderName(getProperty(environment, "jasypt.encryptor.providerName", "SunJCE"));
+            // according Jasypt documentation, if no provider name is explicitly set, the default JVM provider will be used.
+            config.setProviderName(getProperty(environment, "jasypt.encryptor.providerName", null));
             config.setSaltGeneratorClassName(getProperty(environment, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
             config.setStringOutputType(getProperty(environment, "jasypt.encryptor.stringOutputType", "base64"));
             encryptor.setConfig(config);

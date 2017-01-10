@@ -36,7 +36,7 @@ import org.springframework.core.env.PropertySource;
  *     <tr>
  *         <td>jasypt.encryptor.poolSize</td><td>False</td><td>1</td>
  *     </tr><tr>
- *         <td>jasypt.encryptor.providerName</td><td>False</td><td>SunJCE</td>
+ *         <td>jasypt.encryptor.providerName</td><td>False</td><td>{@code null} - the default JVM provider will be used</td>
  *     </tr>
  *     <tr>
  *         <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>

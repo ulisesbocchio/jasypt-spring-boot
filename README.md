@@ -5,6 +5,17 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.ulisesbocchio/jasypt-spring-boot/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.ulisesbocchio/jasypt-spring-boot)
 
+
+[![Code Climate](https://codeclimate.com/github/rsercano/mongoclient/badges/gpa.svg)](https://codeclimate.com/github/ulisesbocchio/jasypt-spring-boot)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6a75fc4e1d3f480f811b5339202400b5)](https://www.codacy.com/app/ulisesbocchio/jasypt-spring-boot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ulisesbocchio/jasypt-spring-boot&amp;utm_campaign=Badge_Grade)
+[![GitHub release](https://img.shields.io/github/release/ulisesbocchio/jasypt-spring-boot.svg)](https://github.com/ulisesbocchio/jasypt-spring-boot)
+[![Github All Releases](https://img.shields.io/github/downloads/ulisesbocchio/jasypt-spring-boot/total.svg)](https://github.com/ulisesbocchio/jasypt-spring-boot)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ulisesbocchio/jasypt-spring-boot.svg)](https://hub.docker.com/r/ulisesbocchio/jasypt-spring-boot/)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/ulisesbocchio/jasypt-spring-boot/blob/master/LICENSE)
+
+[![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Y5VD95E96NU6S)
+
+
 Jasypt Spring Boot provides Encryption support for property sources in Spring Boot Applications.<br/>
 There are 3 ways to integrate `jasypt-spring-boot` in your project:
 

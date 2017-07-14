@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_PLACEHOLDER;
+import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
 
 /**
  * @author Ulises Bocchio
@@ -34,14 +34,19 @@ import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptableProper
 @Slf4j
 public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+    private ConfigurableEnvironment env;
+
+    public EncryptablePropertySourceBeanFactoryPostProcessor(ConfigurableEnvironment env) {
+        this.env = env;
+    }
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        ConfigurableEnvironment env = beanFactory.getBean(ConfigurableEnvironment.class);
         ResourceLoader ac = new DefaultResourceLoader();
-        EncryptablePropertyResolver resolver = beanFactory.getBean(env.resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER), EncryptablePropertyResolver.class);
         MutablePropertySources propertySources = env.getPropertySources();
         Stream<AnnotationAttributes> encryptablePropertySourcesMetadata = getEncryptablePropertySourcesMetadata(beanFactory);
-        encryptablePropertySourcesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, resolver, propertySources));
+        EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
+        encryptablePropertySourcesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, propertyResolver, propertySources));
     }
 
     private static void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, MutablePropertySources propertySources) throws BeansException {

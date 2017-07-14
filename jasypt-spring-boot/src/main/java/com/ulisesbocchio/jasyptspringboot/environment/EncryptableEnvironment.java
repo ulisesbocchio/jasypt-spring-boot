@@ -6,7 +6,6 @@ import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.resolver.DefaultPropertyResolver;
 import org.jasypt.encryption.StringEncryptor;
-import org.jasypt.properties.PropertyValueEncryptionUtils;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.env.*;
 
@@ -15,7 +14,7 @@ import java.util.Map;
 /**
  * @author Ulises Bocchio
  */
-public class EncryptableEnvironment implements ConfigurableEnvironment {
+public class EncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment {
 
     private final ConfigurableEnvironment delegate;
     private final EncryptablePropertyResolver resolver;
@@ -53,6 +52,12 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
     @Override
     public MutablePropertySources getPropertySources() {
         return delegate.getPropertySources();
+    }
+
+    @Override
+    protected void customizePropertySources(MutablePropertySources propertySources) {
+        propertySources.addLast(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, super.getSystemProperties()));
+        propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, super.getSystemEnvironment()));
     }
 
     @Override
@@ -152,6 +157,10 @@ public class EncryptableEnvironment implements ConfigurableEnvironment {
     @Override
     public String getProperty(String key, String defaultValue) {
         return maybeDecrypt(delegate.getProperty(key, defaultValue));
+    }
+
+    public ConfigurableEnvironment getDelegate() {
+        return delegate;
     }
 
     @SuppressWarnings("unchecked")

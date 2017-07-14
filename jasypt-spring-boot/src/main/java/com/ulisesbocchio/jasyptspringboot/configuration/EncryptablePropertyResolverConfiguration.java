@@ -3,18 +3,16 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-import com.ulisesbocchio.jasyptspringboot.annotation.ConditionalOnMissingBean;
-import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
+import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver;
+import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
@@ -22,45 +20,40 @@ import org.springframework.core.env.StandardEnvironment;
  * @author Ulises Bocchio
  */
 @Configuration
+@Slf4j
 public class EncryptablePropertyResolverConfiguration {
 
     private static final String ENCRYPTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.bean:jasyptStringEncryptor}";
     private static final String DETECTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.detector-bean:encryptablePropertyDetector}";
-    public static final String RESOLVER_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.resolver-bean:encryptablePropertyResolver}";
+    private static final String RESOLVER_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.resolver-bean:encryptablePropertyResolver}";
 
-    private static final Logger LOG = LoggerFactory.getLogger(EncryptablePropertyResolverConfiguration.class);
-
-    @Bean
-    public static BeanNamePlaceholderRegistryPostProcessor beanNamePlaceholderRegistryPostProcessor(ConfigurableEnvironment environment) {
-        return new BeanNamePlaceholderRegistryPostProcessor(environment);
-    }
+    private static final String ENCRYPTOR_BEAN_NAME = "lazyJasyptStringEncryptor";
+    private static final String DETECTOR_BEAN_NAME = "lazyEncryptablePropertyDetector";
+    public static final String RESOLVER_BEAN_NAME = "lazyEncryptablePropertyResolver";
 
     @Bean
     public EnvCopy envCopy(ConfigurableEnvironment environment) {
         return new EnvCopy(environment);
     }
 
-    @ConditionalOnMissingBean
-    @Bean(name = ENCRYPTOR_BEAN_PLACEHOLDER)
-    public StringEncryptor stringEncryptor(@SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy) {
-        String encryptorBeanName = envCopy.get().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
-        LOG.info("String Encryptor custom Bean not found with name '{}'. Initializing String Encryptor based on properties with name '{}'",
-                encryptorBeanName, encryptorBeanName);
-        return new DefaultLazyEncryptor(envCopy.get());
+    @Bean(name = ENCRYPTOR_BEAN_NAME)
+    public StringEncryptor stringEncryptor(@SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy, BeanFactory bf) {
+        String customEncryptorBeanName = envCopy.get().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
+        return new DefaultLazyEncryptor(envCopy.get(), customEncryptorBeanName, bf);
     }
 
-    @ConditionalOnMissingBean
-    @Bean(name = DETECTOR_BEAN_PLACEHOLDER)
-    public EncryptablePropertyDetector encryptablePropertyDetector(@SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy) {
+    @Bean(name = DETECTOR_BEAN_NAME)
+    public EncryptablePropertyDetector encryptablePropertyDetector(@SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy, BeanFactory bf) {
         String prefix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.prefix:ENC(}");
         String suffix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.suffix:)}");
-        return new DefaultPropertyDetector(prefix, suffix);
+        String customDetectorBeanName = envCopy.get().resolveRequiredPlaceholders(DETECTOR_BEAN_PLACEHOLDER);
+        return new DefaultLazyPropertyDetector(prefix, suffix, customDetectorBeanName, bf);
     }
 
-    @ConditionalOnMissingBean
-    @Bean(name = RESOLVER_BEAN_PLACEHOLDER)
-    public EncryptablePropertyResolver encryptablePropertyResolver(BeanFactory bf, @SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy) {
-        return new DefaultLazyPropertyResolver(ENCRYPTOR_BEAN_PLACEHOLDER, DETECTOR_BEAN_PLACEHOLDER, bf, envCopy.get());
+    @Bean(name = RESOLVER_BEAN_NAME)
+    public EncryptablePropertyResolver encryptablePropertyResolver(@Qualifier(DETECTOR_BEAN_NAME) EncryptablePropertyDetector propertyDetector, @Qualifier(ENCRYPTOR_BEAN_NAME) StringEncryptor encryptor,  BeanFactory bf, @SuppressWarnings("SpringJavaAutowiringInspection") EnvCopy envCopy) {
+        String customResolverBeanName = envCopy.get().resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER);
+        return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, bf);
     }
 
     /**

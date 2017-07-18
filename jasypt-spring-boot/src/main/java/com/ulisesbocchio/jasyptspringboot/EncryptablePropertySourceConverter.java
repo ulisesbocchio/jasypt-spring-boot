@@ -4,9 +4,7 @@ import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInt
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
-import lombok.SneakyThrows;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.boot.bind.PropertyOrigin;
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
@@ -19,7 +17,6 @@ import java.util.stream.Stream;
  */
 public class EncryptablePropertySourceConverter {
     @SuppressWarnings("unchecked")
-    @SneakyThrows
     public static <T> PropertySource<T> proxyPropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver) {
         //Silly Chris Beams for making CommandLinePropertySource getProperty and containsProperty methods final. Those methods
         //can't be proxied with CGLib because of it. So fallback to wrapper for Command Line Arguments only.

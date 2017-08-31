@@ -1,13 +1,10 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationEvent;
@@ -18,12 +15,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
-import java.util.stream.StreamSupport;
-
-import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.instantiatePropertySource;
-import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.proxyPropertySource;
+import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.convertPropertySources;
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
-import static java.util.stream.Collectors.toList;
 
 /**
  * <p>{@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
@@ -50,24 +43,12 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
         this.interceptionMode = interceptionMode;
     }
 
-    private <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource, BeanFactory bf) {
-        EncryptablePropertyResolver propertyResolver = bf.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
-        PropertySource<T> encryptablePropertySource = interceptionMode == InterceptionMode.PROXY
-                ? proxyPropertySource(propertySource, propertyResolver) : instantiatePropertySource(propertySource, propertyResolver);
-        LOG.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
-                AopUtils.isAopProxy(encryptablePropertySource) ? "AOP Proxy" : encryptablePropertySource.getClass().getSimpleName());
-        return encryptablePropertySource;
-    }
-
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         LOG.info("Post-processing PropertySource instances");
+        EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
         MutablePropertySources propSources = environment.getPropertySources();
-        StreamSupport.stream(propSources.spliterator(), false)
-                .filter(ps -> !(ps instanceof EncryptablePropertySource))
-                .map(ps -> makeEncryptable(ps, beanFactory))
-                .collect(toList())
-                .forEach(ps -> propSources.replace(ps.getName(), ps));
+        convertPropertySources(interceptionMode, propertyResolver, propSources);
     }
 
     @Override

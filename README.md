@@ -32,7 +32,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.14</version>
+            <version>1.15</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -41,7 +41,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.14</version>
+            <version>1.15</version>
     </dependency>
 	```
 
@@ -62,7 +62,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.14</version>
+            <version>1.15</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -88,16 +88,16 @@ Conveniently, there's also a `@EncryptablePropertySources` annotation that one c
 Also, note that as of version 1.8, `@EncryptablePropertySource` supports YAML files
 	
 ## Custom Environment
-As of version 1.7, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: `EncryptableEnvironment` that can be used with `SpringApplicationBuilder` to define the custom environment this way:
+As of version ~~1.7~~ 1.15, a 4th method of enabling encryptable properties exists for some special cases. A custom `ConfigurableEnvironment` class is provided: ~~`EncryptableEnvironment`~~ `StandardEncryptableEnvironment` and `StandardEncryptableServletEnvironment` that can be used with `SpringApplicationBuilder` to define the custom environment this way:
 
 ```java
 new SpringApplicationBuilder()
-    .environment(new EncryptableEnvironment(new StandardServletEnvironment()))
+    .environment(new StandardEncryptableEnvironment())
     .sources(YourApplicationClass.class).run(args);
 
 ```
 
-This method would only require using a dependency for `jasypt-spring-boot`. Notice that `EncryptableEnvironment` is just a wrapper, so you have to provide the actual Environment implementation, in this case `StandardServletEnvironment`. No starter jar dependency is required. While this method is not the recommended one since it has some limitations (explained below) it is useful for early access of encrypted properties on bootstrap. While not required in most scenarios could be useful when customizing Spring Boot's init behavior or integrating with certain capabilities that are configured very early, such as Logging configuration. For a concrete example, this method of enabling encryptable properties is the only one that works with Spring Properties replacement in `logback-spring.xml` files, using the `springProperty` tag. For instance:
+This method would only require using a dependency for `jasypt-spring-boot`. ~~Notice that `EncryptableEnvironment` is just a wrapper, so you have to provide the actual Environment implementation, in this case `StandardServletEnvironment`~~. No starter jar dependency is required. This method is useful for early access of encrypted properties on bootstrap. While not required in most scenarios could be useful when customizing Spring Boot's init behavior or integrating with certain capabilities that are configured very early, such as Logging configuration. For a concrete example, this method of enabling encryptable properties is the only one that works with Spring Properties replacement in `logback-spring.xml` files, using the `springProperty` tag. For instance:
 
 ```xml
 <springProperty name="user" source="db.user"/>
@@ -114,12 +114,9 @@ This method would only require using a dependency for `jasypt-spring-boot`. Noti
 ```
 
 This mechanism could be used for instance (as shown) to initialize Database Logging Appender that require sensitive credentials to be passed.
- 
-### Limitations
-Using this method, StringEncryptor configuration is limited to System Properties or System Environment variables out of the box. And, decryption of properties is **ONLY** available for `String` properties.
 Alternatively, if a custom `StringEncryptor` is needed to be provided, a second constructor `EncryptableEnvironment(ConfigurableEnvironment, StringEncryptor)` is available for that purpose.
 
-## How this Works?
+## How everything Works?
 
 This will trigger some configuration to be loaded that basically does 2 things:
 

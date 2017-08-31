@@ -13,7 +13,9 @@ import java.util.Map;
 
 /**
  * @author Ulises Bocchio
+ * @deprecated in favor of {@link StandardEncryptableEnvironment}
  */
+@Deprecated
 public class EncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment {
 
     private final ConfigurableEnvironment delegate;
@@ -45,6 +47,12 @@ public class EncryptableEnvironment extends StandardEnvironment implements Confi
     }
 
     @Override
+    protected void customizePropertySources(MutablePropertySources propertySources) {
+        propertySources.addLast(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, super.getSystemProperties()));
+        propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, super.getSystemEnvironment()));
+    }
+
+    @Override
     public void addActiveProfile(String profile) {
         delegate.addActiveProfile(profile);
     }
@@ -52,12 +60,6 @@ public class EncryptableEnvironment extends StandardEnvironment implements Confi
     @Override
     public MutablePropertySources getPropertySources() {
         return delegate.getPropertySources();
-    }
-
-    @Override
-    protected void customizePropertySources(MutablePropertySources propertySources) {
-        propertySources.addLast(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, super.getSystemProperties()));
-        propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, super.getSystemEnvironment()));
     }
 
     @Override

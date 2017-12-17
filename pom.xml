@@ -5,7 +5,7 @@
     <groupId>com.github.ulisesbocchio</groupId>
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.17-SNAPSHOT</version>
+    <version>1.17</version>
     <name>Jasypt Spring Boot Parent</name>
     <description>Jasypt Spring Boot Parent</description>
     <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
@@ -42,7 +42,7 @@
         <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
         <connection>scm:git:git://github.com/ulisesbocchio/jasypt-spring-boot.git</connection>
         <developerConnection>scm:git:git@github.com:ulisesbocchio/jasypt-spring-boot.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>jasypt-spring-boot-parent-1.17</tag>
   </scm>
 
     <developers>

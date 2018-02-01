@@ -1,11 +1,9 @@
 package com.ulisesbocchio.jasyptspringboot;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 
 /**
  * Bootstrap configuration applicable only in spring-cloud environments. Can
@@ -17,14 +15,8 @@ import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropert
  *
  */
 @Configuration
-@ConditionalOnClass(name = "org.springframework.cloud.bootstrap.BootstrapApplicationListener")
-@ConditionalOnProperty(name = "spring.cloud.bootstrap.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "jasypt.encryptor.bootstrap", havingValue = "true", matchIfMissing = true)
+@Import(EnableEncryptablePropertiesConfiguration.class)
 public class JasyptSpringCloudBootstrapConfiguration {
 
-	@Configuration
-	@ConditionalOnProperty(name = "jasypt.encryptor.bootstrap", havingValue = "true", matchIfMissing = true)
-	@Import(EnableEncryptablePropertiesConfiguration.class)
-	protected static class BootstrappingEncryptablePropertiesConfiguration {
-
-	}
 }

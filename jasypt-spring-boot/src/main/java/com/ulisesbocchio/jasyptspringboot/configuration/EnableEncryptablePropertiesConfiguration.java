@@ -1,9 +1,13 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
+import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.config.StringPBEConfig;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -51,12 +55,18 @@ import org.springframework.core.env.PropertySource;
  */
 @Configuration
 @Import(EncryptablePropertyResolverConfiguration.class)
-public class EnableEncryptablePropertiesConfiguration {
+@Slf4j
+public class EnableEncryptablePropertiesConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     @Bean
     public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(ConfigurableEnvironment environment) {
         boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
         InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
         return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, interceptionMode);
+    }
+
+    @Override
+    public void initialize(ConfigurableApplicationContext applicationContext) {
+        log.info("Bootstraping jasypt-string-boot auto configuration in context: {}", applicationContext.getId());
     }
 }

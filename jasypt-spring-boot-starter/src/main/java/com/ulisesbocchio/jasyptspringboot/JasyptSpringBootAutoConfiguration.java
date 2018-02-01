@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Import;
  * @author Ulises Bocchio
  */
 @Configuration
-@ConditionalOnMissingBean(EnableEncryptablePropertiesBeanFactoryPostProcessor.class)
 @Import(EnableEncryptablePropertiesConfiguration.class)
 public class JasyptSpringBootAutoConfiguration {
 }

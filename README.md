@@ -160,8 +160,12 @@ Jasypt uses an `StringEncryptor` to decrypt properties. For all 3 methods, if no
       </tr>
       <tr>
           <td>jasypt.encryptor.poolSize</td><td>False</td><td>1</td>
-      </tr><tr>
+      </tr>
+      <tr>
           <td>jasypt.encryptor.providerName</td><td>False</td><td>SunJCE</td>
+      </tr>
+      <tr>
+          <td>jasypt.encryptor.providerClassName</td><td>False</td><td>null</td>
       </tr>
       <tr>
           <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>

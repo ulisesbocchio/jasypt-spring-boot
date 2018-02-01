@@ -47,6 +47,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         config.setKeyObtentionIterations(getProperty(e, "jasypt.encryptor.keyObtentionIterations", "1000"));
         config.setPoolSize(getProperty(e, "jasypt.encryptor.poolSize", "1"));
         config.setProviderName(getProperty(e, "jasypt.encryptor.providerName", null));
+        config.setProviderClassName(getProperty(e, "jasypt.encryptor.providerClassName", null));
         config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
         config.setStringOutputType(getProperty(e, "jasypt.encryptor.stringOutputType", "base64"));
         encryptor.setConfig(config);

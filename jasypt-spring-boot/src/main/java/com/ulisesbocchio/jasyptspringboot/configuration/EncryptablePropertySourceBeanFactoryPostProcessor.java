@@ -87,7 +87,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
             } else {
                 String actualName = name + "#" + resolvedLocation;
                 loadPropertySource(loaders, resource, actualName)
-                        .ifPresent(compositePropertySource::addPropertySource);
+                        .ifPresent(psources -> psources.forEach(compositePropertySource::addPropertySource));
             }
         }
         return new EncryptableEnumerablePropertySourceWrapper<>(compositePropertySource, resolver);
@@ -114,7 +114,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
                 .map(md -> (AnnotationAttributes) md.getAnnotationAttributes(annotation.getName()));
     }
 
-    private Optional<PropertySource<?>> loadPropertySource(List<PropertySourceLoader> loaders, Resource resource, String sourceName) throws IOException {
+    private Optional<List<PropertySource<?>>> loadPropertySource(List<PropertySourceLoader> loaders, Resource resource, String sourceName) throws IOException {
         return Optional.of(resource)
                 .filter(this::isFile)
                 .map(res -> loaders.stream()
@@ -125,8 +125,8 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
     }
 
     @SneakyThrows
-    private PropertySource<?> load(PropertySourceLoader loader, String sourceName, Resource resource) {
-        return loader.load(sourceName, resource, null);
+    private List<PropertySource<?>> load(PropertySourceLoader loader, String sourceName, Resource resource) {
+        return loader.load(sourceName, resource);
     }
 
     private boolean canLoadFileExtension(PropertySourceLoader loader, Resource resource) {

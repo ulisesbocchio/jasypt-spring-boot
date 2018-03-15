@@ -43,6 +43,12 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         actuallyCustomizePropertySources();
     }
 
+    public StandardEncryptableEnvironment(StringEncryptor encryptor) {
+        this.interceptionMode = InterceptionMode.WRAPPER;
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector());
+        actuallyCustomizePropertySources();
+    }
+
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
         this.interceptionMode = interceptionMode;
         this.resolver = new DefaultPropertyResolver(encryptor, detector);

@@ -186,11 +186,6 @@ public class EncryptableEnvironment extends StandardEnvironment implements Confi
     }
 
     @Override
-    public <T> Class<T> getPropertyAsClass(String key, Class<T> targetType) {
-        return delegate.getPropertyAsClass(key, targetType);
-    }
-
-    @Override
     public String getRequiredProperty(String key) throws IllegalStateException {
         return maybeDecrypt(delegate.getRequiredProperty(key));
     }

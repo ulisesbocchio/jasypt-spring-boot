@@ -23,6 +23,7 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What to do First?
+Update 3/17/2018: Version 2.0.0 has been released supporting Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.
 Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!<br/>
 Use one of the following 3 methods (briefly explained above):
 
@@ -32,7 +33,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.18</version>
+            <version>2.0.0</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -41,7 +42,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.18</version>
+            <version>2.0.0</version>
     </dependency>
 	```
 
@@ -62,7 +63,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>1.18</version>
+            <version>2.0.0</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:

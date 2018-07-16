@@ -10,6 +10,8 @@ import org.springframework.core.env.Environment;
 
 import java.util.Optional;
 
+import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
+
 /**
  * Default Lazy Encryptor that delegates to a custom {@link StringEncryptor} bean or creates a default {@link PooledPBEStringEncryptor}
  *
@@ -25,10 +27,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
                 Optional.of(customEncryptorBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (StringEncryptor) bf.getBean(name))
-                        .map(bean -> {
-                            log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName);
-                            return bean;
-                        })
+                        .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
                         .orElseGet(() -> {
                             log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
                             return createDefault(e);

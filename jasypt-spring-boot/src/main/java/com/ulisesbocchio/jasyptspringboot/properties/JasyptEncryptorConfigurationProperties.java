@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import java.util.List;
+
 /**
  * Not Actually used. To this moment this class is only added for meta data auto generation.
  * By the time this configuration is used the configuration properties mechanism doesn't actually
@@ -116,6 +118,12 @@ public class JasyptEncryptorConfigurationProperties {
         private String resolverBean = "encryptablePropertyResolver";
 
         /**
+         * Specify the name of the bean to be provided for a custom {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter}.
+         * Default value is {@code "encryptablePropertyFilter"}
+         */
+        private String filterBean = "encryptablePropertyFilter";
+
+        /**
          * Specify a custom {@link String} to identify as prefix of encrypted properties.
          * Default value is {@code "ENC("}
          */
@@ -126,6 +134,36 @@ public class JasyptEncryptorConfigurationProperties {
          * Default value is {@code ")"}
          */
         private String suffix = ")";
-    }
 
+        @NestedConfigurationProperty
+        private FilterConfigurationProperties filter = new FilterConfigurationProperties();
+
+        @Data
+        public static class FilterConfigurationProperties {
+
+            /**
+             * Specify the property sources name patterns to be included for decryption by{@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter}.
+             * Default value is {@code null}
+             */
+            private List<String> includeSources = null;
+
+            /**
+             * Specify the property sources name patterns to be EXCLUDED for decryption by{@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter}.
+             * Default value is {@code null}
+             */
+            private List<String> excludeSources = null;
+
+            /**
+             * Specify the property name patterns to be included for decryption by{@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter}.
+             * Default value is {@code null}
+             */
+            private List<String> includeNames = null;
+
+            /**
+             * Specify the property name patterns to be EXCLUDED for decryption by{@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter}.
+             * Default value is {@code null}
+             */
+            private List<String> excludeNames = null;
+        }
+    }
 }

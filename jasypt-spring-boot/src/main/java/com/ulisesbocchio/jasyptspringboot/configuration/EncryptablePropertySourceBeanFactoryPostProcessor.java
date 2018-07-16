@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.FILTER_BEAN_NAME;
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
 
 /**
@@ -51,17 +53,18 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
         MutablePropertySources propertySources = env.getPropertySources();
         Stream<AnnotationAttributes> encryptablePropertySourcesMetadata = getEncryptablePropertySourcesMetadata(beanFactory);
         EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
+        EncryptablePropertyFilter propertyFilter = beanFactory.getBean(FILTER_BEAN_NAME, EncryptablePropertyFilter.class);
         List<PropertySourceLoader> loaders = initPropertyLoaders();
-        encryptablePropertySourcesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, propertyResolver, propertySources, loaders));
+        encryptablePropertySourcesMetadata.forEach(eps -> loadEncryptablePropertySource(eps, env, ac, propertyResolver, propertyFilter, propertySources, loaders));
     }
 
     private List<PropertySourceLoader> initPropertyLoaders() {
         return SpringFactoriesLoader.loadFactories(PropertySourceLoader.class, getClass().getClassLoader());
     }
 
-    private void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, MutablePropertySources propertySources, List<PropertySourceLoader> loaders) throws BeansException {
+    private void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources, List<PropertySourceLoader> loaders) throws BeansException {
         try {
-            PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, resolver, loaders);
+            PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, resolver, propertyFilter, loaders);
             propertySources.addLast(ps);
             log.info("Created Encryptable Property Source '{}' from locations: {}", ps.getName(), Arrays.asList(encryptablePropertySource.getStringArray("value")));
         } catch (Exception e) {
@@ -69,7 +72,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
         }
     }
 
-    private PropertySource createPropertySource(AnnotationAttributes attributes, ConfigurableEnvironment environment, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, List<PropertySourceLoader> loaders) throws Exception {
+    private PropertySource createPropertySource(AnnotationAttributes attributes, ConfigurableEnvironment environment, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, List<PropertySourceLoader> loaders) throws Exception {
         String name = generateName(attributes.getString("name"));
         String[] locations = attributes.getStringArray("value");
         boolean ignoreResourceNotFound = attributes.getBoolean("ignoreResourceNotFound");
@@ -90,7 +93,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
                         .ifPresent(psources -> psources.forEach(compositePropertySource::addPropertySource));
             }
         }
-        return new EncryptableEnumerablePropertySourceWrapper<>(compositePropertySource, resolver);
+        return new EncryptableEnumerablePropertySourceWrapper<>(compositePropertySource, resolver, propertyFilter);
     }
 
     private String generateName(String name) {

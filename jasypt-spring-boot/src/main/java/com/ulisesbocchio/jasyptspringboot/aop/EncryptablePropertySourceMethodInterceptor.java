@@ -1,11 +1,11 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.jasypt.encryption.StringEncryptor;
 import org.springframework.core.env.PropertySource;
 
 /**
@@ -14,11 +14,13 @@ import org.springframework.core.env.PropertySource;
 public class EncryptablePropertySourceMethodInterceptor<T> implements MethodInterceptor, EncryptablePropertySource<T> {
 
     private final EncryptablePropertyResolver resolver;
+    private final EncryptablePropertyFilter filter;
     private final PropertySource<T> delegate;
 
-    public EncryptablePropertySourceMethodInterceptor(PropertySource<T> delegate, EncryptablePropertyResolver resolver) {
+    public EncryptablePropertySourceMethodInterceptor(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         this.resolver = resolver;
         this.delegate = delegate;
+        this.filter = filter;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class EncryptablePropertySourceMethodInterceptor<T> implements MethodInte
         }
         Object returnValue = invocation.proceed();
         if(isGetPropertyCall(invocation)) {
-            return getProperty(resolver, getPropertySource(invocation), getNameArgument(invocation));
+            return getProperty(resolver, filter, getPropertySource(invocation), getNameArgument(invocation));
         }
         return returnValue;
     }

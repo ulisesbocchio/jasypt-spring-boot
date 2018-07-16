@@ -7,6 +7,8 @@ import org.springframework.beans.factory.BeanFactory;
 
 import java.util.Optional;
 
+import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
+
 /**
  * Default Lazy property detector that delegates to a custom {@link EncryptablePropertyDetector} bean or initializes a
  * default {@link DefaultPropertyDetector}.
@@ -23,10 +25,7 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
                 Optional.of(customDetectorBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (EncryptablePropertyDetector) bf.getBean(name))
-                        .map(bean -> {
-                            log.info("Found Custom Detector Bean {} with name: {}", bean, customDetectorBeanName);
-                            return bean;
-                        })
+                        .map(tap(bean -> log.info("Found Custom Detector Bean {} with name: {}", bean, customDetectorBeanName)))
                         .orElseGet(() -> {
                             log.info("Property Detector custom Bean not found with name '{}'. Initializing Default Property Detector", customDetectorBeanName);
                             return new DefaultPropertyDetector(prefix, suffix);

@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.convertPropertySources;
+import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.FILTER_BEAN_NAME;
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
 
 /**
@@ -47,8 +49,9 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         LOG.info("Post-processing PropertySource instances");
         EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
+        EncryptablePropertyFilter propertyFilter = beanFactory.getBean(FILTER_BEAN_NAME, EncryptablePropertyFilter.class);
         MutablePropertySources propSources = environment.getPropertySources();
-        convertPropertySources(interceptionMode, propertyResolver, propSources);
+        convertPropertySources(interceptionMode, propertyResolver, propertyFilter, propSources);
     }
 
     @Override

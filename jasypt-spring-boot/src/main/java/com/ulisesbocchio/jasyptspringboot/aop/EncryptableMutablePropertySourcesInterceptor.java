@@ -1,14 +1,12 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-
-import java.util.function.Function;
 
 /**
  * @author Ulises Bocchio
@@ -17,14 +15,16 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
 
     private final InterceptionMode interceptionMode;
     private final EncryptablePropertyResolver resolver;
+    private final EncryptablePropertyFilter filter;
 
-    public EncryptableMutablePropertySourcesInterceptor(InterceptionMode interceptionMode, EncryptablePropertyResolver resolver) {
+    public EncryptableMutablePropertySourcesInterceptor(InterceptionMode interceptionMode, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         this.interceptionMode = interceptionMode;
         this.resolver = resolver;
+        this.filter = filter;
     }
 
     private Object makeEncryptable(Object propertySource) {
-        return EncryptablePropertySourceConverter.makeEncryptable(interceptionMode, resolver, (PropertySource<?>) propertySource);
+        return EncryptablePropertySourceConverter.makeEncryptable(interceptionMode, resolver, filter, (PropertySource<?>) propertySource);
     }
 
     @Override

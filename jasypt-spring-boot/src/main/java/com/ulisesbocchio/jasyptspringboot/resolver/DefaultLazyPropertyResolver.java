@@ -2,14 +2,14 @@ package com.ulisesbocchio.jasyptspringboot.resolver;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
-import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.core.env.Environment;
 
 import java.util.Optional;
+
+import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 
 /**
  * Default Resolver bean that delegates to a custom defined {@link EncryptablePropertyResolver} or creates a new {@link DefaultPropertyResolver}
@@ -26,10 +26,7 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
                 Optional.of(customResolverBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (EncryptablePropertyResolver) bf.getBean(name))
-                        .map(bean -> {
-                            log.info("Found Custom Resolver Bean {} with name: {}", bean, customResolverBeanName);
-                            return bean;
-                        })
+                        .map(tap(bean -> log.info("Found Custom Resolver Bean {} with name: {}", bean, customResolverBeanName)))
                         .orElseGet(() -> {
                             log.info("Property Resolver custom Bean not found with name '{}'. Initializing Default Property Resolver", customResolverBeanName);
                             return new DefaultPropertyResolver(encryptor, propertyDetector);

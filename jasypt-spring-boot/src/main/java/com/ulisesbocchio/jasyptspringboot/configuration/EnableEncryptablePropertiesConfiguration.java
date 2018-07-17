@@ -6,7 +6,6 @@ import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.config.StringPBEConfig;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +53,7 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  */
 @Configuration
-@Import(EncryptablePropertyResolverConfiguration.class)
+@Import({EncryptablePropertyResolverConfiguration.class, CachingConfiguration.class})
 @Slf4j
 public class EnableEncryptablePropertiesConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 

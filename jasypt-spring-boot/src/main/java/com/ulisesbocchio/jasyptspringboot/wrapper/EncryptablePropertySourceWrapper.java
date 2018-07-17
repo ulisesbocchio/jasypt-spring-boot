@@ -1,12 +1,11 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
+import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.core.env.PropertySource;
-import org.springframework.util.Assert;
 
 /**
  * <p>Wrapper for {@link PropertySource} instances that simply delegates the {@link #getProperty} method
@@ -17,27 +16,25 @@ import org.springframework.util.Assert;
  * @author Ulises Bocchio
  */
 public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
-    private final PropertySource<T> delegate;
-    EncryptablePropertyResolver resolver;
-    private final EncryptablePropertyFilter filter;
+    private final EncryptablePropertySource<T> encryptableDelegate;
 
     public EncryptablePropertySourceWrapper(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
-        Assert.notNull(delegate, "PropertySource delegate cannot be null");
-        Assert.notNull(resolver, "EncryptablePropertyResolver cannot be null");
-        Assert.notNull(filter, "EncryptablePropertyFilter cannot be null");
-        this.delegate = delegate;
-        this.resolver = resolver;
-        this.filter = filter;
+        encryptableDelegate = new CachingDelegateEncryptablePropertySource<>(delegate, resolver, filter);
+    }
+
+    @Override
+    public void refresh() {
+        encryptableDelegate.refresh();
     }
 
     @Override
     public Object getProperty(String name) {
-        return getProperty(resolver, filter, delegate, name);
+        return encryptableDelegate.getProperty(name);
     }
 
     @Override
     public PropertySource<T> getDelegate() {
-        return delegate;
+        return encryptableDelegate.getDelegate();
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * @author Ulises Bocchio
  */
 @Configuration
-@Import(EncryptablePropertyResolverConfiguration.class)
+@Import({EncryptablePropertyResolverConfiguration.class, CachingConfiguration.class})
 public class EncryptablePropertySourceConfiguration {
 
     @Bean

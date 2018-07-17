@@ -1,9 +1,8 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
+import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.env.PropertySource;
@@ -11,33 +10,25 @@ import org.springframework.core.env.PropertySource;
 /**
  * @author Ulises Bocchio
  */
-public class EncryptablePropertySourceMethodInterceptor<T> implements MethodInterceptor, EncryptablePropertySource<T> {
-
-    private final EncryptablePropertyResolver resolver;
-    private final EncryptablePropertyFilter filter;
-    private final PropertySource<T> delegate;
+public class EncryptablePropertySourceMethodInterceptor<T> extends CachingDelegateEncryptablePropertySource<T> implements MethodInterceptor {
 
     public EncryptablePropertySourceMethodInterceptor(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
-        this.resolver = resolver;
-        this.delegate = delegate;
-        this.filter = filter;
+        super(delegate, resolver, filter);
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        if(isGetDelegateCall(invocation)) {
+        if (isRefreshCall(invocation)) {
+            refresh();
+            return null;
+        }
+        if (isGetDelegateCall(invocation)) {
             return getDelegate();
         }
-        Object returnValue = invocation.proceed();
-        if(isGetPropertyCall(invocation)) {
-            return getProperty(resolver, filter, getPropertySource(invocation), getNameArgument(invocation));
+        if (isGetPropertyCall(invocation)) {
+            return getProperty(getNameArgument(invocation));
         }
-        return returnValue;
-    }
-
-    @SuppressWarnings("unchecked")
-    private PropertySource<T> getPropertySource(MethodInvocation invocation) {
-        return (PropertySource<T>) invocation.getThis();
+        return invocation.proceed();
     }
 
     private String getNameArgument(MethodInvocation invocation) {
@@ -48,14 +39,13 @@ public class EncryptablePropertySourceMethodInterceptor<T> implements MethodInte
         return invocation.getMethod().getName().equals("getDelegate");
     }
 
+    private boolean isRefreshCall(MethodInvocation invocation) {
+        return invocation.getMethod().getName().equals("refresh");
+    }
+
     private boolean isGetPropertyCall(MethodInvocation invocation) {
         return invocation.getMethod().getName().equals("getProperty")
                 && invocation.getMethod().getParameters().length == 1
                 && invocation.getMethod().getParameters()[0].getType() == String.class;
-    }
-
-    @Override
-    public PropertySource<T> getDelegate() {
-        return delegate;
     }
 }

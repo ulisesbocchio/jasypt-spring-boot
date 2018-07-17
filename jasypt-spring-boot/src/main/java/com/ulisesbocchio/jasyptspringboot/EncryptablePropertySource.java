@@ -9,6 +9,10 @@ public interface EncryptablePropertySource<T> {
 
     PropertySource<T> getDelegate();
 
+    Object getProperty(String name);
+
+    void refresh();
+
     default Object getProperty(EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, PropertySource<T> source, String name) {
         Object value = source.getProperty(name);
         if (filter.shouldInclude(source, name) && value instanceof String) {

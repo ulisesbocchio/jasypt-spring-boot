@@ -22,9 +22,12 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and adding `@EnableEncryptableProperties` to your main Configuration class to enable encryptable properties across the entire Spring Environment
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
-## What to do First?
-Update 3/17/2018: Version 2.0.0 has been released supporting Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.
+## What's new?
+Update 7/17/2018: Version 2.1.0 Release Including [Filters](#using-filters)<br/>
+Update 3/17/2018: Version 2.0.0 has been released supporting Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.<br/>
 Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!<br/>
+
+## What to do First?
 Use one of the following 3 methods (briefly explained above):
 
 1. Simply add the starter jar dependency to your project if your Spring Boot application uses `@SpringBootApplication` or `@EnableAutoConfiguration` and encryptable properties will be enabled across the entire Spring Environment (This means any system property, environment property, command line argument, application.properties, yaml properties, and any other custom property sources can contain encrypted properties):
@@ -33,7 +36,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -42,7 +45,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0</version>
     </dependency>
 	```
 
@@ -324,6 +327,49 @@ Notice that by overriding `EncryptablePropertyResolver`, any other configuration
 wire all that stuff yourself. Fortunately, you don't have to override this bean in most cases, the previous options should suffice.
 
 But as you can see in the implementation, the detection and decryption of the encrypted properties are internal to `MyEncryptablePropertyResolver`
+
+## Using Filters
+
+`jasypt-spring-boot:2.1.0` introduces a new feature to specify property filters. The filter is part of the `EncryptablePropertyResolver` API
+and allows you to determine which properties or property sources to contemplate for decryption. This is, before even examining the actual
+property value to search for, or try to, decrypt it. For instance, by default, all properties which name start with `jasypt.encryptor`
+are excluded from examination. This is to avoid circular dependencies at load time when the library beans are configured.
+
+### DefaultPropertyFilter properties
+
+By default, the `DefaultPropertyResolver` uses `DefaultPropertyFilter`, which allows you to specify the following string pattern lists:
+
+* jasypt.encryptor.property.filter.include-sources: Specify the property sources name patterns to be included for decryption
+* jasypt.encryptor.property.filter.exclude-sources: Specify the property sources name patterns to be EXCLUDED for decryption
+* jasypt.encryptor.property.filter.include-names: Specify the property name patterns to be included for decryption
+* jasypt.encryptor.property.filter.exclude-names: Specify the property name patterns to be EXCLUDED for decryption
+
+### Provide a custom `EncrpytablePropertyFilter`
+
+You can override the default implementation by providing a Bean of type `EncryptablePropertyFilter` with name `encryptablePropertyFilter` or if you wanna provide
+your own bean name, override property `jasypt.encryptor.property.filter-bean` and specify the name you wanna give the bean. When providing this, you'll be responsible for
+detecting properties and/or property sources you want to contemplate for decryption.
+Example:
+
+```java
+    class MyEncryptablePropertyFilter implements EncryptablePropertyFilter {
+    
+        public boolean shouldInclude(PropertySource<?> source, String name) {
+            return name.startsWith('encrypted.');
+        }
+    }
+```
+
+```java
+@Bean(name="encryptablePropertyFilter")
+    EncryptablePropertyFilter encryptablePropertyFilter() {
+        return new MyEncryptablePropertyFilter();
+    }
+```
+
+Notice that for this mechanism to work, you should not provide a custom `EncryptablePropertyResolver` and use the default
+resolver instead. If you provide custom resolver, you are responsible for the entire process of detecting and decrypting
+properties.
 
 ## Demo App
 The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.

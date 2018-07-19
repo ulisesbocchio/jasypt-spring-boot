@@ -1,5 +1,5 @@
 # jasypt-spring-boot
-**[Jasypt](http://jasypt.org)** integration for Spring boot 1.4.X , 1.5.X and 2.0.0.X
+**[Jasypt](http://jasypt.org)** integration for Spring boot 1.4.X , 1.5.X and 2.0.X
 
 [![Build Status](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://travis-ci.org/ulisesbocchio/jasypt-spring-boot)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)

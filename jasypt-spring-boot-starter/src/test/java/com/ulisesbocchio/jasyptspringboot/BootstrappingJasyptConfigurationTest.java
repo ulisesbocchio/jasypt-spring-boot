@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -89,7 +90,7 @@ public class BootstrappingJasyptConfigurationTest {
 			final SpringApplicationBuilder builder = new SpringApplicationBuilder(BootstrapConfig.class)
 					.profiles("subversion")
 					.properties("server.port=0")
-					.web(true);
+					.web(WebApplicationType.SERVLET);
 			
 			if (listener != null) {
 				builder.listeners(listener);
@@ -116,7 +117,7 @@ public class BootstrappingJasyptConfigurationTest {
 			// order should be greater than
 			// BootstrapApplicationListener.DEFAULT_ORDER - so that this
 			// listener is invoked after BootstrapApplicationListener, otherwise
-			// bootstrap.propertis will not have been read. This is required
+			// bootstrap.properties will not have been read. This is required
 			// since encrypted text (i.e.
 			// passwords) could be configured in bootstrap.properties.
 			return BootstrapApplicationListener.DEFAULT_ORDER + 1;

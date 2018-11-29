@@ -1,11 +1,9 @@
 package com.ulisesbocchio.jasyptspringboot;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor;
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -15,7 +13,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor;
+import static org.junit.Assert.*;
 
 /**
  * @author Fahim Farook
@@ -89,7 +87,7 @@ public class BootstrappingJasyptConfigurationTest {
 			final SpringApplicationBuilder builder = new SpringApplicationBuilder(BootstrapConfig.class)
 					.profiles("subversion")
 					.properties("server.port=0")
-					.web(true);
+					.web(WebApplicationType.SERVLET);
 			
 			if (listener != null) {
 				builder.listeners(listener);

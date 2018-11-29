@@ -345,7 +345,7 @@ By default, the `DefaultPropertyResolver` uses `DefaultPropertyFilter`, which al
 * jasypt.encryptor.property.filter.include-names: Specify the property name patterns to be included for decryption
 * jasypt.encryptor.property.filter.exclude-names: Specify the property name patterns to be EXCLUDED for decryption
 
-### Provide a custom `EncrpytablePropertyFilter`
+### Provide a custom `EncryptablePropertyFilter`
 
 You can override the default implementation by providing a Bean of type `EncryptablePropertyFilter` with name `encryptablePropertyFilter` or if you wanna provide
 your own bean name, override property `jasypt.encryptor.property.filter-bean` and specify the name you wanna give the bean. When providing this, you'll be responsible for

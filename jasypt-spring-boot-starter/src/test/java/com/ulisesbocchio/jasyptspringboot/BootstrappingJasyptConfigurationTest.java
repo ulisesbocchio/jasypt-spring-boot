@@ -114,7 +114,7 @@ public class BootstrappingJasyptConfigurationTest {
 			// order should be greater than
 			// BootstrapApplicationListener.DEFAULT_ORDER - so that this
 			// listener is invoked after BootstrapApplicationListener, otherwise
-			// bootstrap.propertis will not have been read. This is required
+			// bootstrap.properties will not have been read. This is required
 			// since encrypted text (i.e.
 			// passwords) could be configured in bootstrap.properties.
 			return BootstrapApplicationListener.DEFAULT_ORDER + 1;

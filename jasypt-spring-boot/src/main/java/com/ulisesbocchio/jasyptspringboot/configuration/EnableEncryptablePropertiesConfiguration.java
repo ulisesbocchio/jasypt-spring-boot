@@ -43,6 +43,9 @@ import org.springframework.core.env.PropertySource;
  *         <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
  *     </tr>
  *     <tr>
+ *         <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.salt.NoOpIVGenerator</td>
+ *     </tr>
+ *     <tr>
  *         <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>
  *     </tr>
  * </table>
@@ -58,14 +61,14 @@ import org.springframework.core.env.PropertySource;
 public class EnableEncryptablePropertiesConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     @Bean
-    public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(ConfigurableEnvironment environment) {
-        boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
-        InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
+    public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(final ConfigurableEnvironment environment) {
+        final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
+        final InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
         return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, interceptionMode);
     }
 
     @Override
-    public void initialize(ConfigurableApplicationContext applicationContext) {
+    public void initialize(final ConfigurableApplicationContext applicationContext) {
         log.info("Bootstraping jasypt-string-boot auto configuration in context: {}", applicationContext.getId());
     }
 }

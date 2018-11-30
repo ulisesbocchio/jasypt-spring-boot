@@ -18,16 +18,14 @@ public class JasyptEncryptorConfigurationProperties {
 
     /**
      * Whether to use JDK/Cglib (depending on classpath availability) proxy with an AOP advice as a decorator for
-     * existing {@link org.springframework.core.env.PropertySource}
-     * or just simply use targeted wrapper Classes.
-     * Default Value is {@code false}.
+     * existing {@link org.springframework.core.env.PropertySource} or just simply use targeted wrapper Classes. Default
+     * Value is {@code false}.
      */
     private Boolean proxyPropertySources = false;
 
     /**
-     * Specify the name of bean to override jasypt-spring-boot's default properties based {@link
-     * org.jasypt.encryption.StringEncryptor}.
-     * Default Value is {@code jasyptStringEncryptor}.
+     * Specify the name of bean to override jasypt-spring-boot's default properties based
+     * {@link org.jasypt.encryption.StringEncryptor}. Default Value is {@code jasyptStringEncryptor}.
      */
     private String bean = "jasyptStringEncryptor";
 
@@ -40,10 +38,8 @@ public class JasyptEncryptorConfigurationProperties {
     private String password;
 
     /**
-     * Encryption/Decryption Algorithm to be used by Jasypt.
-     * For more info on how to get available algorithms visit: <a href="http://www.jasypt.org/cli.html"/>Jasypt CLI
-     * Tools Page</a>.
-     * Default Value is {@code "PBEWithMD5AndDES"}.
+     * Encryption/Decryption Algorithm to be used by Jasypt. For more info on how to get available algorithms visit:
+     * <a href="http://www.jasypt.org/cli.html"/>Jasypt CLI Tools Page</a>. Default Value is {@code "PBEWithMD5AndDES"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getAlgorithm()
@@ -51,8 +47,7 @@ public class JasyptEncryptorConfigurationProperties {
     private String algorithm = "PBEWithMD5AndDES";
 
     /**
-     * Number of hashing iterations to obtain the signing key.
-     * Default Value is {@code "1000"}.
+     * Number of hashing iterations to obtain the signing key. Default Value is {@code "1000"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getKeyObtentionIterations()
@@ -60,8 +55,7 @@ public class JasyptEncryptorConfigurationProperties {
     private String keyObtentionIterations = "1000";
 
     /**
-     * The size of the pool of encryptors to be created.
-     * Default Value is {@code "1"}.
+     * The size of the pool of encryptors to be created. Default Value is {@code "1"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getPoolSize()
@@ -69,9 +63,8 @@ public class JasyptEncryptorConfigurationProperties {
     private String poolSize = "1";
 
     /**
-     * The name of the {@link java.security.Provider} implementation
-     * to be used by the encryptor for obtaining the encryption algorithm.
-     * Default Value is {@code null}.
+     * The name of the {@link java.security.Provider} implementation to be used by the encryptor for obtaining the
+     * encryption algorithm. Default Value is {@code null}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getProviderName()
@@ -79,9 +72,8 @@ public class JasyptEncryptorConfigurationProperties {
     private String providerName = null;
 
     /**
-     * A {@link org.jasypt.salt.SaltGenerator} implementation to be used by the
-     * encryptor.
-     * Default Value is {@code "org.jasypt.salt.RandomSaltGenerator"}.
+     * A {@link org.jasypt.salt.SaltGenerator} implementation to be used by the encryptor. Default Value is
+     * {@code "org.jasypt.salt.RandomSaltGenerator"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getSaltGenerator()
@@ -89,14 +81,22 @@ public class JasyptEncryptorConfigurationProperties {
     private String saltGeneratorClassname = "org.jasypt.salt.RandomSaltGenerator";
 
     /**
-     * Specify the form in which String output will be encoded. {@code "base64"} or {@code "hexadecimal"}.
-     * Default Value is {@code "base64"}.
+     * A {@link org.jasypt.salt.IVGenerator} implementation to be used by the encryptor. Default Value is
+     * {@code "org.jasypt.salt.NoOpIVGenerator"}.
+     *
+     * @see org.jasypt.encryption.pbe.PBEStringEncryptor
+     * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getIVGenerator()
+     */
+    private String ivGeneratorClassname = "org.jasypt.salt.NoOpIVGenerator";
+
+    /**
+     * Specify the form in which String output will be encoded. {@code "base64"} or {@code "hexadecimal"}. Default Value
+     * is {@code "base64"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getStringOutputType()
      */
     private String stringOutputType = "base64";
-
 
     @NestedConfigurationProperty
     private PropertyConfigurationProperties property = new PropertyConfigurationProperties();
@@ -105,32 +105,33 @@ public class JasyptEncryptorConfigurationProperties {
     public static class PropertyConfigurationProperties {
 
         /**
-         * Specify the name of the bean to be provided for a custom {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector}.
-         * Default value is {@code "encryptablePropertyDetector"}
+         * Specify the name of the bean to be provided for a custom
+         * {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector}. Default value is
+         * {@code "encryptablePropertyDetector"}
          */
         private String detectorBean = "encryptablePropertyDetector";
 
         /**
-         * Specify the name of the bean to be provided for a custom {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver}.
-         * Default value is {@code "encryptablePropertyResolver"}
+         * Specify the name of the bean to be provided for a custom
+         * {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver}. Default value is
+         * {@code "encryptablePropertyResolver"}
          */
         private String resolverBean = "encryptablePropertyResolver";
 
         /**
-         * Specify the name of the bean to be provided for a custom {@link EncryptablePropertyFilter}.
-         * Default value is {@code "encryptablePropertyFilter"}
+         * Specify the name of the bean to be provided for a custom {@link EncryptablePropertyFilter}. Default value is
+         * {@code "encryptablePropertyFilter"}
          */
         private String filterBean = "encryptablePropertyFilter";
 
         /**
-         * Specify a custom {@link String} to identify as prefix of encrypted properties.
-         * Default value is {@code "ENC("}
+         * Specify a custom {@link String} to identify as prefix of encrypted properties. Default value is
+         * {@code "ENC("}
          */
         private String prefix = "ENC(";
 
         /**
-         * Specify a custom {@link String} to identify as suffix of encrypted properties.
-         * Default value is {@code ")"}
+         * Specify a custom {@link String} to identify as suffix of encrypted properties. Default value is {@code ")"}
          */
         private String suffix = ")";
 
@@ -141,14 +142,14 @@ public class JasyptEncryptorConfigurationProperties {
         public static class FilterConfigurationProperties {
 
             /**
-             * Specify the property sources name patterns to be included for decryption by{@link EncryptablePropertyFilter}.
-             * Default value is {@code null}
+             * Specify the property sources name patterns to be included for decryption
+             * by{@link EncryptablePropertyFilter}. Default value is {@code null}
              */
             private List<String> includeSources = null;
 
             /**
-             * Specify the property sources name patterns to be EXCLUDED for decryption by{@link EncryptablePropertyFilter}.
-             * Default value is {@code null}
+             * Specify the property sources name patterns to be EXCLUDED for decryption
+             * by{@link EncryptablePropertyFilter}. Default value is {@code null}
              */
             private List<String> excludeSources = null;
 

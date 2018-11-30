@@ -14,3 +14,16 @@ hs_err_pid*
 **/target/
 *.iml
 .DS_Store
+
+# Eclipse IDE support files
+.classpath
+.settings
+.project
+.checkstyle
+.factorypath
+.tern-project
+target
+*.?ar
+*.iml
+*.ipr
+*.iws

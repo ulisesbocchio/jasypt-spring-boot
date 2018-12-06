@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.util;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -12,6 +13,18 @@ public final class Singleton<R> implements Supplier<R> {
 
     private boolean initialized = false;
     private volatile Supplier<R> instanceSupplier;
+
+    public static <R> Singleton<R> from(final Supplier<R> original) {
+        return new Singleton<>(original);
+    }
+
+    public static <T, R> Singleton<R> from(final Function<T, R> original, T arg0) {
+        return fromLazy(original, () -> arg0);
+    }
+
+    public static <T, R> Singleton<R> fromLazy(final Function<T, R> original, Supplier<T> arg0Supplier) {
+        return from(() -> original.apply(arg0Supplier.get()));
+    }
 
     public Singleton(final Supplier<R> original) {
         instanceSupplier = () -> {

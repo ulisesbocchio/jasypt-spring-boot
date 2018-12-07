@@ -25,20 +25,19 @@ public class DefaultLazyEncryptor implements StringEncryptor {
 
     public DefaultLazyEncryptor(final Environment e, final String customEncryptorBeanName, final BeanFactory bf) {
         singleton = new Singleton<>(() ->
-                Optional.of(customEncryptorBeanName)
-                        .filter(bf::containsBean)
-                        .map(name -> (StringEncryptor) bf.getBean(name))
-                        .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
-                        .orElseGet(() -> {
-                            log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
-                            return createDefault(e);
-                        }));
+        Optional.of(customEncryptorBeanName)
+        .filter(bf::containsBean)
+        .map(name -> (StringEncryptor) bf.getBean(name))
+        .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
+        .orElseGet(() -> {
+            log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
+            return createDefault(e);
+        }));
     }
 
-    public DefaultLazyEncryptor(Environment e) {
+    public DefaultLazyEncryptor(final Environment e) {
         singleton = new Singleton<>(() -> createDefault(e));
     }
-
     private StringEncryptor createDefault(Environment e) {
         return Optional.of(e)
                 .filter(DefaultLazyEncryptor::isPBEConfig)
@@ -67,6 +66,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         config.setProviderName(getProperty(e, "jasypt.encryptor.providerName", null));
         config.setProviderClassName(getProperty(e, "jasypt.encryptor.providerClassName", null));
         config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
+        config.setIvGeneratorClassName(getProperty(e, "jasypt.encryptor.ivGeneratorClassname", "org.jasypt.salt.NoOpIVGenerator"));
         config.setStringOutputType(getProperty(e, "jasypt.encryptor.stringOutputType", "base64"));
         encryptor.setConfig(config);
         return encryptor;
@@ -87,11 +87,11 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         return environment.getProperty(key, defaultValue);
     }
 
-    private static boolean propertyExists(Environment environment, String key) {
+    private static boolean propertyExists(final Environment environment, final String key) {
         return environment.getProperty(key) != null;
     }
 
-    private static String getRequiredProperty(Environment environment, String key) {
+    private static String getRequiredProperty(final Environment environment, final String key) {
         if (!propertyExists(environment, key)) {
             throw new IllegalStateException(String.format("Required Encryption configuration property missing: %s", key));
         }
@@ -99,12 +99,13 @@ public class DefaultLazyEncryptor implements StringEncryptor {
     }
 
     @Override
-    public String encrypt(String message) {
+    public String encrypt(final String message) {
         return singleton.get().encrypt(message);
     }
 
     @Override
-    public String decrypt(String encryptedMessage) {
+    public String decrypt(final String encryptedMessage) {
         return singleton.get().decrypt(encryptedMessage);
     }
+
 }

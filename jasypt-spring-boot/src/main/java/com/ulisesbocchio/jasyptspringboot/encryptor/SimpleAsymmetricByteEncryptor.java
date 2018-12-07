@@ -21,8 +21,8 @@ public class SimpleAsymmetricByteEncryptor implements ByteEncryptor {
 
     public SimpleAsymmetricByteEncryptor(SimpleAsymmetricConfig config) {
         crypto = new AsymmetricCryptography(config.getResourceLoader());
-        privateKey = Singleton.fromLazy(crypto::getPrivateKey, config::loadPrivateKeyResource);
-        publicKey = Singleton.fromLazy(crypto::getPublicKey, config::loadPublicKeyResource);
+        privateKey = Singleton.fromLazy(crypto::getPrivateKey, config::loadPrivateKeyResource, config::getPrivateKeyFormat);
+        publicKey = Singleton.fromLazy(crypto::getPublicKey, config::loadPublicKeyResource, config::getPublicKeyFormat);
     }
 
     @Override

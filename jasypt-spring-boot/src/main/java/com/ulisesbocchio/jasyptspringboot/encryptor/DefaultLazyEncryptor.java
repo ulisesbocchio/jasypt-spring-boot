@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.encryptor;
 
+import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
@@ -25,34 +26,36 @@ public class DefaultLazyEncryptor implements StringEncryptor {
 
     public DefaultLazyEncryptor(final Environment e, final String customEncryptorBeanName, final BeanFactory bf) {
         singleton = new Singleton<>(() ->
-        Optional.of(customEncryptorBeanName)
-        .filter(bf::containsBean)
-        .map(name -> (StringEncryptor) bf.getBean(name))
-        .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
-        .orElseGet(() -> {
-            log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
-            return createDefault(e);
-        }));
+                Optional.of(customEncryptorBeanName)
+                        .filter(bf::containsBean)
+                        .map(name -> (StringEncryptor) bf.getBean(name))
+                        .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
+                        .orElseGet(() -> {
+                            log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
+                            return createDefault(e);
+                        }));
     }
 
     public DefaultLazyEncryptor(final Environment e) {
         singleton = new Singleton<>(() -> createDefault(e));
     }
+
     private StringEncryptor createDefault(Environment e) {
         return Optional.of(e)
                 .filter(DefaultLazyEncryptor::isPBEConfig)
                 .map(this::createPBEDefault)
                 .orElseGet(() ->
                         Optional.of(e)
-                            .filter(DefaultLazyEncryptor::isAsymmetricConfig)
-                            .map(this::createAsymmetricDefault)
-                            .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private.key', 'jasypt.encryptor.private.key-location'] must be provided for Password-based or Asymmetric encryption")));
+                                .filter(DefaultLazyEncryptor::isAsymmetricConfig)
+                                .map(this::createAsymmetricDefault)
+                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private.key', 'jasypt.encryptor.private.key-location'] must be provided for Password-based or Asymmetric encryption")));
     }
 
     private StringEncryptor createAsymmetricDefault(Environment e) {
         SimpleAsymmetricConfig config = new SimpleAsymmetricConfig();
         config.setPrivateKey(getProperty(e, "jasypt.encryptor.private.key", null));
         config.setPrivateKeyLocation(getProperty(e, "jasypt.encryptor.private.key-location", null));
+        config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.valueOf(getProperty(e, "jasypt.encryptor.private.key-format", "DER")));
         return new SimpleAsymmetricStringEncryptor(config);
     }
 

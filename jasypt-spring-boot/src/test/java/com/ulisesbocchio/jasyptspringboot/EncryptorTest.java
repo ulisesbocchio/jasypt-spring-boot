@@ -185,7 +185,7 @@ public class EncryptorTest {
 
     @Test
     public void test_asymmetric_key_string_pem_encryption() {
-        final String message = "This is the secret string pem message... BOOHOOO!";
+        final String message = "chupacabras";
         final String encrypted = keyStringPemEncryptor.encrypt(message);
         System.out.println(encrypted);
         final String decrypted = keyStringPemEncryptor.decrypt(encrypted);
@@ -195,7 +195,7 @@ public class EncryptorTest {
 
     @Test
     public void test_PBEWITHHMACSHA512ANDAES_256_encryption() {
-        final String message = "This is the secret message... BOOHOOO!";
+        final String message = "chupacabras";
         final byte[] messageBytes = message.getBytes(StandardCharsets.US_ASCII);
 
         final byte[] ciphertext = _PBEWITHHMACSHA512ANDAES_256.encrypt(messageBytes);

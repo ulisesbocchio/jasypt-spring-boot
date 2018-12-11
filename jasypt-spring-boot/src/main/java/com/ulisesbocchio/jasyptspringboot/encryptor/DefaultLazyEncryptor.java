@@ -48,14 +48,14 @@ public class DefaultLazyEncryptor implements StringEncryptor {
                         Optional.of(e)
                                 .filter(DefaultLazyEncryptor::isAsymmetricConfig)
                                 .map(this::createAsymmetricDefault)
-                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private.key', 'jasypt.encryptor.private.key-location'] must be provided for Password-based or Asymmetric encryption")));
+                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.privateKeyString', 'jasypt.encryptor.privateKeyLocation'] must be provided for Password-based or Asymmetric encryption")));
     }
 
     private StringEncryptor createAsymmetricDefault(Environment e) {
         SimpleAsymmetricConfig config = new SimpleAsymmetricConfig();
-        config.setPrivateKey(getProperty(e, "jasypt.encryptor.private.key", null));
-        config.setPrivateKeyLocation(getProperty(e, "jasypt.encryptor.private.key-location", null));
-        config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.valueOf(getProperty(e, "jasypt.encryptor.private.key-format", "DER")));
+        config.setPrivateKey(getProperty(e, "jasypt.encryptor.privateKeyString", null));
+        config.setPrivateKeyLocation(getProperty(e, "jasypt.encryptor.privateKeyLocation", null));
+        config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.valueOf(getProperty(e, "jasypt.encryptor.privateKeyFormat", "DER")));
         return new SimpleAsymmetricStringEncryptor(config);
     }
 
@@ -76,7 +76,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
     }
 
     private static boolean isAsymmetricConfig(Environment e) {
-        return propertyExists(e, "jasypt.encryptor.private.key") || propertyExists(e, "jasypt.encryptor.private.key-location");
+        return propertyExists(e, "jasypt.encryptor.privateKeyString") || propertyExists(e, "jasypt.encryptor.privateKeyLocation");
     }
 
     private static boolean isPBEConfig(Environment e) {

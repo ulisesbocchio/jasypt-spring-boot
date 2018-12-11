@@ -58,4 +58,9 @@ public class SimpleAsymmetricConfig {
         return loadResource(publicKeyResource, publicKey, publicKeyLocation, publicKeyFormat);
     }
 
+    public void setKeyFormat(KeyFormat keyFormat) {
+        setPublicKeyFormat(keyFormat);
+        setPrivateKeyFormat(keyFormat);
+    }
+
 }

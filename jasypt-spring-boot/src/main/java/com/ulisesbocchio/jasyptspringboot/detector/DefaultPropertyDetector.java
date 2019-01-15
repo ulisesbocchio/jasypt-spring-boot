@@ -11,6 +11,8 @@ import org.springframework.util.Assert;
  */
 public class DefaultPropertyDetector implements EncryptablePropertyDetector {
 
+    public static final String PATTERN_ENV_VARS = "^[$][{]([^}]+)[}]$";
+
     private String prefix = "ENC(";
     private String suffix = ")";
 
@@ -36,8 +38,15 @@ public class DefaultPropertyDetector implements EncryptablePropertyDetector {
 
     @Override
     public String unwrapEncryptedValue(String property) {
-        return property.substring(
+        String value = property.substring(
                 prefix.length(),
                 (property.length() - suffix.length()));
+
+        if (value.matches(PATTERN_ENV_VARS)) {
+            value = value.replaceFirst(PATTERN_ENV_VARS, "$1");
+            value = System.getenv(value);
+        }
+
+        return value;
     }
 }

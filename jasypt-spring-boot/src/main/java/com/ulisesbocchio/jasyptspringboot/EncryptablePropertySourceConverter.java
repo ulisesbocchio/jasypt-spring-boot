@@ -64,6 +64,8 @@ public class EncryptablePropertySourceConverter {
             // Other PropertySource classes like org.springframework.boot.env.OriginTrackedMapPropertySource
             // are final classes as well
             || Modifier.isFinal(propertySource.getClass().getModifiers())) {
+            return instantiatePropertySource(propertySource, resolver, propertyFilter);
+        }            
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTargetClass(propertySource.getClass());
         proxyFactory.setProxyTargetClass(true);

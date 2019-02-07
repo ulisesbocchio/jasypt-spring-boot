@@ -100,6 +100,7 @@ public class EncryptorTest {
         SimpleAsymmetricConfig config = new SimpleAsymmetricConfig();
         String privateKey = FileCopyUtils.copyToString(new InputStreamReader(new ClassPathResource("private_key.pem").getInputStream()));
         String publicKey = FileCopyUtils.copyToString(new InputStreamReader(new ClassPathResource("public_key.pem").getInputStream()));
+
         config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.PEM);
         config.setPublicKeyFormat(AsymmetricCryptography.KeyFormat.PEM);
         config.setPrivateKey(privateKey);

@@ -48,14 +48,14 @@ public class DefaultLazyEncryptor implements StringEncryptor {
                         Optional.of(e)
                                 .filter(DefaultLazyEncryptor::isAsymmetricConfig)
                                 .map(this::createAsymmetricDefault)
-                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.privateKeyString', 'jasypt.encryptor.privateKeyLocation'] must be provided for Password-based or Asymmetric encryption")));
+                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private-key-string', 'jasypt.encryptor.private-key-location'] must be provided for Password-based or Asymmetric encryption")));
     }
 
     private StringEncryptor createAsymmetricDefault(Environment e) {
         SimpleAsymmetricConfig config = new SimpleAsymmetricConfig();
-        config.setPrivateKey(getProperty(e, "jasypt.encryptor.privateKeyString", null));
-        config.setPrivateKeyLocation(getProperty(e, "jasypt.encryptor.privateKeyLocation", null));
-        config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.valueOf(getProperty(e, "jasypt.encryptor.privateKeyFormat", "DER")));
+        config.setPrivateKey(getProperty(e, "jasypt.encryptor.private-key-string", null));
+        config.setPrivateKeyLocation(getProperty(e, "jasypt.encryptor.private-key-location", null));
+        config.setPrivateKeyFormat(AsymmetricCryptography.KeyFormat.valueOf(getProperty(e, "jasypt.encryptor.private-key-format", "DER")));
         return new SimpleAsymmetricStringEncryptor(config);
     }
 
@@ -64,19 +64,19 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(getRequiredProperty(e, "jasypt.encryptor.password"));
         config.setAlgorithm(getProperty(e, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
-        config.setKeyObtentionIterations(getProperty(e, "jasypt.encryptor.keyObtentionIterations", "1000"));
-        config.setPoolSize(getProperty(e, "jasypt.encryptor.poolSize", "1"));
-        config.setProviderName(getProperty(e, "jasypt.encryptor.providerName", null));
-        config.setProviderClassName(getProperty(e, "jasypt.encryptor.providerClassName", null));
-        config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.saltGeneratorClassname", "org.jasypt.salt.RandomSaltGenerator"));
-        config.setIvGeneratorClassName(getProperty(e, "jasypt.encryptor.ivGeneratorClassname", "org.jasypt.salt.NoOpIVGenerator"));
-        config.setStringOutputType(getProperty(e, "jasypt.encryptor.stringOutputType", "base64"));
+        config.setKeyObtentionIterations(getProperty(e, "jasypt.encryptor.key-obtention-iterations", "1000"));
+        config.setPoolSize(getProperty(e, "jasypt.encryptor.pool-size", "1"));
+        config.setProviderName(getProperty(e, "jasypt.encryptor.provider-name", null));
+        config.setProviderClassName(getProperty(e, "jasypt.encryptor.provider-class-name", null));
+        config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.salt-generator-classname", "org.jasypt.salt.RandomSaltGenerator"));
+        config.setIvGeneratorClassName(getProperty(e, "jasypt.encryptor.iv-generator-classname", "org.jasypt.salt.NoOpIVGenerator"));
+        config.setStringOutputType(getProperty(e, "jasypt.encryptor.string-output-type", "base64"));
         encryptor.setConfig(config);
         return encryptor;
     }
 
     private static boolean isAsymmetricConfig(Environment e) {
-        return propertyExists(e, "jasypt.encryptor.privateKeyString") || propertyExists(e, "jasypt.encryptor.privateKeyLocation");
+        return propertyExists(e, "jasypt.encryptor.private-key-string") || propertyExists(e, "jasypt.encryptor.private-key-location");
     }
 
     private static boolean isPBEConfig(Environment e) {

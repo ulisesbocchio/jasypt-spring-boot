@@ -41,7 +41,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -50,7 +50,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1</version>
     </dependency>
 	```
 

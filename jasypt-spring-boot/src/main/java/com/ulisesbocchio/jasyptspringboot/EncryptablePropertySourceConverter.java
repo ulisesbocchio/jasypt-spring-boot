@@ -10,6 +10,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.env.*;
 
+import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -59,9 +60,12 @@ public class EncryptablePropertySourceConverter {
     public static <T> PropertySource<T> proxyPropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter) {
         //Silly Chris Beams for making CommandLinePropertySource getProperty and containsProperty methods final. Those methods
         //can't be proxied with CGLib because of it. So fallback to wrapper for Command Line Arguments only.
-        if (CommandLinePropertySource.class.isAssignableFrom(propertySource.getClass())) {
+        if (CommandLinePropertySource.class.isAssignableFrom(propertySource.getClass())
+            // Other PropertySource classes like org.springframework.boot.env.OriginTrackedMapPropertySource
+            // are final classes as well
+            || Modifier.isFinal(propertySource.getClass().getModifiers())) {
             return instantiatePropertySource(propertySource, resolver, propertyFilter);
-        }
+        }            
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTargetClass(propertySource.getClass());
         proxyFactory.setProxyTargetClass(true);

@@ -62,7 +62,7 @@ public class EnableEncryptablePropertiesConfiguration implements ApplicationCont
 
     @Bean
     public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(final ConfigurableEnvironment environment) {
-        final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxyPropertySources", Boolean.TYPE, false);
+        final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxy-property-sources", Boolean.TYPE, false);
         final InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
         return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, interceptionMode);
     }

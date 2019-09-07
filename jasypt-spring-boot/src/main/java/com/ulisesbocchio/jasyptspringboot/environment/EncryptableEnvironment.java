@@ -26,15 +26,15 @@ public class EncryptableEnvironment extends StandardEnvironment implements Confi
     }
 
     public EncryptableEnvironment(ConfigurableEnvironment delegate, EncryptablePropertyDetector detector) {
-        this(delegate, new DefaultPropertyResolver(discoverEncryptor(delegate), detector));
+        this(delegate, new DefaultPropertyResolver(discoverEncryptor(delegate), detector, delegate));
     }
 
     public EncryptableEnvironment(ConfigurableEnvironment delegate, StringEncryptor encryptor) {
-        this(delegate, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()));
+        this(delegate, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), delegate));
     }
 
     public EncryptableEnvironment(ConfigurableEnvironment delegate, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
-        this(delegate, new DefaultPropertyResolver(encryptor, detector));
+        this(delegate, new DefaultPropertyResolver(encryptor, detector, delegate));
     }
 
     public EncryptableEnvironment(ConfigurableEnvironment delegate, EncryptablePropertyResolver resolver) {

@@ -6,6 +6,7 @@ import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.env.Environment;
 
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
 
     private Singleton<EncryptablePropertyResolver> singleton;
 
-    public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, String customResolverBeanName, BeanFactory bf) {
+    public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, String customResolverBeanName, BeanFactory bf, Environment environment) {
         singleton = new Singleton<>(() ->
                 Optional.of(customResolverBeanName)
                         .filter(bf::containsBean)
@@ -29,7 +30,7 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
                         .map(tap(bean -> log.info("Found Custom Resolver Bean {} with name: {}", bean, customResolverBeanName)))
                         .orElseGet(() -> {
                             log.info("Property Resolver custom Bean not found with name '{}'. Initializing Default Property Resolver", customResolverBeanName);
-                            return new DefaultPropertyResolver(encryptor, propertyDetector);
+                            return new DefaultPropertyResolver(encryptor, propertyDetector, environment);
                         }));
     }
 

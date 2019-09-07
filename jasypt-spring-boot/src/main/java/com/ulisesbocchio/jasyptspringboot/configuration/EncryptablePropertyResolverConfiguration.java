@@ -113,9 +113,9 @@ public class EncryptablePropertyResolverConfiguration {
     public EncryptablePropertyResolver encryptablePropertyResolver(
                 @Qualifier(DETECTOR_BEAN_NAME) final EncryptablePropertyDetector propertyDetector,
                 @Qualifier(ENCRYPTOR_BEAN_NAME) final StringEncryptor encryptor, final BeanFactory bf,
-                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy) {
+                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy, final ConfigurableEnvironment environment) {
         final String customResolverBeanName = envCopy.get().resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER);
-        return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, bf);
+        return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, bf, environment);
     }
 
     /**

@@ -180,7 +180,7 @@ Jasypt uses an `StringEncryptor` to decrypt properties. For all 3 methods, if no
           <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.salt.NoOpIVGenerator</td>
+          <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.iv.NoIvGenerator</td>
       </tr>
       <tr>
           <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>
@@ -194,7 +194,7 @@ The only property required is the encryption password, the rest could be left to
 
 The last property, `jasypt.encryptor.proxyPropertySources` is used to indicate `jasyp-spring-boot` how property values are going to be intercepted for decryption. The default value, `false` uses custom wrapper implementations of `PropertySource`, `EnumerablePropertySource`, and `MapPropertySource`. When `true` is specified for this property, the interception mechanism will use CGLib proxies on each specific `PropertySource` implementation. This may be useful on some scenarios where the type of the original `PropertySource` must be preserved. 
 
-The property `jasypt.encryptor.ivGeneratorClassname` defaults to NoOpIVGenerator for backwards compatibility. However, if you would like to use the newer algorithms in Java 8+ (e.g. PBEWITHHMACSHA512ANDAES_256) you must set this value to `org.jasypt.salt.RandomIVGenerator`.
+The property `jasypt.encryptor.ivGeneratorClassname` defaults to NoIvGenerator for backwards compatibility. However, if you would like to use the newer algorithms in Java 8+ (e.g. PBEWITHHMACSHA512ANDAES_256) you must set this value to `org.jasypt.iv.RandomIvGenerator`.
 
 ## <a name="customEncryptor"></a>Use you own Custom Encryptor
 For custom configuration of the encryptor and the source of the encryptor password you can always define your own StringEncryptor bean in your Spring Context, and the default encryptor will be ignored. For instance:
@@ -210,7 +210,7 @@ For custom configuration of the encryptor and the source of the encryptor passwo
         config.setPoolSize("1");
         config.setProviderName("SunJCE");
         config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
-        config.setIvGeneratorClassName("org.jasypt.salt.NoOpIVGenerator");
+        config.setIvGeneratorClassName("org.jasypt.iv.NoIvGenerator");
         config.setStringOutputType("base64");
         encryptor.setConfig(config);
         return encryptor;
@@ -312,7 +312,7 @@ Example:
             config.setPoolSize(1);
             config.setProviderName("SunJCE");
             config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
-            config.setIvGeneratorClassName("org.jasypt.salt.NoOpIVGenerator");
+            config.setIvGeneratorClassName("org.jasypt.iv.NoIvGenerator");
             config.setStringOutputType("base64");
             encryptor.setConfig(config);
         }

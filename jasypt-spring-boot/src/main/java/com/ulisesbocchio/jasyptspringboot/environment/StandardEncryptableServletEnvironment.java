@@ -18,7 +18,7 @@ import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConver
 
 public class StandardEncryptableServletEnvironment extends StandardServletEnvironment implements ConfigurableEnvironment {
 
-    private final EncryptablePropertyResolver resolver;
+    private EncryptablePropertyResolver resolver;
     private final EncryptablePropertyFilter filter;
     private final InterceptionMode interceptionMode;
     private MutablePropertySources encryptablePropertySources;
@@ -34,15 +34,18 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
 
 
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor) {
-        this(interceptionMode, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()), new DefaultPropertyFilter());
+        this(interceptionMode, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
     public StandardEncryptableServletEnvironment(StringEncryptor encryptor) {
-        this(InterceptionMode.WRAPPER, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()), new DefaultPropertyFilter());
+        this(InterceptionMode.WRAPPER, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
-        this(interceptionMode, new DefaultPropertyResolver(encryptor, detector), new DefaultPropertyFilter());
+        this(interceptionMode, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
     }
 
     public StandardEncryptableServletEnvironment(EncryptablePropertyResolver resolver) {
@@ -59,15 +62,18 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
 
 
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyFilter filter) {
-        this(interceptionMode, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()), filter);
+        this(interceptionMode, filter);
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
     public StandardEncryptableServletEnvironment(StringEncryptor encryptor, EncryptablePropertyFilter filter) {
-        this(InterceptionMode.WRAPPER, new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector()), filter);
+        this(InterceptionMode.WRAPPER, filter);
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
-        this(interceptionMode, new DefaultPropertyResolver(encryptor, detector), filter);
+        this(interceptionMode, filter);
+        this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
     }
 
     public StandardEncryptableServletEnvironment(EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
@@ -84,7 +90,7 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
         this.interceptionMode = interceptionMode;
         this.filter = filter;
-        this.resolver = new DefaultPropertyResolver(new DefaultLazyEncryptor(this), detector);
+        this.resolver = new DefaultPropertyResolver(new DefaultLazyEncryptor(this), detector, this);
         actuallyCustomizePropertySources();
     }
 

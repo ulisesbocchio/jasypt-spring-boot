@@ -5,6 +5,8 @@ import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInt
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
+import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableSystemEnvironmentPropertySourceWrapper;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
@@ -80,6 +82,8 @@ public class EncryptablePropertySourceConverter {
         PropertySource<T> encryptablePropertySource;
         if (needsProxyAnyway(propertySource)) {
             encryptablePropertySource = proxyPropertySource(propertySource, resolver, propertyFilter);
+        } else if (propertySource instanceof  SystemEnvironmentPropertySource) {
+            encryptablePropertySource = (PropertySource<T>) new EncryptableSystemEnvironmentPropertySourceWrapper((SystemEnvironmentPropertySource) propertySource, resolver, propertyFilter);
         } else if (propertySource instanceof MapPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, resolver, propertyFilter);
         } else if (propertySource instanceof EnumerablePropertySource) {

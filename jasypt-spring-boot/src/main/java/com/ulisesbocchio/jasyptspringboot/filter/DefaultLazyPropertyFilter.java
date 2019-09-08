@@ -20,13 +20,16 @@ public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
     private static final List<String> DEFAULT_FILTER_EXCLUDE_PATTERNS = singletonList("^jasypt\\.encryptor\\.*");
     private Singleton<EncryptablePropertyFilter> singleton;
 
-    public DefaultLazyPropertyFilter(List<String> includeSources, List<String> excludeSources, List<String> includeNames, List<String> excludeNames, String customFilterBeanName, BeanFactory bf) {
+    public DefaultLazyPropertyFilter(List<String> includeSources, List<String> excludeSources, List<String> includeNames, List<String> excludeNames, String customFilterBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customFilterBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (EncryptablePropertyFilter) bf.getBean(name))
                         .map(tap(bean -> log.info("Found Custom Filter Bean {} with name: {}", bean, customFilterBeanName)))
                         .orElseGet(() -> {
+                            if (isCustom) {
+                                throw new IllegalStateException(String.format("Property Filter custom Bean not found with name '%s'", customFilterBeanName));
+                            }
                             List<String> actualExcludeNames = concat(Optional.ofNullable(excludeNames).orElseGet(ArrayList::new), DEFAULT_FILTER_EXCLUDE_PATTERNS);
                             log.info("Property Filter custom Bean not found with name '{}'. Initializing Default Property Filter", customFilterBeanName);
                             return new DefaultPropertyFilter(includeSources, excludeSources, includeNames, actualExcludeNames);

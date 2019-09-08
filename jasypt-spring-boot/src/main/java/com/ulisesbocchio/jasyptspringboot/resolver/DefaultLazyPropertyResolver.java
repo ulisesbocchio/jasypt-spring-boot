@@ -22,13 +22,16 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
 
     private Singleton<EncryptablePropertyResolver> singleton;
 
-    public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, String customResolverBeanName, BeanFactory bf, Environment environment) {
+    public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, String customResolverBeanName, boolean isCustom, BeanFactory bf, Environment environment) {
         singleton = new Singleton<>(() ->
                 Optional.of(customResolverBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (EncryptablePropertyResolver) bf.getBean(name))
                         .map(tap(bean -> log.info("Found Custom Resolver Bean {} with name: {}", bean, customResolverBeanName)))
                         .orElseGet(() -> {
+                            if (isCustom) {
+                                throw new IllegalStateException(String.format("Property Resolver custom Bean not found with name '%s'", customResolverBeanName));
+                            }
                             log.info("Property Resolver custom Bean not found with name '{}'. Initializing Default Property Resolver", customResolverBeanName);
                             return new DefaultPropertyResolver(encryptor, propertyDetector, environment);
                         }));

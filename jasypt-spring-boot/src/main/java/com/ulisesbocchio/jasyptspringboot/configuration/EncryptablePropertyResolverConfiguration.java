@@ -40,10 +40,14 @@ import java.lang.annotation.Annotation;
 @Configuration
 public class EncryptablePropertyResolverConfiguration {
 
-    private static final String ENCRYPTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.bean:jasyptStringEncryptor}";
-    private static final String DETECTOR_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.detector-bean:encryptablePropertyDetector}";
-    private static final String RESOLVER_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.resolver-bean:encryptablePropertyResolver}";
-    private static final String FILTER_BEAN_PLACEHOLDER = "${jasypt.encryptor.property.filter-bean:encryptablePropertyFilter}";
+    private static final String ENCRYPTOR_BEAN_PROPERTY = "jasypt.encryptor.bean";
+    private static final String ENCRYPTOR_BEAN_PLACEHOLDER = String.format("${%s:jasyptStringEncryptor}", ENCRYPTOR_BEAN_PROPERTY);
+    private static final String DETECTOR_BEAN_PROPERTY = "jasypt.encryptor.property.detector-bean";
+    private static final String DETECTOR_BEAN_PLACEHOLDER = String.format("${%s:encryptablePropertyDetector}", DETECTOR_BEAN_PROPERTY);
+    private static final String RESOLVER_BEAN_PROPERTY = "jasypt.encryptor.property.resolver-bean";
+    private static final String RESOLVER_BEAN_PLACEHOLDER = String.format("${%s:encryptablePropertyResolver}", RESOLVER_BEAN_PROPERTY);
+    private static final String FILTER_BEAN_PROPERTY = "jasypt.encryptor.property.filter-bean";
+    private static final String FILTER_BEAN_PLACEHOLDER = String.format("${%s:encryptablePropertyFilter}", FILTER_BEAN_PROPERTY);
 
     private static final String ENCRYPTOR_BEAN_NAME = "lazyJasyptStringEncryptor";
     private static final String DETECTOR_BEAN_NAME = "lazyEncryptablePropertyDetector";
@@ -61,7 +65,8 @@ public class EncryptablePropertyResolverConfiguration {
                 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy,
                 final BeanFactory bf) {
         final String customEncryptorBeanName = envCopy.get().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
-        return new DefaultLazyEncryptor(envCopy.get(), customEncryptorBeanName, bf);
+        final boolean isCustom = envCopy.get().containsProperty(ENCRYPTOR_BEAN_PROPERTY);
+        return new DefaultLazyEncryptor(envCopy.get(), customEncryptorBeanName, isCustom, bf);
     }
 
     @Bean(name = DETECTOR_BEAN_NAME)
@@ -71,7 +76,8 @@ public class EncryptablePropertyResolverConfiguration {
         final String prefix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.prefix:ENC(}");
         final String suffix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.suffix:)}");
         final String customDetectorBeanName = envCopy.get().resolveRequiredPlaceholders(DETECTOR_BEAN_PLACEHOLDER);
-        return new DefaultLazyPropertyDetector(prefix, suffix, customDetectorBeanName, bf);
+        final boolean isCustom = envCopy.get().containsProperty(DETECTOR_BEAN_PROPERTY);
+        return new DefaultLazyPropertyDetector(prefix, suffix, customDetectorBeanName, isCustom, bf);
     }
 
     @Bean(name = CONFIG_SINGLETON)
@@ -97,16 +103,16 @@ public class EncryptablePropertyResolverConfiguration {
         });
     }
 
-    @SuppressWarnings("unchecked")
     @Bean(name = FILTER_BEAN_NAME)
     public EncryptablePropertyFilter encryptablePropertyFilter(
                 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy,
                 final ConfigurableBeanFactory bf,
                 @Qualifier(CONFIG_SINGLETON) final Singleton<JasyptEncryptorConfigurationProperties> configProps) {
         final String customFilterBeanName = envCopy.get().resolveRequiredPlaceholders(FILTER_BEAN_PLACEHOLDER);
+        final boolean isCustom = envCopy.get().containsProperty(FILTER_BEAN_PROPERTY);
         final FilterConfigurationProperties filterConfig = configProps.get().getProperty().getFilter();
         return new DefaultLazyPropertyFilter(filterConfig.getIncludeSources(), filterConfig.getExcludeSources(),
-                    filterConfig.getIncludeNames(), filterConfig.getExcludeNames(), customFilterBeanName, bf);
+                    filterConfig.getIncludeNames(), filterConfig.getExcludeNames(), customFilterBeanName, isCustom, bf);
     }
 
     @Bean(name = RESOLVER_BEAN_NAME)
@@ -115,7 +121,8 @@ public class EncryptablePropertyResolverConfiguration {
                 @Qualifier(ENCRYPTOR_BEAN_NAME) final StringEncryptor encryptor, final BeanFactory bf,
                 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy, final ConfigurableEnvironment environment) {
         final String customResolverBeanName = envCopy.get().resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER);
-        return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, bf, environment);
+        final boolean isCustom = envCopy.get().containsProperty(RESOLVER_BEAN_PROPERTY);
+        return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, isCustom, bf, environment);
     }
 
     /**

@@ -24,13 +24,16 @@ public class DefaultLazyEncryptor implements StringEncryptor {
 
     private final Singleton<StringEncryptor> singleton;
 
-    public DefaultLazyEncryptor(final Environment e, final String customEncryptorBeanName, final BeanFactory bf) {
+    public DefaultLazyEncryptor(final Environment e, final String customEncryptorBeanName, boolean isCustom, final BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customEncryptorBeanName)
                         .filter(bf::containsBean)
                         .map(name -> (StringEncryptor) bf.getBean(name))
                         .map(tap(bean -> log.info("Found Custom Encryptor Bean {} with name: {}", bean, customEncryptorBeanName)))
                         .orElseGet(() -> {
+                            if(isCustom) {
+                                throw new IllegalStateException(String.format("String Encryptor custom Bean not found with name '%s'", customEncryptorBeanName));
+                            }
                             log.info("String Encryptor custom Bean not found with name '{}'. Initializing Default String Encryptor", customEncryptorBeanName);
                             return createDefault(e);
                         }));

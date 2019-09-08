@@ -1,17 +1,16 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
-import java.util.Map;
-
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
-
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 
+import java.util.Map;
+
 /**
- * @author Ulises Bocchio
+ * @author Tomas Tulka (@ttulka)
  */
 public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnvironmentPropertySource implements EncryptablePropertySource<Map<String, Object>> {
 

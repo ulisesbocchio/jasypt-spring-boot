@@ -42,24 +42,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <environmentVariables>
-                        <TEST_ENV_FOOSTRING>test1</TEST_ENV_FOOSTRING>
-                        <TEST_ENV_BAR_STRING>test2</TEST_ENV_BAR_STRING>
-                        <TEST_ENV_FOOLIST>a1,b1</TEST_ENV_FOOLIST>
-                        <TEST_ENV_BAR_LIST>a2,b2</TEST_ENV_BAR_LIST>
-                        <TEST_ENV_STRINGMAP_K1>v1</TEST_ENV_STRINGMAP_K1>
-                        <TEST_ENV_LISTMAP_K2>v2</TEST_ENV_LISTMAP_K2>
-                    </environmentVariables>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

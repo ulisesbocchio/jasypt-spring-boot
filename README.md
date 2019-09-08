@@ -24,6 +24,8 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
+Update 9/8/2019: Version 2.1.2 Release Includes: jasypt 1.9.3 rollback with IV Generators (thanks [ttulka](https://github.com/ttulka)) and fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
+
 Update 1/8/2019: Version 2.1.1 Release Including [Asymmetric Encryption](#asymmetric-encryption)<br/> and support for JSB96 with IV Generators (Thanks [@melloware](https://github.com/melloware)!!)
 
 Update 7/17/2018: Version 2.1.0 Release Including [Filters](#using-filters)
@@ -41,7 +43,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.2</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -50,7 +52,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.2</version>
     </dependency>
 	```
 
@@ -71,7 +73,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.2</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:

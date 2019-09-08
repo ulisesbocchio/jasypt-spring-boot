@@ -82,11 +82,11 @@ public class JasyptEncryptorConfigurationProperties {
     private String saltGeneratorClassname = "org.jasypt.salt.RandomSaltGenerator";
 
     /**
-     * A {@link org.jasypt.iv.IVGenerator} implementation to be used by the encryptor. Default Value is
+     * A {@link org.jasypt.iv.IvGenerator} implementation to be used by the encryptor. Default Value is
      * {@code "org.jasypt.iv.NoIvGenerator"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
-     * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getIVGenerator()
+     * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getIvGenerator()
      */
     private String ivGeneratorClassname = "org.jasypt.iv.NoIvGenerator";
 

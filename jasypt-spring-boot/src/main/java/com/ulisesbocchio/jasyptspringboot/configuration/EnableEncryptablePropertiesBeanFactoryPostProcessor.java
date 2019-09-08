@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -30,7 +28,7 @@ import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptableProper
  *
  * @author Ulises Bocchio
  */
-public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationListener<ApplicationEvent>, Ordered {
+public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertiesBeanFactoryPostProcessor.class);
     private ConfigurableEnvironment environment;
@@ -57,10 +55,5 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        LOG.debug("Application Event Raised: {}", event.getClass().getSimpleName());
     }
 }

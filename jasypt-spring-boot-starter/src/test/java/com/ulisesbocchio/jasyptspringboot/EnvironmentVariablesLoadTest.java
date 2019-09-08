@@ -26,8 +26,7 @@ public class EnvironmentVariablesLoadTest {
     private MyProperties myProperties;
 
     @ClassRule
-    public static final EnvironmentVariables environmentVariables
-            = new EnvironmentVariables();
+    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
 
     @BeforeClass

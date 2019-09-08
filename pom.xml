@@ -17,6 +17,7 @@
         <spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
         <jasypt.version>1.9.3</jasypt.version>
         <maven.compiler.version>3.7.0</maven.compiler.version>
+        <system.rules.version>1.19.0</system.rules.version>
         <start-class>Application</start-class>
     </properties>
 
@@ -212,6 +213,11 @@
                 <groupId>com.github.ulisesbocchio</groupId>
                 <artifactId>jasypt-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-rules</artifactId>
+                <version>${system.rules.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

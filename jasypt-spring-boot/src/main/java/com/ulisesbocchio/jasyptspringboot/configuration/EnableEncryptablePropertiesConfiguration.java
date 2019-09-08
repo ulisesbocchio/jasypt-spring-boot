@@ -43,7 +43,7 @@ import org.springframework.core.env.PropertySource;
  *         <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
  *     </tr>
  *     <tr>
- *         <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.salt.NoOpIVGenerator</td>
+ *         <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.iv.NoIvGenerator</td>
  *     </tr>
  *     <tr>
  *         <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>

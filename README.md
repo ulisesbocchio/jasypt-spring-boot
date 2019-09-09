@@ -24,7 +24,7 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
-Update 9/8/2019: Version 2.1.2 Release Includes: jasypt 1.9.3 rollback with IV Generators (thanks [ttulka](https://github.com/ttulka)) and fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
+Update 9/8/2019: Version 2.1.2 Release Includes: jasypt 1.9.3 rollback with IV Generators (thanks [tkalmar](https://github.com/tkalmar)), interpolation inside `ENC()` and `${}` blocks (thanks [ttulka](https://github.com/ttulka)), and fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
 
 Update 1/8/2019: Version 2.1.1 Release Including [Asymmetric Encryption](#asymmetric-encryption)<br/> and support for JSB96 with IV Generators (Thanks [@melloware](https://github.com/melloware)!!)
 

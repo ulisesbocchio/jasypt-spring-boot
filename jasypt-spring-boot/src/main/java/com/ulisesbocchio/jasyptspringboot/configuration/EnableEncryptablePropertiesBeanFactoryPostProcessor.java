@@ -54,6 +54,6 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return Ordered.LOWEST_PRECEDENCE - 100;
     }
 }

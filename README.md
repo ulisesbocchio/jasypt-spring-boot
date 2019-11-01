@@ -385,6 +385,121 @@ Notice that for this mechanism to work, you should not provide a custom `Encrypt
 resolver instead. If you provide custom resolver, you are responsible for the entire process of detecting and decrypting
 properties.
 
+## Maven Plugin
+
+A Maven plugin is provided with a number of helpful utilities.
+
+To use the plugin, just add the following to your pom.xml:
+
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.github.ulisesbocchio</groupId>
+      <artifactId>jasypt-maven-plugin</artifactId>
+      <version>2.1.2</version>
+    </plugin>
+  </plugins>
+</build>
+```
+
+### Encryption
+
+To encrypt placeholders in a file, simply wrap any string with `DEC(...)`. For example:
+
+```properties
+sensitive.password=DEC(secret value)
+regular.property=example
+```
+
+This can be encrypted as follows:
+
+```shell script
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password"
+```
+
+Which would edit that file in place resulting in:
+
+```properties
+sensitive.password=ENC(encrypted)
+regular.property=example
+```
+
+### Decryption
+
+To decrypt placeholders in a file, simply wrap any string with `ENC(...)`. For example:
+
+```properties
+sensitive.password=ENC(encrypted)
+regular.property=example
+```
+
+This can be decrypted as follows:
+
+```shell script
+mvn jasypt:decrypt -Djasypt.encryptor.password="the password"
+```
+
+Which would output the decrypted contents to the screen:
+
+```properties
+sensitive.password=ENC(encrypted)
+regular.property=example
+```
+
+Note that outputting to the screen, rather than editing the file in place, is designed to reduce
+accidental committing of decrypted values to version control. When decrypting, you most likely
+just want to check what value has been encrypted, rather than wanting to permanently decrypt that
+value.
+
+### Load
+You can also decrypt a properties file and load all of its properties into memory and make them accessible to Maven. This is useful when you want to make encrypted properties available to other Maven plugins.
+
+You can chain the goals of the later plugins directly after this one. For example, with flyway:
+
+```shell script
+mvn encrypt:load flyway:migrate -Djasypt.encryptor.password="the password"
+```
+
+You can also specify a prefix for each property with `-Djasypt.plugin.keyPrefix=example.`. This
+helps to avoid potential clashes with other Maven properties.
+
+### File Path
+
+For all of the above utilities, the file path defaults to `file:src/main/resources/application.properties`.
+
+You can insert the name of a Spring profile between the file name and it's extension by specifying by specifying an active profile. For example, the file `file:src/main/resources/application-dev.properties` could be encrypted as follows:
+
+```shell script
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Dspring.profiles.active=dev
+```
+
+You can also changed the file path completely. For example to encrypt a file in your test resources directory:
+
+```shell script
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/test/application.properties"
+```
+
+Or you can encrypt a file with a different name:
+
+```shell script
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/flyway.properties"
+```
+
+Both of these would also work with decryption and loading.
+
+You can also specify a different extension. However, please note that loading only works with property files. Encryption/Decryption work with any file type.
+
+```shell script
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/application.yaml"
+```
+
+You can also specify a file on the classpath, instead of the file system. However, please note that this will not work for encryption, as this will attempt to write the encrypted contents back to disk. Also this will only load files from the plugin's classpath, and not the classpath of the application.
+
+```shell script
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties"
+```
+
 ## Asymmetric Encryption
 `jasypt-spring-boot:2.1.1` introduces a new feature to encrypt/decrypt properties using asymmetric encryption with a pair of private/public keys
 in DER or PEM formats.

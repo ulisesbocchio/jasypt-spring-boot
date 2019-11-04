@@ -20,9 +20,9 @@
     {
       "name": "jasypt.encryptor.algorithm",
       "type": "java.lang.String",
-      "description": "Encryption/Decryption Algorithm to be used by Jasypt.\n Default Value is {@code \"PBEWithMD5AndDES\"}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getAlgorithm()",
+      "description": "Encryption/Decryption Algorithm to be used by Jasypt.\n Default Value is {@code \"PBEWITHHMACSHA512ANDAES_256\"}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getAlgorithm()",
       "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
-      "defaultValue": "PBEWithMD5AndDES"
+      "defaultValue": "PBEWITHHMACSHA512ANDAES_256"
     },
     {
       "name": "jasypt.encryptor.keyObtentionIterations",

@@ -66,13 +66,13 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(getRequiredProperty(e, "jasypt.encryptor.password"));
-        config.setAlgorithm(getProperty(e, "jasypt.encryptor.algorithm", "PBEWithMD5AndDES"));
+        config.setAlgorithm(getProperty(e, "jasypt.encryptor.algorithm", "PBEWITHHMACSHA512ANDAES_256"));
         config.setKeyObtentionIterations(getProperty(e, "jasypt.encryptor.key-obtention-iterations", "1000"));
         config.setPoolSize(getProperty(e, "jasypt.encryptor.pool-size", "1"));
         config.setProviderName(getProperty(e, "jasypt.encryptor.provider-name", null));
         config.setProviderClassName(getProperty(e, "jasypt.encryptor.provider-class-name", null));
         config.setSaltGeneratorClassName(getProperty(e, "jasypt.encryptor.salt-generator-classname", "org.jasypt.salt.RandomSaltGenerator"));
-        config.setIvGeneratorClassName(getProperty(e, "jasypt.encryptor.iv-generator-classname", "org.jasypt.iv.NoIvGenerator"));
+        config.setIvGeneratorClassName(getProperty(e, "jasypt.encryptor.iv-generator-classname", "org.jasypt.iv.RandomIvGenerator"));
         config.setStringOutputType(getProperty(e, "jasypt.encryptor.string-output-type", "base64"));
         encryptor.setConfig(config);
         return encryptor;

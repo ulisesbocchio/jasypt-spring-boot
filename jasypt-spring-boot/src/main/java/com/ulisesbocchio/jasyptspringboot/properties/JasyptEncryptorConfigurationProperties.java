@@ -1,12 +1,12 @@
 package com.ulisesbocchio.jasyptspringboot.properties;
 
-import java.util.List;
-
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+
+import java.util.List;
 
 /**
  * Partially used to load {@link EncryptablePropertyFilter} config.

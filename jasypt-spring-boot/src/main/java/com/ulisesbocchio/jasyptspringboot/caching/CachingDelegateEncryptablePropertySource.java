@@ -34,13 +34,13 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
     public Object getProperty(String name) {
         // Can be called recursively, so, we cannot use computeIfAbsent.
         synchronized (this) {
-            if (cache.containsKey(name)) {
-                return cache.get(name);
-            } else {
+            if (!cache.containsKey(name)) {
                 Object resolved = getProperty(resolver, filter, delegate, name);
-                cache.put(name, resolved);
-                return resolved;
+                if (resolved != null) {
+                    cache.put(name, resolved);
+                }
             }
+            return cache.get(name);
         }
     }
 

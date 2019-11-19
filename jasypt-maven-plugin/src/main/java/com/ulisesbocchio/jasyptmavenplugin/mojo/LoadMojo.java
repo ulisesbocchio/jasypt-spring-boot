@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
  * The 'load' goal loads and decrypts property files for the supplied environment(s). The properties
  * can then be used in pom.xml configurations as '${something.prop}' for other plugins, e.g. flyway
  * or the mybatis generator.
+ *
+ * @author Rupert Madden-Abbott
  */
 @Mojo(name = "load", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class LoadMojo extends AbstractJasyptMojo {

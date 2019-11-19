@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Goal which decrypts demarcated values in properties files.
+ *
+ * @author Rupert Madden-Abbott
  */
 @Mojo(name = "decrypt", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class DecryptMojo extends AbstractJasyptMojo {

@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Goal which encrypts demarcated values in properties files.
+ *
+ * @author Rupert Madden-Abbott
  */
 @Mojo(name = "encrypt", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class EncryptMojo extends AbstractJasyptMojo {

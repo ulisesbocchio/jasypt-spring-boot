@@ -13,6 +13,8 @@ import static java.util.regex.Pattern.DOTALL;
 
 /**
  * A service for encrypting and decrypting Strings.
+ *
+ * @author Rupert Madden-Abbott
  */
 public class EncryptionService {
   private static final Pattern ENCRYPTED_PATTERN = Pattern.compile("ENC\\((.*?)\\)", DOTALL);

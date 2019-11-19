@@ -19,6 +19,8 @@ import static org.codehaus.plexus.util.FileUtils.removeExtension;
 
 /**
  * A mojo that spins up a Spring Boot application for any encrypt/decrypt function.
+ *
+ * @author Rupert Madden-Abbott
  */
 public abstract class AbstractJasyptMojo extends AbstractMojo {
   /**

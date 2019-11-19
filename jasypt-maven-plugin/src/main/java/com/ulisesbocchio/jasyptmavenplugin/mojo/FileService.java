@@ -9,6 +9,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * A service for operating on files.
+ *
+ * @author Rupert Madden-Abbott
  */
 public class FileService {
   /**

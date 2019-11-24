@@ -40,12 +40,12 @@ public class JasyptEncryptorConfigurationProperties {
 
     /**
      * Encryption/Decryption Algorithm to be used by Jasypt. For more info on how to get available algorithms visit:
-     * <a href="http://www.jasypt.org/cli.html"/>Jasypt CLI Tools Page</a>. Default Value is {@code "PBEWithMD5AndDES"}.
+     * <a href="http://www.jasypt.org/cli.html"/>Jasypt CLI Tools Page</a>. Default Value is {@code "PBEWITHHMACSHA512ANDAES_256"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getAlgorithm()
      */
-    private String algorithm = "PBEWithMD5AndDES";
+    private String algorithm = "PBEWITHHMACSHA512ANDAES_256";
 
     /**
      * Number of hashing iterations to obtain the signing key. Default Value is {@code "1000"}.
@@ -83,12 +83,12 @@ public class JasyptEncryptorConfigurationProperties {
 
     /**
      * A {@link org.jasypt.iv.IvGenerator} implementation to be used by the encryptor. Default Value is
-     * {@code "org.jasypt.iv.NoIvGenerator"}.
+     * {@code "org.jasypt.iv.RandomIvGenerator"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getIvGenerator()
      */
-    private String ivGeneratorClassname = "org.jasypt.iv.NoIvGenerator";
+    private String ivGeneratorClassname = "org.jasypt.iv.RandomIvGenerator";
 
     /**
      * Specify the form in which String output will be encoded. {@code "base64"} or {@code "hexadecimal"}. Default Value

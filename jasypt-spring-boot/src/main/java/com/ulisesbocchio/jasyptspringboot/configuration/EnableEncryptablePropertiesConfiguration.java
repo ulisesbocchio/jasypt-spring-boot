@@ -27,7 +27,7 @@ import org.springframework.core.env.PropertySource;
  *         <td>jasypt.encryptor.password</td><td><b>True</b></td><td> - </td>
  *     </tr>
  *     <tr>
- *         <td>jasypt.encryptor.algorithm</td><td>False</td><td>PBEWithMD5AndDES</td>
+ *         <td>jasypt.encryptor.algorithm</td><td>False</td><td>PBEWITHHMACSHA512ANDAES_256</td>
  *     </tr>
  *     <tr>
  *         <td>jasypt.encryptor.keyObtentionIterations</td><td>False</td><td>1000</td>
@@ -41,7 +41,7 @@ import org.springframework.core.env.PropertySource;
  *         <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
  *     </tr>
  *     <tr>
- *         <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.iv.NoIvGenerator</td>
+ *         <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.iv.RandomIvGenerator</td>
  *     </tr>
  *     <tr>
  *         <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>

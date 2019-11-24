@@ -10,8 +10,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+import org.springframework.core.Conventions;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.CompositePropertySource;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -41,6 +45,8 @@ import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptableProper
 @Slf4j
 public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+    private static final String CONFIGURATION_CLASS_ATTRIBUTE =
+            Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
     private ConfigurableEnvironment env;
 
     public EncryptablePropertySourceBeanFactoryPostProcessor(ConfigurableEnvironment env) {
@@ -64,6 +70,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
 
     private void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources, List<PropertySourceLoader> loaders) throws BeansException {
         try {
+            log.info("Loading Encryptable Property Source '{}'", encryptablePropertySource.getString("name"));
             PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, resolver, propertyFilter, loaders);
             propertySources.addLast(ps);
             log.info("Created Encryptable Property Source '{}' from locations: {}", ps.getName(), Arrays.asList(encryptablePropertySource.getStringArray("value")));
@@ -101,30 +108,34 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
     }
 
     private Stream<AnnotationAttributes> getEncryptablePropertySourcesMetadata(ConfigurableListableBeanFactory beanFactory) {
-        Stream<AnnotationAttributes> source = getBeanDefinitionsForAnnotation(beanFactory, com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource.class);
-        Stream<AnnotationAttributes> sources = getBeanDefinitionsForAnnotation(beanFactory, EncryptablePropertySources.class)
-                .flatMap(map -> Arrays.stream((AnnotationAttributes[]) map.get("value")));
-        return Stream.concat(source, sources);
+        return getBeanDefinitionsForAnnotation(beanFactory, com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySource.class, EncryptablePropertySources.class);
     }
 
-    private Stream<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation) {
-        return Arrays.stream(bf.getBeanNamesForAnnotation(annotation))
+    private Stream<AnnotationAttributes> getBeanDefinitionsForAnnotation(ConfigurableListableBeanFactory bf, Class<? extends Annotation> annotation, Class<? extends Annotation> repeatable) {
+        return Stream.concat(Arrays.stream(bf.getBeanNamesForAnnotation(annotation)), Arrays.stream(bf.getBeanNamesForAnnotation(repeatable)))
+                .distinct()
                 .map(bf::getBeanDefinition)
                 .filter(bd -> bd instanceof AnnotatedBeanDefinition)
                 .map(bd -> (AnnotatedBeanDefinition) bd)
+                .filter(bd -> bd.getAttribute(CONFIGURATION_CLASS_ATTRIBUTE) != null && bd instanceof AbstractBeanDefinition)
                 .map(AnnotatedBeanDefinition::getMetadata)
-                .filter(md -> md.hasAnnotation(annotation.getName()))
-                .map(md -> (AnnotationAttributes) md.getAnnotationAttributes(annotation.getName()));
+                .filter(am -> am.hasAnnotation(annotation.getName()) || am.hasAnnotation(repeatable.getName()))
+                .flatMap(am -> Optional
+                        .ofNullable((AnnotationAttributes) am.getAnnotationAttributes(annotation.getName()))
+                        .map(Stream::of)
+                        .orElseGet(() -> Optional
+                                .ofNullable((AnnotationAttributes) am.getAnnotationAttributes(repeatable.getName()))
+                                .map(ram -> Arrays.stream(ram.getAnnotationArray("value")))
+                                .orElseGet(Stream::empty)));
     }
 
     private Optional<List<PropertySource<?>>> loadPropertySource(List<PropertySourceLoader> loaders, Resource resource, String sourceName) throws IOException {
         return Optional.of(resource)
                 .filter(this::isFile)
-                .map(res -> loaders.stream()
+                .flatMap(res -> loaders.stream()
                         .filter(loader -> canLoadFileExtension(loader, resource))
                         .findFirst()
-                        .map(loader -> load(loader, sourceName, resource))
-                        .orElse(null));
+                        .map(loader -> load(loader, sourceName, resource)));
     }
 
     @SneakyThrows
@@ -134,7 +145,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
 
     private boolean canLoadFileExtension(PropertySourceLoader loader, Resource resource) {
         return Arrays.stream(loader.getFileExtensions())
-                .anyMatch(extension -> resource.getFilename().toLowerCase().endsWith("." + extension.toLowerCase()));
+                .anyMatch(extension -> Objects.requireNonNull(resource.getFilename()).toLowerCase().endsWith("." + extension.toLowerCase()));
     }
 
     private boolean isFile(Resource resource) {
@@ -144,6 +155,6 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return Ordered.LOWEST_PRECEDENCE - 100;
     }
 }

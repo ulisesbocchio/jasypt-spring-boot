@@ -24,15 +24,28 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
-Update 9/8/2019: Version 2.1.2 Release Includes: jasypt 1.9.3 rollback with IV Generators (thanks [tkalmar](https://github.com/tkalmar)), interpolation inside `ENC()` and `${}` blocks (thanks [ttulka](https://github.com/ttulka)), and fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
+### Update 11/24/2019: Version 3.0.0 Release Includes
+* Spring Boot 1.5.X No longer supported
+* Changed default encryption to PBEWITHHMACSHA512ANDAES_256 (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
+* Switched properties cache to HashMap to avoid concurrency issues (Thanks [@krm1312](https://github.com/krm1312))
+* Higher priority for Properties post processor (Thanks [@ttulka](https://github.com/ttulka))
+* Jasypt Spring Boot [Maven Plugin](#maven-plugin) (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
+### Update 9/8/2019: Version 2.1.2 Release Includes
+* jasypt 1.9.3 rollback with IV Generators (thanks [@tkalmar](https://github.com/tkalmar))
+* interpolation inside `ENC()` and `${}` blocks (thanks [@ttulka](https://github.com/ttulka))
+* fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
 
-Update 1/8/2019: Version 2.1.1 Release Including [Asymmetric Encryption](#asymmetric-encryption)<br/> and support for JSB96 with IV Generators (Thanks [@melloware](https://github.com/melloware)!!)
+### Update 1/8/2019: Version 2.1.1 Release Including
+* [Asymmetric Encryption](#asymmetric-encryption)
+* and support for JSB96 with IV Generators (Thanks [@melloware](https://github.com/melloware)!!)
 
-Update 7/17/2018: Version 2.1.0 Release Including [Filters](#using-filters)
+### Update 7/17/2018: Version 2.1.0 Release Including
+* [Filters](#using-filters)
 
-Update 3/17/2018: Version 2.0.0 has been released supporting Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.
+### Update 3/17/2018: Version 2.0.0 has been released supporting
+* Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.
 
-Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!<br/>
+### Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!
 
 ## What to do First?
 Use one of the following 3 methods (briefly explained above):

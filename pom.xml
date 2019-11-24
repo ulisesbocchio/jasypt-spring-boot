@@ -24,6 +24,7 @@
     <modules>
         <module>jasypt-spring-boot</module>
         <module>jasypt-spring-boot-starter</module>
+        <module>jasypt-maven-plugin</module>
     </modules>
 
     <issueManagement>

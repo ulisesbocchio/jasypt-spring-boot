@@ -12,7 +12,6 @@
 hs_err_pid*
 
 **/target/
-*.iml
 .DS_Store
 
 # Eclipse IDE support files
@@ -24,6 +23,9 @@ hs_err_pid*
 .tern-project
 target
 *.?ar
-*.iml
 *.ipr
 *.iws
+
+# IntelliJ
+.idea/
+*.iml

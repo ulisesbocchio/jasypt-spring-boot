@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -40,13 +40,11 @@ public class BootstrappingJasyptConfigurationTest {
 		startWith(new BaseBootstrappingTestListener() {
 			
 			@Override
-			public void onApplicationEvent(final ApplicationEnvironmentPreparedEvent event) {
-				assertFalse("ENC() value is not decrypted during bootstrap phase",
-						event.getEnvironment().getProperty("spring.cloud.config.server.svn.password").equals("mypassword"));
+			public void onApplicationEvent(final ApplicationStartedEvent event) {
+				assertEquals("ENC() value is not decrypted during bootstrap phase", "mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"));
 			}
 		}, "--spring.cloud.bootstrap.enabled=true", "--jasypt.encryptor.bootstrap=false");
 		
-		// to get codacy to pass.
 		assertNotNull(this.context.getBean(EnableEncryptablePropertiesBeanFactoryPostProcessor.class));
 	}
 	
@@ -57,26 +55,36 @@ public class BootstrappingJasyptConfigurationTest {
 		startWith(new BaseBootstrappingTestListener() {
 			
 			@Override
-			public void onApplicationEvent(final ApplicationEnvironmentPreparedEvent event) {
-				assertTrue("ENC() value is decrypted during bootstrap phase",
-						event.getEnvironment().getProperty("spring.cloud.config.server.svn.password").equals("mypassword"));
+			public void onApplicationEvent(final ApplicationStartedEvent event) {
+				assertEquals("ENC() value is decrypted during bootstrap phase", "mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"));
 			}
 		}, "--spring.cloud.bootstrap.enabled=true", "--jasypt.encryptor.bootstrap=true");
 		
-		// to get codacy to pass.
 		assertNotNull(this.context.getBean(EnableEncryptablePropertiesBeanFactoryPostProcessor.class));
 	}
 	
 	@Test
 	public void encryptableBFPPBeanCreatedWhenBoostrapTrue() {
-		startWith(null, "--spring.cloud.bootstrap.enabled=true");
+		startWith(new BaseBootstrappingTestListener() {
+
+			@Override
+			public void onApplicationEvent(final ApplicationStartedEvent event) {
+				assertEquals("ENC() value is decrypted during bootstrap phase", "mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"));
+			}
+		}, "--spring.cloud.bootstrap.enabled=true");
 		assertNotNull("EnableEncryptablePropertiesBeanFactoryPostProcessor not created when spring.cloud.bootstrap.enabled=true", 
 				this.context.getBean(EnableEncryptablePropertiesBeanFactoryPostProcessor.class));
 	}
 	
 	@Test
 	public void encryptableBFPPBeanCreatedWhenBoostrapFalse() {
-		startWith(null, "--spring.cloud.bootstrap.enabled=false");
+		startWith(new BaseBootstrappingTestListener() {
+
+			@Override
+			public void onApplicationEvent(final ApplicationStartedEvent event) {
+				assertNotEquals("ENC() value is decrypted during bootstrap phase", "mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"));
+			}
+		}, "--spring.cloud.bootstrap.enabled=false");
 		assertNotNull("EnableEncryptablePropertiesBeanFactoryPostProcessor not created when spring.cloud.bootstrap.enabled=false", 
 				this.context.getBean(EnableEncryptablePropertiesBeanFactoryPostProcessor.class));
 	}
@@ -107,7 +115,7 @@ public class BootstrappingJasyptConfigurationTest {
 	}
 	
 	static abstract class BaseBootstrappingTestListener
-			implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+			implements ApplicationListener<ApplicationStartedEvent>, Ordered {
 
 		@Override
 		public int getOrder() {

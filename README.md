@@ -25,11 +25,19 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 
 ## What's new?
 ### Update 11/24/2019: Version 3.0.0 Release Includes
+* Adds support for Spring Boot 2.1.X
 * Spring Boot 1.5.X No longer supported
 * Changed default encryption to PBEWITHHMACSHA512ANDAES_256 (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
 * Switched properties cache to HashMap to avoid concurrency issues (Thanks [@krm1312](https://github.com/krm1312))
 * Higher priority for Properties post processor (Thanks [@ttulka](https://github.com/ttulka))
 * Jasypt Spring Boot [Maven Plugin](#maven-plugin) (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
+* To keep your encrypted properties with previous default config use:
+```yaml
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+```
 ### Update 9/8/2019: Version 2.1.2 Release Includes
 * jasypt 1.9.3 rollback with IV Generators (thanks [@tkalmar](https://github.com/tkalmar))
 * interpolation inside `ENC()` and `${}` blocks (thanks [@ttulka](https://github.com/ttulka))

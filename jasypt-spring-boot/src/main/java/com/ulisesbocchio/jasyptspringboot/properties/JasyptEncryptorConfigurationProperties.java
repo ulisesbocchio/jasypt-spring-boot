@@ -5,18 +5,51 @@ import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
+import org.springframework.boot.context.properties.bind.handler.IgnoreErrorsBindHandler;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
 
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Partially used to load {@link EncryptablePropertyFilter} config.
  *
  * @author Ulises Bocchio
  */
+@SuppressWarnings("ConfigurationProperties")
 @ConfigurationProperties(prefix = "jasypt.encryptor", ignoreUnknownFields = true)
 @Data
 public class JasyptEncryptorConfigurationProperties {
+
+    public static JasyptEncryptorConfigurationProperties bindConfigProps(ConfigurableEnvironment environment) {
+        final BindHandler handler = new IgnoreErrorsBindHandler(BindHandler.DEFAULT);
+        final MutablePropertySources propertySources = environment.getPropertySources();
+        final Binder binder = new Binder(ConfigurationPropertySources.from(propertySources),
+                new PropertySourcesPlaceholdersResolver(propertySources),
+                ApplicationConversionService.getSharedInstance());
+        final JasyptEncryptorConfigurationProperties config = new JasyptEncryptorConfigurationProperties();
+
+        final ResolvableType type = ResolvableType.forClass(JasyptEncryptorConfigurationProperties.class);
+        final Annotation annotation = AnnotationUtils.findAnnotation(JasyptEncryptorConfigurationProperties.class,
+                ConfigurationProperties.class);
+        final Annotation[] annotations = new Annotation[]{annotation};
+        final Bindable<?> target = Bindable.of(type).withExistingValue(config).withAnnotations(annotations);
+
+        binder.bind("jasypt.encryptor", target, handler);
+        return config;
+    }
 
     /**
      * Whether to use JDK/Cglib (depending on classpath availability) proxy with an AOP advice as a decorator for
@@ -78,6 +111,15 @@ public class JasyptEncryptorConfigurationProperties {
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getProviderName()
      */
     private String providerName = null;
+
+    /**
+     * The class name of the {@link java.security.Provider} implementation to be used by the encryptor for obtaining the
+     * encryption algorithm. Default Value is {@code null}.
+     *
+     * @see org.jasypt.encryption.pbe.PBEStringEncryptor
+     * @see org.jasypt.encryption.pbe.config.SimpleStringPBEConfig#setProviderClassName(String)
+     */
+    private String providerClassName = null;
 
     /**
      * A {@link org.jasypt.salt.SaltGenerator} implementation to be used by the encryptor. Default Value is
@@ -185,9 +227,9 @@ public class JasyptEncryptorConfigurationProperties {
 
             /**
              * Specify the property name patterns to be EXCLUDED for decryption by{@link EncryptablePropertyFilter}.
-             * Default value is {@code null}
+             * Default value is {@code jasypt\\.encryptor\\.*}
              */
-            private List<String> excludeNames = null;
+            private List<String> excludeNames = singletonList("^jasypt\\.encryptor\\.*");
         }
     }
 }

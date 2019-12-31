@@ -3,36 +3,19 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
-import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties.PropertyConfigurationProperties.FilterConfigurationProperties;
 import com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.BindHandler;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
-import org.springframework.boot.context.properties.bind.handler.IgnoreErrorsBindHandler;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
-import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.StandardEnvironment;
-
-import java.lang.annotation.Annotation;
 
 /**
  * @author Ulises Bocchio
@@ -62,8 +45,8 @@ public class EncryptablePropertyResolverConfiguration {
 
     @Bean(name = ENCRYPTOR_BEAN_NAME)
     public StringEncryptor stringEncryptor(
-                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy,
-                final BeanFactory bf) {
+            final EnvCopy envCopy,
+            final BeanFactory bf) {
         final String customEncryptorBeanName = envCopy.get().resolveRequiredPlaceholders(ENCRYPTOR_BEAN_PLACEHOLDER);
         final boolean isCustom = envCopy.get().containsProperty(ENCRYPTOR_BEAN_PROPERTY);
         return new DefaultLazyEncryptor(envCopy.get(), customEncryptorBeanName, isCustom, bf);
@@ -71,79 +54,36 @@ public class EncryptablePropertyResolverConfiguration {
 
     @Bean(name = DETECTOR_BEAN_NAME)
     public EncryptablePropertyDetector encryptablePropertyDetector(
-                @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"}) final EnvCopy envCopy,
-                final BeanFactory bf) {
-        final String prefix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.prefix:ENC(}");
-        final String suffix = envCopy.get().resolveRequiredPlaceholders("${jasypt.encryptor.property.suffix:)}");
+            final EnvCopy envCopy,
+            final BeanFactory bf) {
         final String customDetectorBeanName = envCopy.get().resolveRequiredPlaceholders(DETECTOR_BEAN_PLACEHOLDER);
         final boolean isCustom = envCopy.get().containsProperty(DETECTOR_BEAN_PROPERTY);
-        return new DefaultLazyPropertyDetector(prefix, suffix, customDetectorBeanName, isCustom, bf);
+        return new DefaultLazyPropertyDetector(envCopy.get(), customDetectorBeanName, isCustom, bf);
     }
 
     @Bean(name = CONFIG_SINGLETON)
     public Singleton<JasyptEncryptorConfigurationProperties> configProps(
-                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy,
-                final ConfigurableBeanFactory bf) {
-        return new Singleton<>(() -> {
-            final BindHandler handler = new IgnoreErrorsBindHandler(BindHandler.DEFAULT);
-            final MutablePropertySources propertySources = envCopy.get().getPropertySources();
-            final Binder binder = new Binder(ConfigurationPropertySources.from(propertySources),
-                        new PropertySourcesPlaceholdersResolver(propertySources),
-                        ApplicationConversionService.getSharedInstance(), bf::copyRegisteredEditorsTo);
-            final JasyptEncryptorConfigurationProperties config = new JasyptEncryptorConfigurationProperties();
-
-            final ResolvableType type = ResolvableType.forClass(JasyptEncryptorConfigurationProperties.class);
-            final Annotation annotation = AnnotationUtils.findAnnotation(JasyptEncryptorConfigurationProperties.class,
-                        ConfigurationProperties.class);
-            final Annotation[] annotations = new Annotation[] {annotation};
-            final Bindable<?> target = Bindable.of(type).withExistingValue(config).withAnnotations(annotations);
-
-            binder.bind("jasypt.encryptor", target, handler);
-            return config;
-        });
+            final EnvCopy envCopy) {
+        return new Singleton<>(() -> JasyptEncryptorConfigurationProperties.bindConfigProps(envCopy.get()));
     }
 
     @Bean(name = FILTER_BEAN_NAME)
     public EncryptablePropertyFilter encryptablePropertyFilter(
-                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy,
-                final ConfigurableBeanFactory bf,
-                @Qualifier(CONFIG_SINGLETON) final Singleton<JasyptEncryptorConfigurationProperties> configProps) {
+            final EnvCopy envCopy,
+            final ConfigurableBeanFactory bf) {
         final String customFilterBeanName = envCopy.get().resolveRequiredPlaceholders(FILTER_BEAN_PLACEHOLDER);
         final boolean isCustom = envCopy.get().containsProperty(FILTER_BEAN_PROPERTY);
-        final FilterConfigurationProperties filterConfig = configProps.get().getProperty().getFilter();
-        return new DefaultLazyPropertyFilter(filterConfig.getIncludeSources(), filterConfig.getExcludeSources(),
-                    filterConfig.getIncludeNames(), filterConfig.getExcludeNames(), customFilterBeanName, isCustom, bf);
+        return new DefaultLazyPropertyFilter(envCopy.get(), customFilterBeanName, isCustom, bf);
     }
 
     @Bean(name = RESOLVER_BEAN_NAME)
     public EncryptablePropertyResolver encryptablePropertyResolver(
-                @Qualifier(DETECTOR_BEAN_NAME) final EncryptablePropertyDetector propertyDetector,
-                @Qualifier(ENCRYPTOR_BEAN_NAME) final StringEncryptor encryptor, final BeanFactory bf,
-                @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final EnvCopy envCopy, final ConfigurableEnvironment environment) {
+            @Qualifier(DETECTOR_BEAN_NAME) final EncryptablePropertyDetector propertyDetector,
+            @Qualifier(ENCRYPTOR_BEAN_NAME) final StringEncryptor encryptor, final BeanFactory bf,
+            final EnvCopy envCopy, final ConfigurableEnvironment environment) {
         final String customResolverBeanName = envCopy.get().resolveRequiredPlaceholders(RESOLVER_BEAN_PLACEHOLDER);
         final boolean isCustom = envCopy.get().containsProperty(RESOLVER_BEAN_PROPERTY);
         return new DefaultLazyPropertyResolver(propertyDetector, encryptor, customResolverBeanName, isCustom, bf, environment);
-    }
-
-    /**
-     * Need a copy of the environment without the Enhanced property sources to avoid circular dependencies.
-     */
-    private static class EnvCopy {
-        StandardEnvironment copy;
-
-        EnvCopy(final ConfigurableEnvironment environment) {
-            copy = new StandardEnvironment();
-            environment.getPropertySources().forEach(ps -> {
-                final PropertySource<?> original = ps instanceof EncryptablePropertySource
-                            ? ((EncryptablePropertySource) ps).getDelegate()
-                            : ps;
-                copy.getPropertySources().addLast(original);
-            });
-        }
-
-        ConfigurableEnvironment get() {
-            return copy;
-        }
     }
 
 }

@@ -1,9 +1,11 @@
 package com.ulisesbocchio.jasyptspringboot.detector;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
+import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.Optional;
 
@@ -20,7 +22,7 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
 
     private Singleton<EncryptablePropertyDetector> singleton;
 
-    public DefaultLazyPropertyDetector(String prefix, String suffix, String customDetectorBeanName, boolean isCustom, BeanFactory bf) {
+    public DefaultLazyPropertyDetector(ConfigurableEnvironment environment, String customDetectorBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customDetectorBeanName)
                         .filter(bf::containsBean)
@@ -31,8 +33,17 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
                                 throw new IllegalStateException(String.format("Property Detector custom Bean not found with name '%s'", customDetectorBeanName));
                             }
                             log.info("Property Detector custom Bean not found with name '{}'. Initializing Default Property Detector", customDetectorBeanName);
-                            return new DefaultPropertyDetector(prefix, suffix);
+                            return createDefault(environment);
                         }));
+    }
+
+    public DefaultLazyPropertyDetector(ConfigurableEnvironment environment) {
+        singleton = new Singleton<>(() -> createDefault(environment));
+    }
+
+    private DefaultPropertyDetector createDefault(ConfigurableEnvironment environment) {
+        JasyptEncryptorConfigurationProperties props = JasyptEncryptorConfigurationProperties.bindConfigProps(environment);
+        return new DefaultPropertyDetector(props.getProperty().getPrefix(), props.getProperty().getSuffix());
     }
 
     @Override

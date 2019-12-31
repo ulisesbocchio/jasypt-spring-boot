@@ -33,8 +33,16 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
                                 throw new IllegalStateException(String.format("Property Resolver custom Bean not found with name '%s'", customResolverBeanName));
                             }
                             log.info("Property Resolver custom Bean not found with name '{}'. Initializing Default Property Resolver", customResolverBeanName);
-                            return new DefaultPropertyResolver(encryptor, propertyDetector, environment);
+                            return createDefault(propertyDetector, encryptor, environment);
                         }));
+    }
+
+    public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, Environment environment) {
+        singleton = new Singleton<>(() -> createDefault(propertyDetector, encryptor, environment));
+    }
+
+    private DefaultPropertyResolver createDefault(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, Environment environment) {
+        return new DefaultPropertyResolver(encryptor, propertyDetector, environment);
     }
 
     @Override

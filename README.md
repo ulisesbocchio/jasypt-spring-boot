@@ -24,9 +24,11 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
-### Update 12/30/2019: Version 3.0.1 Release Includes
+### Update 12/31/2019: Version 3.0.1 Release Includes
 * Adds support for [skipping classes](#filter-out-propertysource-classes-from-being-introspected) from being introspected
-* Usage of `replacePlaceHolders` instead of `replaceRequiredPlaceholders` on property resolution to mirror Spring's default behavior
+* Usage of `replacePlaceHolders` instead of `replaceRequiredPlaceholders` on property resolver to mirror Spring's default behavior
+* Refactored `StandardEncryptableEnvironment` to use builder pattern and lazy load resolver/filter/detector/encryptor
+* Removed deprecated `EncryptableENvironment`
 ### Update 11/24/2019: Version 3.0.0 Release Includes
 * Adds support for Spring Boot 2.1.X
 * Spring Boot 1.5.X No longer supported
@@ -132,7 +134,7 @@ new SpringApplicationBuilder()
 
 ```
 
-This method would only require using a dependency for `jasypt-spring-boot`. ~~Notice that `EncryptableEnvironment` is just a wrapper, so you have to provide the actual Environment implementation, in this case `StandardServletEnvironment`~~. No starter jar dependency is required. This method is useful for early access of encrypted properties on bootstrap. While not required in most scenarios could be useful when customizing Spring Boot's init behavior or integrating with certain capabilities that are configured very early, such as Logging configuration. For a concrete example, this method of enabling encryptable properties is the only one that works with Spring Properties replacement in `logback-spring.xml` files, using the `springProperty` tag. For instance:
+This method would only require using a dependency for `jasypt-spring-boot`. No starter jar dependency is required. This method is useful for early access of encrypted properties on bootstrap. While not required in most scenarios could be useful when customizing Spring Boot's init behavior or integrating with certain capabilities that are configured very early, such as Logging configuration. For a concrete example, this method of enabling encryptable properties is the only one that works with Spring Properties replacement in `logback-spring.xml` files, using the `springProperty` tag. For instance:
 
 ```xml
 <springProperty name="user" source="db.user"/>
@@ -149,7 +151,14 @@ This method would only require using a dependency for `jasypt-spring-boot`. ~~No
 ```
 
 This mechanism could be used for instance (as shown) to initialize Database Logging Appender that require sensitive credentials to be passed.
-Alternatively, if a custom `StringEncryptor` is needed to be provided, a second constructor `EncryptableEnvironment(ConfigurableEnvironment, StringEncryptor)` is available for that purpose.
+Alternatively, if a custom `StringEncryptor` is needed to be provided, a static builder method is provided `StandardEncryptableEnvironment#builder` for customization (other customizations are possible):
+
+```java
+StandardEncryptableEnvironment
+    .builder()
+    .encryptor(new MyEncryptor())
+    .build()
+```
 
 ## How everything Works?
 

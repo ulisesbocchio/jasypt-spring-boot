@@ -2,6 +2,7 @@ package com.ulisesbocchio.jasyptspringboot;
 
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
@@ -45,13 +46,13 @@ public class EncryptablePropertySourceConverter {
         return encryptablePropertySource;
     }
 
-    public static MutablePropertySources proxyPropertySources(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources) {
+    public static MutablePropertySources proxyPropertySources(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources, EnvCopy envCopy) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(MutablePropertySources.class);
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.addInterface(PropertySources.class);
         proxyFactory.setTarget(propertySources);
-        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter));
+        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter, envCopy));
         return (MutablePropertySources) proxyFactory.getProxy();
     }
 

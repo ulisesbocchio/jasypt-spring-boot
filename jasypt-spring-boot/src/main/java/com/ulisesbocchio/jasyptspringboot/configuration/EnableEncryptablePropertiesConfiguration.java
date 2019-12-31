@@ -12,6 +12,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * <p>Configuration class that registers a {@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
  * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link StringEncryptor} for decrypting properties
@@ -58,10 +62,26 @@ import org.springframework.core.env.PropertySource;
 @Slf4j
 public class EnableEncryptablePropertiesConfiguration {
 
+    @SuppressWarnings("unchecked")
     @Bean
     public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(final ConfigurableEnvironment environment) {
         final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxy-property-sources", Boolean.TYPE, false);
+        final List<String> skipPropertySources = (List<String>) environment.getProperty("jasypt.encryptor.skip-property-sources", List.class, Collections.EMPTY_LIST);
+        final List<Class<PropertySource<?>>> skipPropertySourceClasses = skipPropertySources.stream().map(EnableEncryptablePropertiesConfiguration::getPropertiesClass).collect(Collectors.toList());
         final InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
-        return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, interceptionMode);
+        return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, interceptionMode, skipPropertySourceClasses);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Class<PropertySource<?>> getPropertiesClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (PropertySource.class.isAssignableFrom(clazz)) {
+                return (Class<PropertySource<?>>) clazz;
+            }
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s does not implement %s", className, PropertySource.class.getName()));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s not found", className), e);
+        }
     }
 }

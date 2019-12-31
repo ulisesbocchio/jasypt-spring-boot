@@ -59,6 +59,13 @@
       "defaultValue": false
     },
     {
+      "name": "jasypt.encryptor.skipPropertySources",
+      "type": "java.lang.List",
+      "description": "Define a list of {@link org.springframework.core.env.PropertySource} to skip from wrapping/proxying. Properties held\n * in classes on this list will not be eligible for decryption. Default Value is {@code empty list}.",
+      "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
+      "defaultValue": "empty list"
+    },
+    {
       "name": "jasypt.encryptor.saltGeneratorClassname",
       "type": "java.lang.String",
       "description": "A {@link org.jasypt.salt.SaltGenerator} implementation to be used by the\n encryptor.\n Default Value is {@code \"org.jasypt.salt.RandomSaltGenerator\"}.\n\n @see org.jasypt.encryption.pbe.PBEStringEncryptor\n @see org.jasypt.encryption.pbe.config.StringPBEConfig#getSaltGenerator()",

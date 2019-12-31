@@ -24,6 +24,9 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
+### Update 12/30/2019: Version 3.0.1 Release Includes
+* Adds support for [skipping classes](#filter-out-propertysource-classes-from-being-introspected) from being introspected
+* Usage of `replacePlaceHolders` instead of `replaceRequiredPlaceholders` on property resolution to mirror Spring's default behavior
 ### Update 11/24/2019: Version 3.0.0 Release Includes
 * Adds support for Spring Boot 2.1.X
 * Spring Boot 1.5.X No longer supported
@@ -188,28 +191,31 @@ Jasypt uses an `StringEncryptor` to decrypt properties. For all 3 methods, if no
           <td>jasypt.encryptor.algorithm</td><td>False</td><td>PBEWITHHMACSHA512ANDAES_256</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.keyObtentionIterations</td><td>False</td><td>1000</td>
+          <td>jasypt.encryptor.key-obtention-iterations</td><td>False</td><td>1000</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.poolSize</td><td>False</td><td>1</td>
+          <td>jasypt.encryptor.pool-size</td><td>False</td><td>1</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.providerName</td><td>False</td><td>SunJCE</td>
+          <td>jasypt.encryptor.provider-name</td><td>False</td><td>SunJCE</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.providerClassName</td><td>False</td><td>null</td>
+          <td>jasypt.encryptor.provider-class-name</td><td>False</td><td>null</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.saltGeneratorClassname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
+          <td>jasypt.encryptor.salt-generator-classname</td><td>False</td><td>org.jasypt.salt.RandomSaltGenerator</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.ivGeneratorClassname</td><td>False</td><td>org.jasypt.iv.RandomIvGenerator</td>
+          <td>jasypt.encryptor.iv-generator-classname</td><td>False</td><td>org.jasypt.iv.RandomIvGenerator</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.stringOutputType</td><td>False</td><td>base64</td>
+          <td>jasypt.encryptor.string-output-type</td><td>False</td><td>base64</td>
       </tr>
       <tr>
-          <td>jasypt.encryptor.proxyPropertySources</td><td>False</td><td>false</td>
+          <td>jasypt.encryptor.proxy-property-sources</td><td>False</td><td>false</td>
+      </tr>
+      <tr>
+          <td>jasypt.encryptor.skip-property-sources</td><td>False</td><td>empty list</td>
       </tr>
   </table>
 
@@ -403,6 +409,14 @@ Example:
 Notice that for this mechanism to work, you should not provide a custom `EncryptablePropertyResolver` and use the default
 resolver instead. If you provide custom resolver, you are responsible for the entire process of detecting and decrypting
 properties.
+
+## Filter out `PropertySource` classes from being introspected
+Define a comma-separated list of fully-qualified class names to be skipped from introspection. This classes will not be
+wrapped/proxied by this plugin and thereby properties contained in them won't supported encryption/decryption:
+
+```properties
+jasypt.encryptor.skip-property-sources=org.springframework.boot.env.RandomValuePropertySource,org.springframework.boot.ansi.AnsiPropertySource
+```
 
 ## Maven Plugin
 

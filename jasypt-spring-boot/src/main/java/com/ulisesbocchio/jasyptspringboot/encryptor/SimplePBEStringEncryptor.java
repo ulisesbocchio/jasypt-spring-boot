@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.jasypt.encryption.pbe.PBEByteEncryptor;
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class SimplePBEStringEncryptor implements PBEStringEncryptor {
@@ -17,13 +18,13 @@ public class SimplePBEStringEncryptor implements PBEStringEncryptor {
     @Override
     @SneakyThrows
     public String encrypt(String message) {
-        return Base64.getEncoder().encodeToString(delegate.encrypt(message.getBytes("UTF-8")));
+        return Base64.getEncoder().encodeToString(delegate.encrypt(message.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
     @SneakyThrows
     public String decrypt(String encryptedMessage) {
-        return new String(delegate.decrypt(Base64.getDecoder().decode(encryptedMessage)), "UTF-8");
+        return new String(delegate.decrypt(Base64.getDecoder().decode(encryptedMessage)), StandardCharsets.UTF_8);
     }
 
     @Override

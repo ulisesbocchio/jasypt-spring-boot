@@ -11,7 +11,11 @@ import com.ulisesbocchio.jasyptspringboot.resolver.DefaultPropertyResolver;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
+
+import java.util.Collections;
+import java.util.List;
 
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.convertPropertySources;
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.proxyPropertySources;
@@ -27,6 +31,7 @@ import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConver
 public class StandardEncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment {
 
     private EncryptablePropertyResolver resolver;
+    private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
     private final EncryptablePropertyFilter filter;
     private final InterceptionMode interceptionMode;
     private MutablePropertySources encryptablePropertySources;
@@ -36,8 +41,16 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         this(InterceptionMode.WRAPPER);
     }
 
+    public StandardEncryptableEnvironment(List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+        this(InterceptionMode.WRAPPER, skipPropertySourceClasses);
+    }
+
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode) {
-        this(interceptionMode, new DefaultPropertyDetector(), new DefaultPropertyFilter());
+        this(interceptionMode, Collections.emptyList(), new DefaultPropertyDetector(), new DefaultPropertyFilter());
+    }
+
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+        this(interceptionMode, skipPropertySourceClasses, new DefaultPropertyDetector(), new DefaultPropertyFilter());
     }
 
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor) {
@@ -45,9 +58,19 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, StringEncryptor encryptor) {
+        this(interceptionMode, skipPropertySourceClasses, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
+    }
+
     public StandardEncryptableEnvironment(StringEncryptor encryptor) {
         this(InterceptionMode.WRAPPER, new DefaultPropertyFilter());
-        this.resolver =new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
+    }
+
+    public StandardEncryptableEnvironment(StringEncryptor encryptor, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+        this(InterceptionMode.WRAPPER, skipPropertySourceClasses, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
@@ -55,16 +78,33 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
     }
 
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+        this(interceptionMode, skipPropertySourceClasses, new DefaultPropertyFilter());
+        this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
+    }
+
     public StandardEncryptableEnvironment(EncryptablePropertyResolver resolver) {
-        this(InterceptionMode.WRAPPER, resolver, new DefaultPropertyFilter());
+        this(InterceptionMode.WRAPPER, Collections.emptyList(), resolver, new DefaultPropertyFilter());
+    }
+
+    public StandardEncryptableEnvironment(EncryptablePropertyResolver resolver, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+        this(InterceptionMode.WRAPPER, skipPropertySourceClasses, resolver, new DefaultPropertyFilter());
     }
 
     public StandardEncryptableEnvironment(EncryptablePropertyFilter filter) {
         this(InterceptionMode.WRAPPER, filter);
     }
 
+    public StandardEncryptableEnvironment(EncryptablePropertyFilter filter, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+        this(InterceptionMode.WRAPPER, skipPropertySourceClasses, filter);
+    }
+
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, EncryptablePropertyFilter filter) {
-        this(interceptionMode, new DefaultPropertyDetector(), filter);
+        this(interceptionMode, Collections.emptyList(), new DefaultPropertyDetector(), filter);
+    }
+
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyFilter filter) {
+        this(interceptionMode, skipPropertySourceClasses, new DefaultPropertyDetector(), filter);
     }
 
 
@@ -78,26 +118,37 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         this.resolver = new DefaultPropertyResolver(encryptor, new DefaultPropertyDetector(), this);
     }
 
+    public StandardEncryptableEnvironment(EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
+        this(InterceptionMode.WRAPPER, Collections.emptyList(), resolver, filter);
+    }
+
+    public StandardEncryptableEnvironment(List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
+        this(InterceptionMode.WRAPPER, skipPropertySourceClasses, resolver, filter);
+    }
+
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, StringEncryptor encryptor, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
         this(interceptionMode, filter);
         this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
     }
 
-    public StandardEncryptableEnvironment(EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
-        this(InterceptionMode.WRAPPER, resolver, filter);
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, StringEncryptor encryptor, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
+        this(interceptionMode, skipPropertySourceClasses, filter);
+        this.resolver = new DefaultPropertyResolver(encryptor, detector, this);
     }
 
-    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
         this.interceptionMode = interceptionMode;
+        this.skipPropertySourceClasses = skipPropertySourceClasses;
         this.filter = filter;
-        this.resolver = resolver;
+        this.resolver = new DefaultPropertyResolver(new DefaultLazyEncryptor(this), detector, this);
         actuallyCustomizePropertySources();
     }
 
-    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, EncryptablePropertyDetector detector, EncryptablePropertyFilter filter) {
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         this.interceptionMode = interceptionMode;
+        this.skipPropertySourceClasses = skipPropertySourceClasses;
         this.filter = filter;
-        this.resolver = new DefaultPropertyResolver(new DefaultLazyEncryptor(this), detector, this);
+        this.resolver = resolver;
         actuallyCustomizePropertySources();
     }
 
@@ -108,8 +159,8 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
     }
 
     protected void actuallyCustomizePropertySources() {
-        convertPropertySources(interceptionMode, resolver, filter, originalPropertySources);
-        this.encryptablePropertySources = proxyPropertySources(interceptionMode, resolver, filter, originalPropertySources);
+        convertPropertySources(interceptionMode, skipPropertySourceClasses, resolver, filter, originalPropertySources);
+        this.encryptablePropertySources = proxyPropertySources(interceptionMode, skipPropertySourceClasses, resolver, filter, originalPropertySources);
     }
 
     @Override

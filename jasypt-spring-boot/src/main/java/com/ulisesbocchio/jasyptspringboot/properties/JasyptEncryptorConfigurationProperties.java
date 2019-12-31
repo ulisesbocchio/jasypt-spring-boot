@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,6 +24,12 @@ public class JasyptEncryptorConfigurationProperties {
      * Value is {@code false}.
      */
     private Boolean proxyPropertySources = false;
+
+    /**
+     * Define a list of {@link org.springframework.core.env.PropertySource} to skip from wrapping/proxying. Properties held
+     * in classes on this list will not be eligible for decryption. Default Value is {@code empty list}.
+     */
+    private List<String> skipPropertySources = Collections.emptyList();
 
     /**
      * Specify the name of bean to override jasypt-spring-boot's default properties based

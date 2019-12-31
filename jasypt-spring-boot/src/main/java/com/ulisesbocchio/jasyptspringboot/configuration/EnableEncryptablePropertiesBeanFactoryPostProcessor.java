@@ -14,6 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
+import java.util.List;
+
 import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.convertPropertySources;
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.FILTER_BEAN_NAME;
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
@@ -33,14 +35,12 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertiesBeanFactoryPostProcessor.class);
     private ConfigurableEnvironment environment;
     private InterceptionMode interceptionMode;
+    private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
 
-    public EnableEncryptablePropertiesBeanFactoryPostProcessor() {
-        this.interceptionMode = InterceptionMode.PROXY;
-    }
-
-    public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, InterceptionMode interceptionMode) {
+    public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
         this.environment = environment;
         this.interceptionMode = interceptionMode;
+        this.skipPropertySourceClasses = skipPropertySourceClasses;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
         EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
         EncryptablePropertyFilter propertyFilter = beanFactory.getBean(FILTER_BEAN_NAME, EncryptablePropertyFilter.class);
         MutablePropertySources propSources = environment.getPropertySources();
-        convertPropertySources(interceptionMode, propertyResolver, propertyFilter, propSources);
+        convertPropertySources(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter, propSources);
     }
 
     @Override

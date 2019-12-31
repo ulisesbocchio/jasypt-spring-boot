@@ -13,6 +13,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.env.*;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -24,17 +25,18 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class EncryptablePropertySourceConverter {
 
-    public static void convertPropertySources(InterceptionMode interceptionMode, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propSources) {
+    public static void convertPropertySources(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propSources) {
         StreamSupport.stream(propSources.spliterator(), false)
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
-                .map(ps -> makeEncryptable(interceptionMode, propertyResolver, propertyFilter, ps))
+                .map(ps -> makeEncryptable(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter, ps))
                 .collect(toList())
                 .forEach(ps -> propSources.replace(ps.getName(), ps));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> PropertySource<T> makeEncryptable(InterceptionMode interceptionMode, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, PropertySource<T> propertySource) {
-        if (propertySource instanceof EncryptablePropertySource) {
+    public static <T> PropertySource<T> makeEncryptable(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, PropertySource<T> propertySource) {
+        if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
+            log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
             return propertySource;
         }
         PropertySource<T> encryptablePropertySource = convertPropertySource(interceptionMode, propertyResolver, propertyFilter, propertySource);
@@ -43,31 +45,31 @@ public class EncryptablePropertySourceConverter {
         return encryptablePropertySource;
     }
 
-    private static <T> PropertySource<T> convertPropertySource(InterceptionMode interceptionMode, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, PropertySource<T> propertySource) {
-        return interceptionMode == InterceptionMode.PROXY
-                ? proxyPropertySource(propertySource, propertyResolver, propertyFilter) : instantiatePropertySource(propertySource, propertyResolver, propertyFilter);
-    }
-
-    public static MutablePropertySources proxyPropertySources(InterceptionMode interceptionMode, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources) {
+    public static MutablePropertySources proxyPropertySources(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(MutablePropertySources.class);
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.addInterface(PropertySources.class);
         proxyFactory.setTarget(propertySources);
-        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(interceptionMode, propertyResolver, propertyFilter));
+        proxyFactory.addAdvice(new EncryptableMutablePropertySourcesInterceptor(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter));
         return (MutablePropertySources) proxyFactory.getProxy();
     }
 
+    private static <T> PropertySource<T> convertPropertySource(InterceptionMode interceptionMode, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter, PropertySource<T> propertySource) {
+        return interceptionMode == InterceptionMode.PROXY
+                ? proxyPropertySource(propertySource, propertyResolver, propertyFilter) : instantiatePropertySource(propertySource, propertyResolver, propertyFilter);
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T> PropertySource<T> proxyPropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter) {
+    private static <T> PropertySource<T> proxyPropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter) {
         //Silly Chris Beams for making CommandLinePropertySource getProperty and containsProperty methods final. Those methods
         //can't be proxied with CGLib because of it. So fallback to wrapper for Command Line Arguments only.
         if (CommandLinePropertySource.class.isAssignableFrom(propertySource.getClass())
-            // Other PropertySource classes like org.springframework.boot.env.OriginTrackedMapPropertySource
-            // are final classes as well
-            || Modifier.isFinal(propertySource.getClass().getModifiers())) {
+                // Other PropertySource classes like org.springframework.boot.env.OriginTrackedMapPropertySource
+                // are final classes as well
+                || Modifier.isFinal(propertySource.getClass().getModifiers())) {
             return instantiatePropertySource(propertySource, resolver, propertyFilter);
-        }            
+        }
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTargetClass(propertySource.getClass());
         proxyFactory.setProxyTargetClass(true);
@@ -77,8 +79,8 @@ public class EncryptablePropertySourceConverter {
         return (PropertySource<T>) proxyFactory.getProxy();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> PropertySource<T> instantiatePropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static <T> PropertySource<T> instantiatePropertySource(PropertySource<T> propertySource, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter) {
         PropertySource<T> encryptablePropertySource;
         if (needsProxyAnyway(propertySource)) {
             encryptablePropertySource = proxyPropertySource(propertySource, resolver, propertyFilter);

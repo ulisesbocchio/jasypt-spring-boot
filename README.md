@@ -69,7 +69,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -78,7 +78,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
     </dependency>
 	```
 
@@ -99,7 +99,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -439,7 +439,7 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1</version>
     </plugin>
   </plugins>
 </build>

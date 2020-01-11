@@ -35,7 +35,7 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
     @Override
     public String resolvePropertyValue(String value) {
         return Optional.ofNullable(value)
-                .map(environment::resolveRequiredPlaceholders)
+                .map(environment::resolvePlaceholders)
                 .filter(detector::isEncrypted)
                 .map(resolvedValue -> {
                     try {

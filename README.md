@@ -24,6 +24,10 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
+### Update 01/11/2020: Version 3.0.2 Release Includes
+* Allows unresolvable properties from env actuator (Thanks [@thorntonrp](https://github.com/thorntonrp))
+* Fixes [jasypt-maven-plugin]((#maven-plugin)) issues
+* Adds support to [jasypt-maven-plugin](#maven-plugin) for encryption/decryption of single values
 ### Update 12/31/2019: Version 3.0.1 Release Includes
 * Adds support for [skipping classes](#filter-out-propertysource-classes-from-being-introspected) from being introspected
 * Usage of `replacePlaceHolders` instead of `replaceRequiredPlaceholders` on property resolver to mirror Spring's default behavior
@@ -69,7 +73,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -78,7 +82,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
     </dependency>
 	```
 
@@ -99,7 +103,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -439,13 +443,22 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.1</version>
+      <version>3.0.2</version>
     </plugin>
   </plugins>
 </build>
 ```
 
+The plugin reads you encryption configuration directly from your Spring Boot configuration
+
 ### Encryption
+
+To encrypt a single value run:
+
+```bash
+mvn jasypt:encrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="theValueYouWantToEncrypt"
+```
+
 
 To encrypt placeholders in a file, simply wrap any string with `DEC(...)`. For example:
 
@@ -456,7 +469,7 @@ regular.property=example
 
 This can be encrypted as follows:
 
-```shell script
+```bash
 mvn jasypt:encrypt -Djasypt.encryptor.password="the password"
 ```
 
@@ -469,6 +482,12 @@ regular.property=example
 
 ### Decryption
 
+To decrypt a single value run:
+
+```bash
+mvn jasypt:decrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="DbG1GppXOsFa2G69PnmADvQFI3esceEhJYbaEIKCcEO5C85JEqGAhfcjFMGnoRFf"
+```
+
 To decrypt placeholders in a file, simply wrap any string with `ENC(...)`. For example:
 
 ```properties
@@ -478,7 +497,7 @@ regular.property=example
 
 This can be decrypted as follows:
 
-```shell script
+```bash
 mvn jasypt:decrypt -Djasypt.encryptor.password="the password"
 ```
 
@@ -499,7 +518,7 @@ You can also decrypt a properties file and load all of its properties into memor
 
 You can chain the goals of the later plugins directly after this one. For example, with flyway:
 
-```shell script
+```bash
 mvn encrypt:load flyway:migrate -Djasypt.encryptor.password="the password"
 ```
 
@@ -512,19 +531,19 @@ For all of the above utilities, the file path defaults to `file:src/main/resourc
 
 You can insert the name of a Spring profile between the file name and it's extension by specifying by specifying an active profile. For example, the file `file:src/main/resources/application-dev.properties` could be encrypted as follows:
 
-```shell script
+```bash
 mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Dspring.profiles.active=dev
 ```
 
 You can also changed the file path completely. For example to encrypt a file in your test resources directory:
 
-```shell script
+```bash
 mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/test/application.properties"
 ```
 
 Or you can encrypt a file with a different name:
 
-```shell script
+```bash
 mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/flyway.properties"
 ```
 
@@ -532,14 +551,21 @@ Both of these would also work with decryption and loading.
 
 You can also specify a different extension. However, please note that loading only works with property files. Encryption/Decryption work with any file type.
 
-```shell script
+```bash
 mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/application.yaml"
 ```
 
 You can also specify a file on the classpath, instead of the file system. However, please note that this will not work for encryption, as this will attempt to write the encrypted contents back to disk. Also this will only load files from the plugin's classpath, and not the classpath of the application.
 
-```shell script
+```bash
 mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties"
+```
+
+### Spring profiles and other spring config
+You can override any spring config you support in your application when running the plugin, for instance selecting a given spring profile:
+ 
+```bash
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties" -Dspring.profiles.active=cloud
 ```
 
 ## Asymmetric Encryption

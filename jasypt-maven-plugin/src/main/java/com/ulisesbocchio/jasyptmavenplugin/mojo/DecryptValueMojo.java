@@ -18,9 +18,10 @@ public class DecryptValueMojo extends AbstractValueJasyptMojo {
     @Override
     protected void run(final EncryptionService service, final String value, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {
-        log.info("Decrypting value " + value);
         try {
-            String decryptedValue = service.decryptValue(value);
+            String actualValue = value.startsWith(encryptPrefix) ? value.substring(encryptPrefix.length(), value.length() - encryptSuffix.length()) : value;
+            log.info("Decrypting value " + actualValue);
+            String decryptedValue = service.decryptValue(actualValue);
             log.info("\n" + decryptedValue);
         } catch (Exception e) {
             throw new MojoExecutionException("Error Decrypting: " + e.getMessage(), e);

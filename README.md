@@ -456,7 +456,7 @@ The plugin reads you encryption configuration directly from your Spring Boot con
 To encrypt a single value run:
 
 ```bash
-mvn jasypt:encrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="theValueYouWantToEncrypt"
+mvn jasypt:encrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="theValueYouWantToEncrypt"
 ```
 
 
@@ -485,7 +485,7 @@ regular.property=example
 To decrypt a single value run:
 
 ```bash
-mvn jasypt:decrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="DbG1GppXOsFa2G69PnmADvQFI3esceEhJYbaEIKCcEO5C85JEqGAhfcjFMGnoRFf"
+mvn jasypt:decrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="DbG1GppXOsFa2G69PnmADvQFI3esceEhJYbaEIKCcEO5C85JEqGAhfcjFMGnoRFf"
 ```
 
 To decrypt placeholders in a file, simply wrap any string with `ENC(...)`. For example:

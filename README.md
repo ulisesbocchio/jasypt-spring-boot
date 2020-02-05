@@ -538,13 +538,13 @@ mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Dspring.profiles
 You can also changed the file path completely. For example to encrypt a file in your test resources directory:
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/test/application.properties"
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/test/application.properties"
 ```
 
 Or you can encrypt a file with a different name:
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/flyway.properties"
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/flyway.properties"
 ```
 
 Both of these would also work with decryption and loading.
@@ -552,7 +552,7 @@ Both of these would also work with decryption and loading.
 You can also specify a different extension. However, please note that loading only works with property files. Encryption/Decryption work with any file type.
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:/src/main/resources/application.yaml"
+mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/application.yaml"
 ```
 
 You can also specify a file on the classpath, instead of the file system. However, please note that this will not work for encryption, as this will attempt to write the encrypted contents back to disk. Also this will only load files from the plugin's classpath, and not the classpath of the application.

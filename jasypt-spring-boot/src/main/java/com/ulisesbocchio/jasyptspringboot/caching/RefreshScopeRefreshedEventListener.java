@@ -43,6 +43,7 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         propertySources.forEach(this::refreshPropertySource);
     }
 
+    @SuppressWarnings("rawtypes")
     private void refreshPropertySource(PropertySource<?> propertySource) {
         if (propertySource instanceof CompositePropertySource) {
             CompositePropertySource cps = (CompositePropertySource) propertySource;

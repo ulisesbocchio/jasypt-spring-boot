@@ -19,6 +19,7 @@ import java.util.Properties;
  *
  * @author Rupert Madden-Abbott
  */
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Mojo(name = "load", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class LoadMojo extends AbstractFileJasyptMojo {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadMojo.class);

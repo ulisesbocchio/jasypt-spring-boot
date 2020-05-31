@@ -15,6 +15,7 @@ import java.nio.file.Path;
  *
  * @author Rupert Madden-Abbott
  */
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Slf4j
 public abstract class AbstractFileJasyptMojo extends AbstractJasyptMojo {
 

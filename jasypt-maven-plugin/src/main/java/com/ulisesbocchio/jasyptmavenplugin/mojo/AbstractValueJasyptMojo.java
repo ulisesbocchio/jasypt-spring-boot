@@ -12,6 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author ubocchio
  */
 @Slf4j
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public abstract class AbstractValueJasyptMojo extends AbstractJasyptMojo {
 
     /**

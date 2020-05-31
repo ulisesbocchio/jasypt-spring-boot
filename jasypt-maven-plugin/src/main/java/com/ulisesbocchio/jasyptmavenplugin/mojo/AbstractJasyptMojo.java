@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
  *
  * @author Rupert Madden-Abbott
  */
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Slf4j
 public abstract class AbstractJasyptMojo extends AbstractMojo {
 

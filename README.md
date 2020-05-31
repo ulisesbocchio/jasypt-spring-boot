@@ -519,7 +519,7 @@ You can also decrypt a properties file and load all of its properties into memor
 You can chain the goals of the later plugins directly after this one. For example, with flyway:
 
 ```bash
-mvn encrypt:load flyway:migrate -Djasypt.encryptor.password="the password"
+mvn jasypt:load flyway:migrate -Djasypt.encryptor.password="the password"
 ```
 
 You can also specify a prefix for each property with `-Djasypt.plugin.keyPrefix=example.`. This
@@ -532,19 +532,19 @@ For all of the above utilities, the file path defaults to `file:src/main/resourc
 You can insert the name of a Spring profile between the file name and it's extension by specifying by specifying an active profile. For example, the file `file:src/main/resources/application-dev.properties` could be encrypted as follows:
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Dspring.profiles.active=dev
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Dspring.profiles.active=dev
 ```
 
 You can also changed the file path completely. For example to encrypt a file in your test resources directory:
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/test/application.properties"
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/test/application.properties"
 ```
 
 Or you can encrypt a file with a different name:
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/flyway.properties"
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/flyway.properties"
 ```
 
 Both of these would also work with decryption and loading.
@@ -552,20 +552,20 @@ Both of these would also work with decryption and loading.
 You can also specify a different extension. However, please note that loading only works with property files. Encryption/Decryption work with any file type.
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/application.yaml"
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/application.yaml"
 ```
 
 You can also specify a file on the classpath, instead of the file system. However, please note that this will not work for encryption, as this will attempt to write the encrypted contents back to disk. Also this will only load files from the plugin's classpath, and not the classpath of the application.
 
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties"
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties"
 ```
 
 ### Spring profiles and other spring config
 You can override any spring config you support in your application when running the plugin, for instance selecting a given spring profile:
  
 ```bash
-mvn encrypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties" -Dspring.profiles.active=cloud
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties" -Dspring.profiles.active=cloud
 ```
 
 ## Asymmetric Encryption

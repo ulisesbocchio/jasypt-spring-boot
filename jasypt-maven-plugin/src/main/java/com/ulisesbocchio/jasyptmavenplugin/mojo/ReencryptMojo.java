@@ -6,8 +6,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.util.function.Consumer;
-
 @Mojo(name = "reencrypt", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class ReencryptMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.password") private String oldPassword;
@@ -19,8 +17,8 @@ public class ReencryptMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.pool-size") private String oldPoolSize;
     @Parameter(property = "jasypt.plugin.old.provider-name") private String oldProviderName;
     @Parameter(property = "jasypt.plugin.old.provider-class-name") private String oldProviderClassName;
-    @Parameter(property = "jasypt.plugin.old.salt-generator-class-name") private String oldSaltGeneratorClassName;
-    @Parameter(property = "jasypt.plugin.old.iv-generator-class-name") private String oldIvGeneratorClassName;
+    @Parameter(property = "jasypt.plugin.old.salt-generator-classname") private String oldSaltGeneratorClassname;
+    @Parameter(property = "jasypt.plugin.old.iv-generator-classname") private String oldIvGeneratorClassname;
     @Parameter(property = "jasypt.plugin.old.string-output-type") private String oldStringOutputType;
 
     @Override
@@ -35,8 +33,8 @@ public class ReencryptMojo extends AbstractReencryptMojo {
         setIfNotNull(properties::setPoolSize, oldPoolSize);
         setIfNotNull(properties::setProviderName, oldProviderName);
         setIfNotNull(properties::setProviderClassName, oldProviderClassName);
-        setIfNotNull(properties::setSaltGeneratorClassname, oldSaltGeneratorClassName);
-        setIfNotNull(properties::setIvGeneratorClassname, oldIvGeneratorClassName);
+        setIfNotNull(properties::setSaltGeneratorClassname, oldSaltGeneratorClassname);
+        setIfNotNull(properties::setIvGeneratorClassname, oldIvGeneratorClassname);
         setIfNotNull(properties::setStringOutputType, oldStringOutputType);
     }
 }

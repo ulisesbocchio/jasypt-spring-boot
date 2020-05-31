@@ -44,7 +44,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
     }
 
     private StringEncryptor createDefault(ConfigurableEnvironment e) {
-        return new StringEncryptorBuilder(JasyptEncryptorConfigurationProperties.bindConfigProps(e)).build();
+        return new StringEncryptorBuilder(JasyptEncryptorConfigurationProperties.bindConfigProps(e), "jasypt.encryptor").build();
     }
 
     @Override

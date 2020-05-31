@@ -9,6 +9,7 @@ import org.jasypt.encryption.StringEncryptor;
 import org.springframework.boot.Banner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.Environment;
 
 /**
  * A mojo that spins up a Spring Boot application for any encrypt/decrypt function.
@@ -42,12 +43,20 @@ public abstract class AbstractJasyptMojo extends AbstractMojo {
     @Parameter(property = "jasypt.plugin.decrypt.suffix", defaultValue = ")")
     private String decryptSuffix = ")";
 
+    private Environment environment;
+
+    protected Environment getEnvironment() {
+        return environment;
+    }
+
     @Override
     public void execute() throws MojoExecutionException {
         ConfigurableApplicationContext context = new SpringApplicationBuilder()
                 .sources(Application.class)
                 .bannerMode(Banner.Mode.OFF)
                 .run();
+
+        this.environment = context.getEnvironment();
 
         String[] activeProfiles = context.getEnvironment().getActiveProfiles();
         String profiles = activeProfiles.length != 0 ? String.join(",", activeProfiles) : "Default";

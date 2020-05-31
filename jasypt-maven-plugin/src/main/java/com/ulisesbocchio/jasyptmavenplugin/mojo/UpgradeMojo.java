@@ -14,14 +14,6 @@ public class UpgradeMojo extends AbstractReencryptMojo {
 
     @Override
     protected void configure(JasyptEncryptorConfigurationProperties properties) {
-        if (oldMajorVersion == 2) {
-            upgradeFrom2(properties);
-        } else {
-            throw new RuntimeException("Unrecognised major version " + oldMajorVersion);
-        }
-    }
-
-    private void upgradeFrom2(JasyptEncryptorConfigurationProperties properties) {
         Environment environment = getEnvironment();
 
         setIfNotNull(properties::setPassword, environment.getProperty("jasypt.encryptor.password"));
@@ -29,6 +21,14 @@ public class UpgradeMojo extends AbstractReencryptMojo {
         setIfNotNull(properties::setPrivateKeyString, environment.getProperty("jasypt.encryptor.private-key-string"));
         setIfNotNull(properties::setPrivateKeyLocation, environment.getProperty("jasypt.encryptor.private-key-location"));
 
+        if (oldMajorVersion < 2) {
+            upgradeFrom2(properties);
+        } else {
+            throw new RuntimeException("Unrecognised major version " + oldMajorVersion);
+        }
+    }
+
+    private void upgradeFrom2(JasyptEncryptorConfigurationProperties properties) {
         properties.setAlgorithm("PBEWithMD5AndDES");
         properties.setKeyObtentionIterations("1000");
         properties.setPoolSize("1");

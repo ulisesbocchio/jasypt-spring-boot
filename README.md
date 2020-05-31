@@ -504,7 +504,7 @@ mvn jasypt:decrypt -Djasypt.encryptor.password="the password"
 Which would output the decrypted contents to the screen:
 
 ```properties
-sensitive.password=ENC(encrypted)
+sensitive.password=DEC(decrypted)
 regular.property=example
 ```
 

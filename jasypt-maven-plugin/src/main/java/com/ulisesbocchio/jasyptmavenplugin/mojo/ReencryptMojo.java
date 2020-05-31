@@ -39,10 +39,4 @@ public class ReencryptMojo extends AbstractReencryptMojo {
         setIfNotNull(properties::setIvGeneratorClassname, oldIvGeneratorClassName);
         setIfNotNull(properties::setStringOutputType, oldStringOutputType);
     }
-
-    private <T> void setIfNotNull(Consumer<T> setter, T value) {
-        if (value != null) {
-            setter.accept(value);
-        }
-    }
 }

@@ -47,4 +47,10 @@ public abstract class AbstractReencryptMojo extends AbstractFileJasyptMojo {
     }
 
     protected abstract void configure(JasyptEncryptorConfigurationProperties properties);
+
+    protected <T> void setIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
+            setter.accept(value);
+        }
+    }
 }

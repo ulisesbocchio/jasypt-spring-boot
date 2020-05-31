@@ -1,9 +1,11 @@
 package com.ulisesbocchio.jasyptmavenplugin.mojo;
 
 import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
+import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.springframework.core.env.Environment;
 
 @Mojo(name = "upgrade", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class UpgradeMojo extends AbstractReencryptMojo {
@@ -20,6 +22,13 @@ public class UpgradeMojo extends AbstractReencryptMojo {
     }
 
     private void upgradeFrom2(JasyptEncryptorConfigurationProperties properties) {
+        Environment environment = getEnvironment();
+
+        setIfNotNull(properties::setPassword, environment.getProperty("jasypt.encryptor.password"));
+        setIfNotNull(properties::setPrivateKeyFormat, environment.getProperty("jasypt.encryptor.private-key-format", AsymmetricCryptography.KeyFormat.class));
+        setIfNotNull(properties::setPrivateKeyString, environment.getProperty("jasypt.encryptor.private-key-string"));
+        setIfNotNull(properties::setPrivateKeyLocation, environment.getProperty("jasypt.encryptor.private-key-location"));
+
         properties.setAlgorithm("PBEWithMD5AndDES");
         properties.setKeyObtentionIterations("1000");
         properties.setPoolSize("1");

@@ -513,6 +513,35 @@ accidental committing of decrypted values to version control. When decrypting, y
 just want to check what value has been encrypted, rather than wanting to permanently decrypt that
 value.
 
+### Re-encryption
+Changing the configuration for existing encrypted properties is slightly awkward using the encrypt/decrypt goals. You
+must run the decrypt goal using the old configuration, then copy the decrypted output back into the original file, then
+run the encrypt goal with the new configuration.
+
+The re-encrypt goal simplifies this by re-encrypting a file in place. 2 sets of configuration must be provided. The
+new configuration is supplied in the same way as you would configure the other maven goals. The old configuration
+is supplied via system properties prefixed with "jasypt.plugin.old" instead of "jasypt.encryptor".
+
+For example, to re-encrypt application.properties that was previously encrypted with the password OLD and then
+encrypt with the new password NEW:
+
+```bash
+mvn jasypt:reencrypt -Djasypt.plugin.old.password=OLD -Djasypt.encryptor.password=NEW
+```
+
+### Upgrade
+Sometimes the default encryption configuration might change between versions of jasypt-spring-boot. You can
+automatically upgrade your encrypted properties to the new defaults with the upgrade goal. This will decrypt your
+application.properties file using the old default configuration and re-encrypt using the new default configuration.
+
+```bash
+mvn jasypt:upgrade -Djasypt.encryptor.password=EXAMPLE
+```
+
+You can also pass the system property `-Djasypt.plugin.old.major-version` to specify the version you are upgrading from.
+This will always default to the last major version where the configuration changed. Currently, the only major version
+where the defaults changed is version 2, so there is no need to set this property, but it is there for future use.
+
 ### Load
 You can also decrypt a properties file and load all of its properties into memory and make them accessible to Maven. This is useful when you want to make encrypted properties available to other Maven plugins.
 

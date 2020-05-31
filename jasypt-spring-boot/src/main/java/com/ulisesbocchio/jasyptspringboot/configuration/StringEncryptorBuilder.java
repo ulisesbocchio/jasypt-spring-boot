@@ -9,31 +9,35 @@ import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 @Slf4j
-public class StringEncryptorCreator {
-    public static StringEncryptor create(JasyptEncryptorConfigurationProperties configProps) {
-        return Optional.of(configProps)
-                .filter(StringEncryptorCreator::isPBEConfig)
-                .map(StringEncryptorCreator::createPBEDefault)
-                .orElseGet(() ->
-                        Optional.of(configProps)
-                                .filter(StringEncryptorCreator::isAsymmetricConfig)
-                                .map(StringEncryptorCreator::createAsymmetricDefault)
-                                .orElseThrow(() -> new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private-key-string', 'jasypt.encryptor.private-key-location'] must be provided for Password-based or Asymmetric encryption")));
+public class StringEncryptorBuilder {
+    private final JasyptEncryptorConfigurationProperties configProps;
+
+    public StringEncryptorBuilder(JasyptEncryptorConfigurationProperties configProps) {
+        this.configProps = configProps;
     }
 
-    private static boolean isPBEConfig(JasyptEncryptorConfigurationProperties config) {
-        return config.getPassword() != null;
+    public StringEncryptor build() {
+        if (isPBEConfig()) {
+            return createPBEDefault();
+        } else if (isAsymmetricConfig()) {
+            return createAsymmetricDefault();
+        } else {
+            throw new IllegalStateException("either 'jasypt.encryptor.password' or one of ['jasypt.encryptor.private-key-string', 'jasypt.encryptor.private-key-location'] must be provided for Password-based or Asymmetric encryption");
+        }
     }
 
-    private static boolean isAsymmetricConfig(JasyptEncryptorConfigurationProperties config) {
-        return config.getPrivateKeyString() != null || config.getPrivateKeyLocation() != null;
+    private boolean isPBEConfig() {
+        return configProps.getPassword() != null;
     }
 
-    private static StringEncryptor createAsymmetricDefault(JasyptEncryptorConfigurationProperties configProps) {
+    private boolean isAsymmetricConfig() {
+        return configProps.getPrivateKeyString() != null || configProps.getPrivateKeyLocation() != null;
+    }
+
+    private StringEncryptor createAsymmetricDefault() {
         SimpleAsymmetricConfig config = new SimpleAsymmetricConfig();
         config.setPrivateKey(get(configProps::getPrivateKeyString, "jasypt.encryptor.private-key-string", null));
         config.setPrivateKeyLocation(get(configProps::getPrivateKeyLocation, "jasypt.encryptor.private-key-location", null));
@@ -41,7 +45,7 @@ public class StringEncryptorCreator {
         return new SimpleAsymmetricStringEncryptor(config);
     }
 
-    private static StringEncryptor createPBEDefault(JasyptEncryptorConfigurationProperties configProps) {
+    private StringEncryptor createPBEDefault() {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(getRequired(configProps::getPassword, "jasypt.encryptor.password"));
@@ -57,7 +61,7 @@ public class StringEncryptorCreator {
         return encryptor;
     }
 
-    private static <T> T getRequired(Supplier<T> supplier, String key) {
+    private <T> T getRequired(Supplier<T> supplier, String key) {
         T value = supplier.get();
         if (value == null) {
             throw new IllegalStateException(String.format("Required Encryption configuration property missing: %s", key));
@@ -65,7 +69,7 @@ public class StringEncryptorCreator {
         return value;
     }
 
-    private static <T> T get(Supplier<T> supplier, String key, T defaultValue) {
+    private <T> T get(Supplier<T> supplier, String key, T defaultValue) {
         T value = supplier.get();
         if (value == defaultValue) {
             log.info("Encryptor config not found for property {}, using default value: {}", key, value);

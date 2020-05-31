@@ -1,6 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.encryptor;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorCreator;
+import com.ulisesbocchio.jasyptspringboot.configuration.StringEncryptorBuilder;
 import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class DefaultLazyEncryptor implements StringEncryptor {
     }
 
     private StringEncryptor createDefault(ConfigurableEnvironment e) {
-        return StringEncryptorCreator.create(JasyptEncryptorConfigurationProperties.bindConfigProps(e));
+        return new StringEncryptorBuilder(JasyptEncryptorConfigurationProperties.bindConfigProps(e)).build();
     }
 
     @Override

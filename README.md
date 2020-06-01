@@ -786,4 +786,4 @@ While [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-b
 
 ## Flattr
 
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?fid=9zegzy&url=https%3A%2F%2Fgithub.com%2Fulisesbocchio)
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/@ubocchio/github/ulisesbocchio)

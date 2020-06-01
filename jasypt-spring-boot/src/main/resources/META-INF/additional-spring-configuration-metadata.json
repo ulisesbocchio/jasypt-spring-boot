@@ -1,0 +1,33 @@
+{
+  "groups": [
+    {
+      "name": "jasypt.encryptor",
+      "type": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
+      "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "jasypt.encryptor.bootstrap",
+      "type": "java.lang.Boolean",
+      "description": "Bootstrap configuration applicable only in spring-cloud environments. Can be explicitly turned-off in bootstrap.properties or as a command line argument.",
+      "sourceType": "com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties",
+      "defaultValue": true
+    }
+  ],
+  "hints": [
+    {
+      "name": "jasypt.encryptor.bootstrap",
+      "values": [
+        {
+          "value": true,
+          "description": "enable bootstrap of jasypt-spring-boot for spring-cloud environemnts."
+        },
+        {
+          "value": false,
+          "description": "disable bootstrap of jasypt-spring-boot for spring-cloud environemnts."
+        }
+      ]
+    }
+  ]
+}

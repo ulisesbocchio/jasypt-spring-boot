@@ -164,6 +164,22 @@ public class JasyptEncryptorConfigurationProperties {
      */
     private KeyFormat privateKeyFormat = KeyFormat.DER;
 
+    /**
+     * Specify a PEM/DER base64 encoded string. PEM encoded keys can simply omit the "BEGIN/END PUBLIC KEY" header/footer
+     * and just specify the base64 encoded key. This property takes precedence over {@link #setPrivateKeyLocation(String)}
+     */
+    private String publicKeyString = null;
+
+    /**
+     * Specify a PEM/DER public key location, in Spring's resource nomenclature (i.e. classpath:resource/path or file://path/to/file)
+     */
+    private String publicKeyLocation = null;
+
+    /**
+     * Specify the public key format to use: DER (default) or PEM
+     */
+    private KeyFormat publicKeyFormat = KeyFormat.DER;
+
     @NestedConfigurationProperty
     private PropertyConfigurationProperties property = new PropertyConfigurationProperties();
 

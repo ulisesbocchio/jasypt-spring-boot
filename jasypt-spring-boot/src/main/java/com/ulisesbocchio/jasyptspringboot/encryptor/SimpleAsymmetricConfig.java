@@ -39,7 +39,7 @@ public class SimpleAsymmetricConfig {
     private KeyFormat privateKeyFormat = KeyFormat.DER;
     private KeyFormat publicKeyFormat = KeyFormat.DER;
 
-    private Resource loadResource(Resource asResource, String asString, String asLocation, KeyFormat format) {
+    private Resource loadResource(Resource asResource, String asString, String asLocation, KeyFormat format, String type) {
         return Optional.ofNullable(asResource)
                 .orElseGet(() ->
                         Optional.ofNullable(asString)
@@ -47,15 +47,15 @@ public class SimpleAsymmetricConfig {
                                 .orElseGet(() ->
                                         Optional.ofNullable(asLocation)
                                                 .map(resourceLoader::getResource)
-                                                .orElseThrow(() -> new IllegalArgumentException("Unable to load key. Either resource, key as string, or resource location must be provided"))));
+                                                .orElseThrow(() -> new IllegalArgumentException("Unable to load " + type + " key. Either resource, key as string, or resource location must be provided"))));
     }
 
     public Resource loadPrivateKeyResource() {
-        return loadResource(privateKeyResource, privateKey, privateKeyLocation, privateKeyFormat);
+        return loadResource(privateKeyResource, privateKey, privateKeyLocation, privateKeyFormat, "Private");
     }
 
     public Resource loadPublicKeyResource() {
-        return loadResource(publicKeyResource, publicKey, publicKeyLocation, publicKeyFormat);
+        return loadResource(publicKeyResource, publicKey, publicKeyLocation, publicKeyFormat, "Public");
     }
 
     public void setKeyFormat(KeyFormat keyFormat) {

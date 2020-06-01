@@ -18,6 +18,7 @@ import org.springframework.util.ClassUtils;
 public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent> {
 
     public static final String REFRESHED_EVENT_CLASS = "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent";
+    public static final String ENVIRONMENT_EVENT_CLASS = "org.springframework.cloud.context.environment.EnvironmentChangeEvent";
     private final ConfigurableEnvironment environment;
 
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment) {
@@ -27,14 +28,17 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        boolean refreshedPresent = ClassUtils.isPresent(REFRESHED_EVENT_CLASS, classLoader);
-        if (refreshedPresent) {
-            Class<?> refreshedClass = ClassUtils.forName(REFRESHED_EVENT_CLASS, classLoader);
-            if (ClassUtils.isAssignableValue(refreshedClass, event)) {
-                log.info("Refreshing cached encryptable property sources");
-                refreshCachedProperties();
-            }
+        if (isAssignable(ENVIRONMENT_EVENT_CLASS, event) || isAssignable(REFRESHED_EVENT_CLASS, event)) {
+            log.info("Refreshing cached encryptable property sources");
+            refreshCachedProperties();
+        }
+    }
+
+    boolean isAssignable(String className, Object value) {
+        try {
+            return ClassUtils.isAssignableValue(ClassUtils.forName(className, null), value);
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

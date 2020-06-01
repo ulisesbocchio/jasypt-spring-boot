@@ -12,7 +12,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
     private final PropertySource<T> delegate;
     private final EncryptablePropertyResolver resolver;
     private final EncryptablePropertyFilter filter;
-    private Map<String, Object> cache;
+    private final Map<String, Object> cache;
 
     public CachingDelegateEncryptablePropertySource(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());

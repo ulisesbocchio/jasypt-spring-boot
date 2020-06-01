@@ -453,28 +453,38 @@ To use the plugin, just add the following to your pom.xml:
 </build>
 ```
 
-The plugin reads you encryption configuration directly from your Spring Boot configuration
+When using this plugin, the easiest way to provide your encryption password is via a system property i.e.
+-Djasypt.encryptor.password="the password".
+
+By default, the plugin will consider encryption configuration in standard Spring boot configuration files under
+./src/main/resources. You can also use system properties or environment variables to supply this configuration.
+
+Keep in mind that the rest of your application code and resources are not available to the plugin because Maven plugins
+do not share a classpath with projects. If your application provides encryption configuration via a StringEncryptor
+bean then this will not be picked up.
+
+In general, it is recommended to just rely on the secure default configuration.
 
 ### Encryption
 
 To encrypt a single value run:
 
 ```bash
-mvn jasypt:encrypt-value -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="theValueYouWantToEncrypt"
+mvn jasypt:encrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="theValueYouWantToEncrypt"
 ```
 
-
-To encrypt placeholders in a file, simply wrap any string with `DEC(...)`. For example:
+To encrypt placeholders in `src/main/resources/application.properties`, simply wrap any string with `DEC(...)`.
+For example:
 
 ```properties
 sensitive.password=DEC(secret value)
 regular.property=example
 ```
 
-This can be encrypted as follows:
+Then run:
 
 ```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password"
+mvn jasypt:encrypt -Djasypt.encryptor.password="the password"
 ```
 
 Which would edit that file in place resulting in:
@@ -484,15 +494,18 @@ sensitive.password=ENC(encrypted)
 regular.property=example
 ```
 
+The file name and location can be customised.
+
 ### Decryption
 
 To decrypt a single value run:
 
 ```bash
-mvn jasypt:decrypt-value -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="DbG1GppXOsFa2G69PnmADvQFI3esceEhJYbaEIKCcEO5C85JEqGAhfcjFMGnoRFf"
+mvn jasypt:decrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="DbG1GppXOsFa2G69PnmADvQFI3esceEhJYbaEIKCcEO5C85JEqGAhfcjFMGnoRFf"
 ```
 
-To decrypt placeholders in a file, simply wrap any string with `ENC(...)`. For example:
+To decrypt placeholders in `src/main/resources/application.properties`, simply wrap any string with `ENC(...)`. For
+example:
 
 ```properties
 sensitive.password=ENC(encrypted)
@@ -502,7 +515,7 @@ regular.property=example
 This can be decrypted as follows:
 
 ```bash
-mvn jasypt:decrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password"
+mvn jasypt:decrypt -Djasypt.encryptor.password="the password"
 ```
 
 Which would output the decrypted contents to the screen:
@@ -530,8 +543,11 @@ For example, to re-encrypt application.properties that was previously encrypted 
 encrypt with the new password NEW:
 
 ```bash
-mvn jasypt:reencrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.plugin.old.password=OLD -Djasypt.encryptor.password=NEW
+mvn jasypt:reencrypt -Djasypt.plugin.old.password=OLD -Djasypt.encryptor.password=NEW
 ```
+
+*Note: All old configuration must be passed as system properties. Environment variables and Spring Boot configuration
+files are not supported.*
 
 ### Upgrade
 Sometimes the default encryption configuration might change between versions of jasypt-spring-boot. You can
@@ -539,7 +555,7 @@ automatically upgrade your encrypted properties to the new defaults with the upg
 application.properties file using the old default configuration and re-encrypt using the new default configuration.
 
 ```bash
-mvn jasypt:upgrade -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password=EXAMPLE
+mvn jasypt:upgrade -Djasypt.encryptor.password=EXAMPLE
 ```
 
 You can also pass the system property `-Djasypt.plugin.old.major-version` to specify the version you are upgrading from.
@@ -552,53 +568,44 @@ You can also decrypt a properties file and load all of its properties into memor
 You can chain the goals of the later plugins directly after this one. For example, with flyway:
 
 ```bash
-mvn jasypt:load -Dspring.config.location="file:src/main/resources/application.properties" flyway:migrate -Djasypt.encryptor.password="the password"
+mvn jasypt:load flyway:migrate -Djasypt.encryptor.password="the password"
 ```
 
 You can also specify a prefix for each property with `-Djasypt.plugin.keyPrefix=example.`. This
 helps to avoid potential clashes with other Maven properties.
 
-### File Path
+### Changing the file path
 
-For all of the above utilities, the file path defaults to `file:src/main/resources/application.properties`.
+For all the above utilities, the path of the file you are encrypting/decrypting defaults to
+`file:src/main/resources/application.properties`.
 
-You can insert the name of a Spring profile between the file name and it's extension by specifying by specifying an active profile. For example, the file `file:src/main/resources/application-dev.properties` could be encrypted as follows:
+This can be changed using the `-Djasypt.plugin.path` system property.
 
-```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Dspring.profiles.active=dev
-```
-
-You can also changed the file path completely. For example to encrypt a file in your test resources directory:
+You can encrypt a file in your test resources directory:
 
 ```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/test/application.properties"
+mvn jasypt:encrypt -Djasypt.plugin.path="file:src/main/test/application.properties" -Djasypt.encryptor.password="the password"
 ```
 
-Or you can encrypt a file with a different name:
+Or with a different name:
 
 ```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/flyway.properties"
+mvn jasypt:encrypt -Djasypt.plugin.path="file:src/main/resources/flyway.properties" -Djasypt.encryptor.password="the password"
 ```
 
-Both of these would also work with decryption and loading.
-
-You can also specify a different extension. However, please note that loading only works with property files. Encryption/Decryption work with any file type.
+Or with a different file type (the plugin supports any plain text file format including YAML):
 
 ```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="file:src/main/resources/application.yaml"
+mvn jasypt:encrypt -Djasypt.plugin.path="file:src/main/resources/application.yaml" -Djasypt.encryptor.password="the password"
 ```
 
-You can also specify a file on the classpath, instead of the file system. However, please note that this will not work for encryption, as this will attempt to write the encrypted contents back to disk. Also this will only load files from the plugin's classpath, and not the classpath of the application.
-
-```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties"
-```
+**Note that the load goal only supports .property files**
 
 ### Spring profiles and other spring config
 You can override any spring config you support in your application when running the plugin, for instance selecting a given spring profile:
  
 ```bash
-mvn jasypt:encrypt -Dspring.config.location="file:src/main/resources/application.properties" -Djasypt.encryptor.password="the password" -Djasypt.plugin.path="classpath:application.properties" -Dspring.profiles.active=cloud
+mvn jasypt:encrypt -Dspring.profiles.active=cloud -Djasypt.encryptor.password="the password" 
 ```
 
 ## Asymmetric Encryption

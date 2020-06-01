@@ -1,8 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
+import com.ulisesbocchio.jasyptspringboot.*;
 import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
@@ -16,6 +14,11 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertySource;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Ulises Bocchio
@@ -35,8 +38,31 @@ public class EncryptablePropertyResolverConfiguration {
     private static final String ENCRYPTOR_BEAN_NAME = "lazyJasyptStringEncryptor";
     private static final String DETECTOR_BEAN_NAME = "lazyEncryptablePropertyDetector";
     private static final String CONFIG_SINGLETON = "configPropsSingleton";
-    static final String RESOLVER_BEAN_NAME = "lazyEncryptablePropertyResolver";
-    static final String FILTER_BEAN_NAME = "lazyEncryptablePropertyFilter";
+    public static final String RESOLVER_BEAN_NAME = "lazyEncryptablePropertyResolver";
+    public static final String FILTER_BEAN_NAME = "lazyEncryptablePropertyFilter";
+
+    @SuppressWarnings("unchecked")
+    @Bean
+    public static EncryptablePropertySourceConverter encryptablePropertySourceConverter(ConfigurableEnvironment environment, @Qualifier(RESOLVER_BEAN_NAME)  EncryptablePropertyResolver propertyResolver, @Qualifier(FILTER_BEAN_NAME) EncryptablePropertyFilter propertyFilter) {
+        final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxy-property-sources", Boolean.TYPE, false);
+        final List<String> skipPropertySources = (List<String>) environment.getProperty("jasypt.encryptor.skip-property-sources", List.class, Collections.EMPTY_LIST);
+        final List<Class<PropertySource<?>>> skipPropertySourceClasses = skipPropertySources.stream().map(EncryptablePropertyResolverConfiguration::getPropertiesClass).collect(Collectors.toList());
+        final InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
+        return new EncryptablePropertySourceConverter(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Class<PropertySource<?>> getPropertiesClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (PropertySource.class.isAssignableFrom(clazz)) {
+                return (Class<PropertySource<?>>) clazz;
+            }
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s does not implement %s", className, PropertySource.class.getName()));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s not found", className), e);
+        }
+    }
 
     @Bean
     public EnvCopy envCopy(final ConfigurableEnvironment environment) {

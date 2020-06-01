@@ -45,7 +45,7 @@ public class StringEncryptorBuilder {
         config.setPrivateKey(get(configProps::getPrivateKeyString, propertyPrefix + ".private-key-string", null));
         config.setPrivateKeyLocation(get(configProps::getPrivateKeyLocation, propertyPrefix + ".private-key-location", null));
         config.setPrivateKeyFormat(get(configProps::getPrivateKeyFormat, propertyPrefix + ".private-key-format", AsymmetricCryptography.KeyFormat.DER));
-        config.setPrivateKey(get(configProps::getPublicKeyString, propertyPrefix + ".public-key-string", null));
+        config.setPublicKey(get(configProps::getPublicKeyString, propertyPrefix + ".public-key-string", null));
         config.setPublicKeyLocation(get(configProps::getPublicKeyLocation, propertyPrefix + ".public-key-location", null));
         config.setPublicKeyFormat(get(configProps::getPublicKeyFormat, propertyPrefix + ".public-key-format", AsymmetricCryptography.KeyFormat.DER));
         return new SimpleAsymmetricStringEncryptor(config);

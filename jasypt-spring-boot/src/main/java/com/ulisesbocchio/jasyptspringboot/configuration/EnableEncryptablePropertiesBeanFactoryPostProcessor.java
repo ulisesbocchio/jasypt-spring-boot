@@ -1,8 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
-import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -13,12 +12,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-
-import java.util.List;
-
-import static com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter.convertPropertySources;
-import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.FILTER_BEAN_NAME;
-import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
 
 /**
  * <p>{@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
@@ -33,23 +26,19 @@ import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptableProper
 public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertiesBeanFactoryPostProcessor.class);
-    private ConfigurableEnvironment environment;
-    private InterceptionMode interceptionMode;
-    private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
+    private final ConfigurableEnvironment environment;
+    private final EncryptablePropertySourceConverter converter;
 
-    public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses) {
+    public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         this.environment = environment;
-        this.interceptionMode = interceptionMode;
-        this.skipPropertySourceClasses = skipPropertySourceClasses;
+        this.converter = converter;
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         LOG.info("Post-processing PropertySource instances");
-        EncryptablePropertyResolver propertyResolver = beanFactory.getBean(RESOLVER_BEAN_NAME, EncryptablePropertyResolver.class);
-        EncryptablePropertyFilter propertyFilter = beanFactory.getBean(FILTER_BEAN_NAME, EncryptablePropertyFilter.class);
         MutablePropertySources propSources = environment.getPropertySources();
-        convertPropertySources(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter, propSources);
+        converter.convertPropertySources(propSources);
     }
 
     @Override

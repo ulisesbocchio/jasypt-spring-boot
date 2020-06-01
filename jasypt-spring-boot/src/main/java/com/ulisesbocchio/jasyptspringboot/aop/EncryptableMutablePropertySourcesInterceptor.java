@@ -16,22 +16,16 @@ import java.util.List;
  */
 public class EncryptableMutablePropertySourcesInterceptor implements MethodInterceptor {
 
-    private final InterceptionMode interceptionMode;
-    private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
-    private final EncryptablePropertyResolver resolver;
-    private final EncryptablePropertyFilter filter;
+    private final EncryptablePropertySourceConverter propertyConverter;
     private final EnvCopy envCopy;
 
-    public EncryptableMutablePropertySourcesInterceptor(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, EnvCopy envCopy) {
-        this.interceptionMode = interceptionMode;
-        this.skipPropertySourceClasses = skipPropertySourceClasses;
-        this.resolver = resolver;
-        this.filter = filter;
+    public EncryptableMutablePropertySourcesInterceptor(EncryptablePropertySourceConverter propertyConverter, EnvCopy envCopy) {
+        this.propertyConverter = propertyConverter;
         this.envCopy = envCopy;
     }
 
     private Object makeEncryptable(Object propertySource) {
-        return EncryptablePropertySourceConverter.makeEncryptable(interceptionMode, skipPropertySourceClasses, resolver, filter, (PropertySource<?>) propertySource);
+        return propertyConverter.makeEncryptable((PropertySource<?>) propertySource);
     }
 
     @Override

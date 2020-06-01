@@ -453,7 +453,17 @@ To use the plugin, just add the following to your pom.xml:
 </build>
 ```
 
-The plugin reads you encryption configuration directly from your Spring Boot configuration
+When using this plugin, the easiest way to provide your encryption password is via a system property i.e.
+-Djasypt.encryptor.password="the password".
+
+By default, the plugin will consider encryption configuration in standard Spring boot configuration files under
+./src/main/resources. You can also use system properties or environment variables to supply this configuration.
+
+Keep in mind that the rest of your application code and resources are not available to the plugin because Maven plugins
+do not share a classpath with projects. If your application provides encryption configuration via a StringEncryptor
+bean then this will not be picked up.
+
+In general, it is recommended to just rely on the secure default configuration.
 
 ### Encryption
 

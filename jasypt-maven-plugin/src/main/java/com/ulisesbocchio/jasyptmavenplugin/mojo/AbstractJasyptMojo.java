@@ -11,6 +11,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A mojo that spins up a Spring Boot application for any encrypt/decrypt function.
  *
@@ -52,9 +55,13 @@ public abstract class AbstractJasyptMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
+        Map<String, Object> defaultProperties = new HashMap<>();
+        defaultProperties.put("spring.config.location", "file:./src/main/resources/");
+
         ConfigurableApplicationContext context = new SpringApplicationBuilder()
                 .sources(Application.class)
                 .bannerMode(Banner.Mode.OFF)
+                .properties(defaultProperties)
                 .run();
 
         this.environment = context.getEnvironment();

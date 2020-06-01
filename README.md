@@ -24,6 +24,10 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 
 ## What's new?
+### Update 05/31/2020: Version 3.0.3 Release Includes
+* Minor bug fixes
+* Documentation fixes
+* Refresh event fix for spring cloud config
 ### Update 01/11/2020: Version 3.0.2 Release Includes
 * Allows unresolvable properties from env actuator (Thanks [@thorntonrp](https://github.com/thorntonrp))
 * Fixes [jasypt-maven-plugin]((#maven-plugin)) issues
@@ -73,7 +77,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -82,7 +86,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
     </dependency>
 	```
 
@@ -103,7 +107,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -443,7 +447,7 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.2</version>
+      <version>3.0.3</version>
     </plugin>
   </plugins>
 </build>

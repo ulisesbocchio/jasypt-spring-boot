@@ -1,4 +1,4 @@
-package com.ulisesbocchio.jasyptspringboot.resolver;
+package com.ulisesbocchio.jasyptspringbootstarter.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

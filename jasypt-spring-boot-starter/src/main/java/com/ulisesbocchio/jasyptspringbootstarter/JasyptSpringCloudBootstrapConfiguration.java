@@ -1,4 +1,4 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringbootstarter;
 
 import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

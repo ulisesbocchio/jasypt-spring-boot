@@ -7,7 +7,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * Goal which decrypts demarcated values in properties files.
+ * Goal which decrypts values.
  *
  * @author ubocchio
  */

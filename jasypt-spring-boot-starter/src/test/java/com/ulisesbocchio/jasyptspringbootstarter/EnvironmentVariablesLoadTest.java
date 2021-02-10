@@ -1,4 +1,4 @@
-package com.ulisesbocchio.jasyptspringboot;
+package com.ulisesbocchio.jasyptspringbootstarter;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.junit.BeforeClass;

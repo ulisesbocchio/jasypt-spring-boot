@@ -21,7 +21,7 @@ public class UpgradeMojo extends AbstractReencryptMojo {
         setIfNotNull(properties::setPrivateKeyString, environment.getProperty("jasypt.encryptor.private-key-string"));
         setIfNotNull(properties::setPrivateKeyLocation, environment.getProperty("jasypt.encryptor.private-key-location"));
 
-        if (oldMajorVersion < 2) {
+        if (oldMajorVersion == 2) {
             upgradeFrom2(properties);
         } else {
             throw new RuntimeException("Unrecognised major version " + oldMajorVersion);

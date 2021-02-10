@@ -30,7 +30,7 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 * Refresh event fix for spring cloud config
 ### Update 01/11/2020: Version 3.0.2 Release Includes
 * Allows unresolvable properties from env actuator (Thanks [@thorntonrp](https://github.com/thorntonrp))
-* Fixes [jasypt-maven-plugin]((#maven-plugin)) issues
+* Fixes [jasypt-maven-plugin](#maven-plugin) issues
 * Adds support to [jasypt-maven-plugin](#maven-plugin) for encryption/decryption of single values
 ### Update 12/31/2019: Version 3.0.1 Release Includes
 * Adds support for [skipping classes](#filter-out-propertysource-classes-from-being-introspected) from being introspected

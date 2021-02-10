@@ -19,6 +19,7 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
     public static final String ENVIRONMENT_EVENT_CLASS = "org.springframework.cloud.context.environment.EnvironmentChangeEvent";
     private final ConfigurableEnvironment environment;
     private final EncryptablePropertySourceConverter converter;
+    private Boolean cloudDependencyExists = true;
 
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         this.environment = environment;
@@ -42,8 +43,9 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
 
     boolean isAssignable(String className, Object value) {
         try {
-            return ClassUtils.isAssignableValue(ClassUtils.forName(className, null), value);
+            return cloudDependencyExists && ClassUtils.isAssignableValue(ClassUtils.forName(className, null), value);
         } catch (ClassNotFoundException e) {
+            cloudDependencyExists = false;
             return false;
         }
     }

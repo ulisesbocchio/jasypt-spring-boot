@@ -40,7 +40,7 @@ public class EncryptablePropertySourceConverter {
 
     public void convertPropertySources(MutablePropertySources propSources) {
         StreamSupport.stream(propSources.spliterator(), false)
-                .filter(ps -> !(ps instanceof EncryptablePropertySource))
+                .filter(ps -> !(ps instanceof EncryptablePropertySource || ps instanceof PropertySource.StubPropertySource))
                 .map(this::makeEncryptable)
                 .collect(toList())
                 .forEach(ps -> propSources.replace(ps.getName(), ps));

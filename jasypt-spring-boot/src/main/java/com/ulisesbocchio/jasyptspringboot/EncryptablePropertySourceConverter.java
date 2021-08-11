@@ -3,6 +3,7 @@ package com.ulisesbocchio.jasyptspringboot;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
+import com.ulisesbocchio.jasyptspringboot.filter.DefaultSkipPropertySourceFilter;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
@@ -27,13 +28,20 @@ import static java.util.stream.Collectors.toList;
 public class EncryptablePropertySourceConverter {
 
     private final InterceptionMode interceptionMode;
-    private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
+    private final SkipPropertySourceFilter skipPropertySourceFilter;
     private final EncryptablePropertyResolver propertyResolver;
     private final EncryptablePropertyFilter propertyFilter;
 
     public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
         this.interceptionMode = interceptionMode;
-        this.skipPropertySourceClasses = skipPropertySourceClasses;
+        this.skipPropertySourceFilter = new DefaultSkipPropertySourceFilter(skipPropertySourceClasses);
+        this.propertyResolver = propertyResolver;
+        this.propertyFilter = propertyFilter;
+    }
+
+    public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, SkipPropertySourceFilter skipPropertySourceFilter, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
+        this.interceptionMode = interceptionMode;
+        this.skipPropertySourceFilter = skipPropertySourceFilter == null ? new DefaultSkipPropertySourceFilter(null) : skipPropertySourceFilter;
         this.propertyResolver = propertyResolver;
         this.propertyFilter = propertyFilter;
     }
@@ -48,7 +56,7 @@ public class EncryptablePropertySourceConverter {
 
     @SuppressWarnings("unchecked")
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
-        if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
+        if (propertySource instanceof EncryptablePropertySource || skipPropertySourceFilter.shouldSkip(propertySource)) {
             log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
             return propertySource;
         }

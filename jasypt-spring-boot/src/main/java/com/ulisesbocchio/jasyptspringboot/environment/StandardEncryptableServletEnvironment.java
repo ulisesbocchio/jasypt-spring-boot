@@ -4,6 +4,7 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
+import com.ulisesbocchio.jasyptspringboot.SkipPropertySourceFilter;
 import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
@@ -31,7 +32,7 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
     private MutablePropertySources originalPropertySources;
 
     public StandardEncryptableServletEnvironment() {
-        this(null, null, null, null, null, null);
+        this(null, (SkipPropertySourceFilter)null, null, null, null, null);
     }
 
     /**
@@ -47,6 +48,22 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
     @Builder
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
         EnvironmentInitializer initializer = new EnvironmentInitializer(this, interceptionMode, skipPropertySourceClasses, resolver, filter, encryptor, detector);
+        this.encryptablePropertySources = initializer.initialize(originalPropertySources);
+    }
+
+    /**
+     * Create a new Encryptable Environment. All arguments are optional, provide null if default value is desired.
+     *
+     * @param interceptionMode          The interception method to utilize, or null (Default is {@link InterceptionMode#WRAPPER})
+     * @param skipPropertySourceFilter  A Filter to skip from interception, or null (Default is empty)
+     * @param resolver                  The property resolver to utilize, or null (Default is {@link DefaultLazyPropertyResolver}  which will resolve to specified configuration)
+     * @param filter                    The property filter to utilize, or null (Default is {@link DefaultLazyPropertyFilter}  which will resolve to specified configuration)
+     * @param encryptor                 The string encryptor to utilize, or null (Default is {@link DefaultLazyEncryptor} which will resolve to specified configuration)
+     * @param detector                  The property detector to utilize, or null (Default is {@link DefaultLazyPropertyDetector} which will resolve to specified configuration)
+     */
+    @Builder
+    public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, SkipPropertySourceFilter skipPropertySourceFilter, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+        EnvironmentInitializer initializer = new EnvironmentInitializer(this, interceptionMode, skipPropertySourceFilter, resolver, filter, encryptor, detector);
         this.encryptablePropertySources = initializer.initialize(originalPropertySources);
     }
 

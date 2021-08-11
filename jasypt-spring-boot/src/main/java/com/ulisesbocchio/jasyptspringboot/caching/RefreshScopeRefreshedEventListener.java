@@ -1,5 +1,8 @@
 package com.ulisesbocchio.jasyptspringboot.caching;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.SneakyThrows;
@@ -19,17 +22,34 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
     public static final String ENVIRONMENT_EVENT_CLASS = "org.springframework.cloud.context.environment.EnvironmentChangeEvent";
     private final ConfigurableEnvironment environment;
     private final EncryptablePropertySourceConverter converter;
-    private Boolean cloudDependencyExists = true;
+    private final List<Class<?>> refreshedEventClasses;
 
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         this.environment = environment;
         this.converter = converter;
+        final String tmp = environment.getProperty("jasypt.refreshed_event_classes");
+        String[] classes;
+        if (tmp == null) {
+           classes = new String[] {
+               REFRESHED_EVENT_CLASS, ENVIRONMENT_EVENT_CLASS
+           };
+        } else {
+           classes = tmp.split("[ ,;]+");
+        }
+        refreshedEventClasses = new ArrayList<>();
+        for (String cl : classes) {
+            try {
+                refreshedEventClasses.add(ClassUtils.forName(cl, null));
+            } catch (ClassNotFoundException e) {
+              log.warn("ignore {}", cl);
+            }
+        }
     }
 
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
-        if (isAssignable(ENVIRONMENT_EVENT_CLASS, event) || isAssignable(REFRESHED_EVENT_CLASS, event)) {
+        if (isAssignable(event)) {
             log.info("Refreshing cached encryptable property sources");
             refreshCachedProperties();
             decorateNewSources();
@@ -41,14 +61,14 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         converter.convertPropertySources(propSources);
     }
 
-    boolean isAssignable(String className, Object value) {
-        try {
-            return cloudDependencyExists && ClassUtils.isAssignableValue(ClassUtils.forName(className, null), value);
-        } catch (ClassNotFoundException e) {
-            cloudDependencyExists = false;
-            return false;
-        }
-    }
+    boolean isAssignable(Object value) {
+      for (Class<?> cl : refreshedEventClasses) {
+          if (cl.isInstance(value)) {
+              return true;
+          }
+      }
+      return false;
+  }
 
     private void refreshCachedProperties() {
         PropertySources propertySources = environment.getPropertySources();

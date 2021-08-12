@@ -4,22 +4,24 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.*;
 import org.springframework.util.ClassUtils;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
-public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent> {
+public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, PriorityOrdered {
 
     public static final String REFRESHED_EVENT_CLASS = "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent";
     public static final String ENVIRONMENT_EVENT_CLASS = "org.springframework.cloud.context.environment.EnvironmentChangeEvent";
     private final ConfigurableEnvironment environment;
     private final EncryptablePropertySourceConverter converter;
     private Boolean cloudDependencyExists = true;
+    private final int order = Ordered.LOWEST_PRECEDENCE - 100;
 
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         this.environment = environment;
@@ -64,5 +66,10 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
             EncryptablePropertySource eps = (EncryptablePropertySource) propertySource;
             eps.refresh();
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return order;
     }
 }

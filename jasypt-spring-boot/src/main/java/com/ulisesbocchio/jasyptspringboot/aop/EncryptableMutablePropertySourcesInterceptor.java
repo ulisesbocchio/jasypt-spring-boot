@@ -1,15 +1,11 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
-import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.env.PropertySource;
-
-import java.util.List;
 
 /**
  * @author Ulises Bocchio
@@ -40,13 +36,16 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
                 envCopy.get().getPropertySources().addLast((PropertySource<?>) arguments[0]);
                 return invocation.getMethod().invoke(invocation.getThis(), makeEncryptable(arguments[0]));
             case "addBefore":
-                envCopy.get().getPropertySources().addBefore((String) arguments[0], (PropertySource<?>) arguments[1]);
+                final String name1 = (String) arguments[0];
+                envCopy.getPropertySources(name1).addBefore(name1, (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
             case "addAfter":
-                envCopy.get().getPropertySources().addAfter((String) arguments[0], (PropertySource<?>) arguments[1]);
+                final String name2 = (String) arguments[0];
+                envCopy.getPropertySources(name2).addAfter(name2, (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
             case "replace":
-                envCopy.get().getPropertySources().replace((String) arguments[0], (PropertySource<?>) arguments[1]);
+                final String name3 = (String) arguments[0];
+                envCopy.getPropertySources(name3).replace(name3, (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
             default:
                 return invocation.proceed();

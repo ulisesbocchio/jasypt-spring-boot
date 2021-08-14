@@ -28,7 +28,7 @@ import java.util.List;
 public class StandardEncryptableServletEnvironment extends StandardServletEnvironment implements ConfigurableEnvironment {
 
     private MutablePropertySources encryptablePropertySources;
-    private MutablePropertySources originalPropertySources;
+    protected MutablePropertySources originalPropertySources;
 
     public StandardEncryptableServletEnvironment() {
         this(null, null, null, null, null, null);
@@ -59,5 +59,9 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
     @Override
     public MutablePropertySources getPropertySources() {
         return this.encryptablePropertySources;
+    }
+
+    public MutablePropertySources getOriginalPropertySources() {
+        return originalPropertySources;
     }
 }

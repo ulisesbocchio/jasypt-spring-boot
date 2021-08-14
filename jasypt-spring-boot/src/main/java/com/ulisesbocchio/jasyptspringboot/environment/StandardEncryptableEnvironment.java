@@ -28,7 +28,7 @@ import java.util.List;
 public class StandardEncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment {
 
     private MutablePropertySources encryptablePropertySources;
-    private MutablePropertySources originalPropertySources;
+    protected MutablePropertySources originalPropertySources;
 
     public StandardEncryptableEnvironment() {
         this(null, null, null, null, null, null);

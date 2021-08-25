@@ -6,6 +6,7 @@ import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
 import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver;
+import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
@@ -15,8 +16,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class EnvironmentInitializer {
-    private final ConfigurableEnvironment environment;
+    private final EncryptableEnvironment environment;
     private final InterceptionMode interceptionMode;
     private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
     private final EncryptablePropertyResolver resolver;
@@ -24,7 +26,7 @@ public class EnvironmentInitializer {
     private final StringEncryptor encryptor;
     private final EncryptablePropertyDetector detector;
 
-    public EnvironmentInitializer(ConfigurableEnvironment environment, InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+    public EnvironmentInitializer(EncryptableEnvironment environment, InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
 
         this.environment = environment;
         this.interceptionMode = interceptionMode;
@@ -35,7 +37,8 @@ public class EnvironmentInitializer {
         this.detector = detector;
     }
 
-    MutablePropertySources initialize(MutablePropertySources originalPropertySources) {
+    MutablePropertySources initialize() {
+        log.info("Initializing Environment: {}", environment.getClass().getSimpleName());
         InterceptionMode actualInterceptionMode = Optional.ofNullable(interceptionMode).orElse(InterceptionMode.WRAPPER);
         List<Class<PropertySource<?>>> actualSkipPropertySourceClasses = Optional.ofNullable(skipPropertySourceClasses).orElseGet(Collections::emptyList);
         EnvCopy envCopy = new EnvCopy(environment);
@@ -44,7 +47,7 @@ public class EnvironmentInitializer {
         EncryptablePropertyDetector actualDetector = Optional.ofNullable(detector).orElseGet(() -> new DefaultLazyPropertyDetector(envCopy.get()));
         EncryptablePropertyResolver actualResolver = Optional.ofNullable(resolver).orElseGet(() -> new DefaultLazyPropertyResolver(actualDetector, actualEncryptor, environment));
         EncryptablePropertySourceConverter converter = new EncryptablePropertySourceConverter(actualInterceptionMode, actualSkipPropertySourceClasses, actualResolver, actualFilter);
-        converter.convertPropertySources(originalPropertySources);
-        return converter.proxyPropertySources(originalPropertySources, envCopy);
+        converter.convertPropertySources(environment.getOriginalPropertySources());
+        return converter.proxyPropertySources(environment.getOriginalPropertySources(), envCopy);
     }
 }

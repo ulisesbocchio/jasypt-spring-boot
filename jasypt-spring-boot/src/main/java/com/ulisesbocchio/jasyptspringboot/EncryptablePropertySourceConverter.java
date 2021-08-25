@@ -13,7 +13,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.*;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -25,6 +27,10 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class EncryptablePropertySourceConverter {
 
+    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+    private static final List<String> DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES = Arrays.asList(
+            "org.springframework.core.env.PropertySource$StubPropertySource"
+    );
     private final InterceptionMode interceptionMode;
     private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
     private final EncryptablePropertyResolver propertyResolver;
@@ -32,15 +38,33 @@ public class EncryptablePropertySourceConverter {
 
     public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
         this.interceptionMode = interceptionMode;
-        this.skipPropertySourceClasses = skipPropertySourceClasses;
+        this.skipPropertySourceClasses = Stream.concat(skipPropertySourceClasses.stream(), defaultSkipPropertySourceClasses().stream()).collect(toList());
         this.propertyResolver = propertyResolver;
         this.propertyFilter = propertyFilter;
+    }
+
+    static List<Class<PropertySource<?>>> defaultSkipPropertySourceClasses() {
+        return DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES.stream().map(EncryptablePropertySourceConverter::getPropertiesClass).collect(toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Class<PropertySource<?>> getPropertiesClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (PropertySource.class.isAssignableFrom(clazz)) {
+                return (Class<PropertySource<?>>) clazz;
+            }
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s does not implement %s", className, PropertySource.class.getName()));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s not found", className), e);
+        }
     }
 
     public void convertPropertySources(MutablePropertySources propSources) {
         StreamSupport.stream(propSources.spliterator(), false)
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
                 .map(this::makeEncryptable)
+                .filter(Objects::nonNull)
                 .collect(toList())
                 .forEach(ps -> propSources.replace(ps.getName(), ps));
     }
@@ -49,7 +73,7 @@ public class EncryptablePropertySourceConverter {
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
         if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
             log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
-            return propertySource;
+            return null;
         }
         PropertySource<T> encryptablePropertySource = convertPropertySource(propertySource);
         log.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
@@ -100,10 +124,10 @@ public class EncryptablePropertySourceConverter {
             encryptablePropertySource = (PropertySource<T>) new EncryptableSystemEnvironmentPropertySourceWrapper((SystemEnvironmentPropertySource) propertySource, propertyResolver, propertyFilter);
         } else if (propertySource instanceof MapPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, propertyResolver, propertyFilter);
-        } else if (propertySource instanceof EnumerablePropertySource) {
-            encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<>((EnumerablePropertySource) propertySource, propertyResolver, propertyFilter);
         } else if (ClassUtils.isAssignable(new ParameterizedTypeReference<PropertySource<Iterable<ConfigurationPropertySource>>>() {}, propertySource.getClass())) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableConfigurationPropertySourcesPropertySource((PropertySource<Iterable<ConfigurationPropertySource>>) propertySource);
+        } else if (propertySource instanceof EnumerablePropertySource) {
+            encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<>((EnumerablePropertySource) propertySource, propertyResolver, propertyFilter);
         } else {
             encryptablePropertySource = new EncryptablePropertySourceWrapper<>(propertySource, propertyResolver, propertyFilter);
         }

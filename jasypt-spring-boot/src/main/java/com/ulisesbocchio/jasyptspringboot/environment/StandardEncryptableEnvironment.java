@@ -10,10 +10,8 @@ import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver;
 import lombok.Builder;
 import org.jasypt.encryption.StringEncryptor;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.StandardEnvironment;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+import org.springframework.core.env.*;
 
 import java.util.List;
 
@@ -25,7 +23,7 @@ import java.util.List;
  * properties is the only one that works with Spring Properties replacement in logback-spring.xml files, using the
  * springProperty tag
  */
-public class StandardEncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment {
+public class StandardEncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment, EncryptableEnvironment {
 
     private MutablePropertySources encryptablePropertySources;
     private MutablePropertySources originalPropertySources;
@@ -47,17 +45,26 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
     @Builder
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
         EnvironmentInitializer initializer = new EnvironmentInitializer(this, interceptionMode, skipPropertySourceClasses, resolver, filter, encryptor, detector);
-        this.encryptablePropertySources = initializer.initialize(originalPropertySources);
+        this.encryptablePropertySources = initializer.initialize();
     }
 
     @Override
     protected void customizePropertySources(MutablePropertySources propertySources) {
         super.customizePropertySources(propertySources);
-        this.originalPropertySources = propertySources;
     }
 
     @Override
     public MutablePropertySources getPropertySources() {
         return this.encryptablePropertySources;
+    }
+
+    @Override
+    public MutablePropertySources getOriginalPropertySources() {
+        return super.getPropertySources();
+    }
+
+    @Override
+    protected ConfigurablePropertyResolver createPropertyResolver(MutablePropertySources propertySources) {
+        return ConfigurationPropertySources.createPropertyResolver(propertySources);
     }
 }

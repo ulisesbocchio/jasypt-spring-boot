@@ -46,24 +46,12 @@ public class EncryptablePropertyResolverConfiguration {
     public static EncryptablePropertySourceConverter encryptablePropertySourceConverter(ConfigurableEnvironment environment, @Qualifier(RESOLVER_BEAN_NAME)  EncryptablePropertyResolver propertyResolver, @Qualifier(FILTER_BEAN_NAME) EncryptablePropertyFilter propertyFilter) {
         final boolean proxyPropertySources = environment.getProperty("jasypt.encryptor.proxy-property-sources", Boolean.TYPE, false);
         final List<String> skipPropertySources = (List<String>) environment.getProperty("jasypt.encryptor.skip-property-sources", List.class, Collections.EMPTY_LIST);
-        final List<Class<PropertySource<?>>> skipPropertySourceClasses = skipPropertySources.stream().map(EncryptablePropertyResolverConfiguration::getPropertiesClass).collect(Collectors.toList());
+        final List<Class<PropertySource<?>>> skipPropertySourceClasses = skipPropertySources.stream().map(EncryptablePropertySourceConverter::getPropertiesClass).collect(Collectors.toList());
         final InterceptionMode interceptionMode = proxyPropertySources ? InterceptionMode.PROXY : InterceptionMode.WRAPPER;
         return new EncryptablePropertySourceConverter(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter);
     }
 
     @SuppressWarnings("unchecked")
-    private static Class<PropertySource<?>> getPropertiesClass(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            if (PropertySource.class.isAssignableFrom(clazz)) {
-                return (Class<PropertySource<?>>) clazz;
-            }
-            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s does not implement %s", className, PropertySource.class.getName()));
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s not found", className), e);
-        }
-    }
-
     @Bean
     public EnvCopy envCopy(final ConfigurableEnvironment environment) {
         return new EnvCopy(environment);

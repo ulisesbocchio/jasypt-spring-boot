@@ -48,6 +48,9 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
             case "replace":
                 envCopy.get().getPropertySources().replace((String) arguments[0], (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
+            case "remove":
+                envCopy.get().getPropertySources().remove((String) arguments[0]);
+                return invocation.proceed();
             default:
                 return invocation.proceed();
         }

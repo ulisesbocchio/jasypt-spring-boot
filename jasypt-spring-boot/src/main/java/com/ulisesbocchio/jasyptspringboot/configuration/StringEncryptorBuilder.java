@@ -72,7 +72,6 @@ public class StringEncryptorBuilder {
     }
 
     private StringEncryptor createPBEDefault() {
-        System.out.println("PASSWORD " + configProps.getPassword());
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(getRequired(configProps::getPassword, propertyPrefix + ".password"));

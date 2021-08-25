@@ -1,29 +1,27 @@
 package com.ulisesbocchio.jasyptspringboot;
 
-import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricConfig;
-import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor;
-import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEByteEncryptor;
-import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEStringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.encryptor.*;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography;
 import lombok.SneakyThrows;
 import org.jasypt.salt.RandomSaltGenerator;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
-import java.security.Security;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EncryptorTest {
 
+    private static String gcmKey = null;
     private SimplePBEByteEncryptor _PBEWITHHMACSHA512ANDAES_256 = null;
     private SimplePBEStringEncryptor stringEncryptor = null;
     private SimpleAsymmetricStringEncryptor keyFileEncryptor = null;
@@ -32,16 +30,33 @@ public class EncryptorTest {
     private SimpleAsymmetricStringEncryptor keyFilePemEncryptor = null;
     private SimpleAsymmetricStringEncryptor keyResourcePemEncryptor = null;
     private SimpleAsymmetricStringEncryptor keyStringPemEncryptor = null;
+    private SimpleGCMStringEncryptor gcmKeyEncryptor = null;
+    private SimpleGCMStringEncryptor gcmKeyLocationEncryptor = null;
+    private SimpleGCMStringEncryptor gcmPasswordEncryptor = null;
+    private SimpleGCMConfig gcmPasswordEncryptorConfig = null;
+    private SimpleGCMConfig gcmPasswordNoSaltEncryptorConfig = null;
+    private SimpleGCMStringEncryptor gcmPasswordNoSaltEncryptor = null;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() {
-        System.out.println("====== Algorithms ==========");
-        System.out.println(Stream.of(Security.getProviders()).map(EncryptorTest::getProviderDetails).collect(Collectors.joining("\n")));
-        System.out.println("===========================");
-        System.out.println();
+//        System.out.println("====== Algorithms ==========");
+//        System.out.println(Stream.of(Security.getProviders()).map(EncryptorTest::getProviderDetails).collect(Collectors.joining("\n")));
+//        System.out.println("===========================");
+//        System.out.println();
+//        System.out.println("====== Algorithms ==========");
+//        System.out.println(Stream.of(Security.getProviders()).map(EncryptorTest::getProviderDetails).collect(Collectors.joining("\n")));
+//        for (Provider provider: Security.getProviders()) {
+//            System.out.println(provider.getName());
+//            for (String key: provider.stringPropertyNames())
+//                System.out.println("\t" + key + "\t" + provider.getProperty(key));
+//        }
+//        System.out.println("===========================");
+        gcmKey = SimpleGCMByteEncryptor.generateBase64EncodedSecretKey();
+        System.out.println("GCM KEY");
+        System.out.println(gcmKey);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         setup_PBEWITHHMACSHA512ANDAES_256();
         setup_stringEncryptor();
@@ -51,6 +66,41 @@ public class EncryptorTest {
         setup_keyFilePemEncryptor();
         setup_keyResourcePemEncryptor();
         setup_keyStringPemEncryptor();
+        setup_gcmKeyEncryptor();
+        setup_gcmKeyLocationEncryptor();
+        setup_gcmPasswordEncryptor();
+        setup_gcmPasswordNoSaltEncryptor();
+    }
+
+    @SneakyThrows
+    private void setup_gcmPasswordEncryptor() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKeyPassword("sumbudrule");
+        byte[] salt = new byte[16];
+        SecureRandom.getInstanceStrong().nextBytes(salt);
+        config.setSecretKeySalt(Base64.getEncoder().encodeToString(salt));
+        gcmPasswordEncryptorConfig = config;
+        gcmPasswordEncryptor = new SimpleGCMStringEncryptor(config);
+    }
+
+    @SneakyThrows
+    private void setup_gcmPasswordNoSaltEncryptor() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKeyPassword("sumbudrule");
+        gcmPasswordNoSaltEncryptorConfig = config;
+        gcmPasswordNoSaltEncryptor = new SimpleGCMStringEncryptor(config);
+    }
+
+    private void setup_gcmKeyEncryptor() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKey(gcmKey);
+        gcmKeyEncryptor = new SimpleGCMStringEncryptor(config);
+    }
+
+    private void setup_gcmKeyLocationEncryptor() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKeyLocation("classpath:secret_key.b64");
+        gcmKeyLocationEncryptor = new SimpleGCMStringEncryptor(config);
     }
 
     private void setup_keyFileEncryptor() {
@@ -141,7 +191,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyFileEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -151,7 +201,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyResourceEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -161,7 +211,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyStringEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -171,7 +221,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyFilePemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -181,7 +231,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyResourcePemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -191,7 +241,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyStringPemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        Assert.assertEquals(decrypted, message);
+        assertEquals(decrypted, message);
     }
 
     @Test
@@ -205,7 +255,7 @@ public class EncryptorTest {
                 _PBEWITHHMACSHA512ANDAES_256.decrypt(ciphertext),
                 StandardCharsets.US_ASCII);
 
-        Assert.assertEquals(message, decrypted);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -216,6 +266,78 @@ public class EncryptorTest {
 
         final String decrypted = stringEncryptor.decrypt(ciphertext);
 
-        Assert.assertEquals(message, decrypted);
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmKeyEncryptor_encryption() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmKeyEncryptor.encrypt(message);
+
+        final String decrypted = gcmKeyEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmKeyLocationEncryptor_encryption() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmKeyLocationEncryptor.encrypt(message);
+
+        final String decrypted = gcmKeyLocationEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmPasswordEncryptor_encryption() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmPasswordEncryptor.encrypt(message);
+
+        final String decrypted = gcmPasswordEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    @SneakyThrows
+    public void test_GcmPasswordEncryptor_encryption2() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmPasswordEncryptor.encrypt(message);
+
+        SimpleGCMStringEncryptor encryptor = new SimpleGCMStringEncryptor(gcmPasswordEncryptorConfig);
+
+        final String decrypted = encryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmPasswordNoSaltEncryptor_encryption() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmPasswordNoSaltEncryptor.encrypt(message);
+
+        final String decrypted = gcmPasswordNoSaltEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    @SneakyThrows
+    public void test_GcmPasswordNoSaltEncryptor_encryption2() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmPasswordNoSaltEncryptor.encrypt(message);
+
+        SimpleGCMStringEncryptor encryptor = new SimpleGCMStringEncryptor(gcmPasswordNoSaltEncryptorConfig);
+
+        final String decrypted = encryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
     }
 }

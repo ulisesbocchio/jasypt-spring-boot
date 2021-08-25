@@ -1,43 +1,32 @@
 package com.ulisesbocchio.jasyptspringbootstarter;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SystemStubsExtension.class)
 @SpringBootTest(classes = EnvironmentVariablesLoadTest.TestConfig.class)
 public class EnvironmentVariablesLoadTest {
 
     @Autowired
     private MyProperties myProperties;
 
-    @ClassRule
-    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-
-    @BeforeClass
-    public static void setup() {
-        environmentVariables.set("TEST_ENV_FOOSTRING", "test1");
-        environmentVariables.set("TEST_ENV_BAR_STRING", "test2");
-        environmentVariables.set("TEST_ENV_FOOLIST", "a1,b1");
-        environmentVariables.set("TEST_ENV_BAR_LIST", "a2,b2");
-        environmentVariables.set("TEST_ENV_STRINGMAP_K1", "v1");
-        environmentVariables.set("TEST_ENV_LISTMAP_K2", "v2");
-    }
+    @SystemStub
+    private EnvironmentVariables environmentVariables =
+            new EnvironmentVariables("TEST_ENV_FOOSTRING", "test1", "TEST_ENV_BAR_STRING", "test2", "TEST_ENV_FOOLIST", "a1,b1", "TEST_ENV_BAR_LIST", "a2,b2", "TEST_ENV_STRINGMAP_K1", "v1", "TEST_ENV_LISTMAP_K2", "v2");
 
     @EnableEncryptableProperties
     @EnableConfigurationProperties(EnvironmentVariablesLoadTest.MyProperties.class)

@@ -1,6 +1,9 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
+import com.ulisesbocchio.jasyptspringboot.util.ClassUtils;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
@@ -20,7 +23,9 @@ public class EnvCopy {
             final PropertySource<?> original = ps instanceof EncryptablePropertySource
                     ? ((EncryptablePropertySource) ps).getDelegate()
                     : ps;
-            copy.getPropertySources().addLast(original);
+            if (!(ClassUtils.isAssignable(new ParameterizedTypeReference<PropertySource<Iterable<ConfigurationPropertySource>>>() {}, original.getClass()))) {
+                copy.getPropertySources().addLast(original);
+            }
         }));
     }
 

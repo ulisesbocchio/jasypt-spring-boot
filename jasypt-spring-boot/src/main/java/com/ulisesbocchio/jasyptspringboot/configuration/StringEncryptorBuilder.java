@@ -2,6 +2,8 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricConfig;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMConfig;
+import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor;
 import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +29,15 @@ public class StringEncryptorBuilder {
             return createPBEDefault();
         } else if (isAsymmetricConfig()) {
             return createAsymmetricDefault();
+        } else if (isGCMConfig()) {
+            return createGCMDefault();
         } else {
             throw new IllegalStateException("either '" + propertyPrefix + ".password' or one of ['" + propertyPrefix + ".private-key-string', '" + propertyPrefix + ".private-key-location'] must be provided for Password-based or Asymmetric encryption");
         }
+    }
+
+    private boolean isGCMConfig() {
+        return configProps.getAlgorithm().matches(".*AES/GCM.*") || configProps.getGcmSecretKey() != null;
     }
 
     private boolean isPBEConfig() {
@@ -38,6 +46,18 @@ public class StringEncryptorBuilder {
 
     private boolean isAsymmetricConfig() {
         return configProps.getPrivateKeyString() != null || configProps.getPrivateKeyLocation() != null || configProps.getPublicKeyString() != null || configProps.getPublicKeyLocation() != null;
+    }
+
+    private StringEncryptor createGCMDefault() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setAlgorithm(get(configProps::getAlgorithm, propertyPrefix + ".algorithm", "AES/GCM/NoPadding"));
+        config.setSecretKey(get(configProps::getGcmSecretKey, propertyPrefix + ".gcm-secret-key", null));
+        config.setSecretKeyLocation(get(configProps::getGcmSecretKeyLocation, propertyPrefix + ".gcm-secret-key-location", null));
+        config.setSecretKeyPassword(get(configProps::getPassword, propertyPrefix + ".password", null));
+        config.setSecretKeySalt(get(configProps::getGcmSecretKeySalt, propertyPrefix + ".gcm-secret-key-salt", null));
+        config.setSecretKeyAlgorithm(get(configProps::getGcmSecretKeyAlgorithm, propertyPrefix + ".gcm-secret-key-algorithm", "PBKDF2WithHmacSHA256"));
+        config.setSecretKeyIterations(get(configProps::getKeyObtentionIterationsInt, propertyPrefix + ".key-obtention-iterations", 65536));
+        return new SimpleGCMStringEncryptor(config);
     }
 
     private StringEncryptor createAsymmetricDefault() {
@@ -52,6 +72,7 @@ public class StringEncryptorBuilder {
     }
 
     private StringEncryptor createPBEDefault() {
+        System.out.println("PASSWORD " + configProps.getPassword());
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(getRequired(configProps::getPassword, propertyPrefix + ".password"));

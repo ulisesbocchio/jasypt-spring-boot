@@ -41,6 +41,7 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
                     try {
                         String unwrappedProperty = detector.unwrapEncryptedValue(resolvedValue.trim());
                         String resolvedProperty = environment.resolvePlaceholders(unwrappedProperty);
+                        System.out.println("RESOLVED PROPERTY " + resolvedProperty);
                         return encryptor.decrypt(resolvedProperty);
                     } catch (EncryptionOperationNotPossibleException e) {
                         throw new DecryptionException("Unable to decrypt: " + value + ". Decryption of Properties failed,  make sure encryption/decryption " +

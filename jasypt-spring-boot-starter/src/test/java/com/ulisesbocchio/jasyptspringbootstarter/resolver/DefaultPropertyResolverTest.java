@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -21,18 +22,21 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(
-    properties = {
-        "test.username=${externalized.username}",
-        "test.password=${externalized.password}"
-    },
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DefaultPropertyResolverTest {
-
-    @SpringBootApplication
-    public static class TestApp {
-
+@SpringBootApplication
+class TestApp {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder()
+                .sources(TestApp.class)
+                .run(args);
     }
+}
+@SpringBootTest(
+        properties = {
+                "spring.config.use-legacy-processing=true"
+        },
+        classes = TestApp.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class DefaultPropertyResolverTest {
 
     @Value("${spring.cloud.config.server.svn.password}")
     public String secret;
@@ -52,9 +56,9 @@ public class DefaultPropertyResolverTest {
     @Test
     public void propertiesAreAccessibleFromEnvActuator() {
         ResponseEntity<?> response = new RestTemplateBuilder()
-            .errorHandler(ErrorHandler.DEFAULT)
-            .build().exchange(RequestEntity
-                .get(URI.create("http://localhost:" + port + "/actuator/env")).build(), JsonNode.class);
+                .errorHandler(ErrorHandler.DEFAULT)
+                .build().exchange(RequestEntity
+                        .get(URI.create("http://localhost:" + port + "/actuator/env")).build(), JsonNode.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 

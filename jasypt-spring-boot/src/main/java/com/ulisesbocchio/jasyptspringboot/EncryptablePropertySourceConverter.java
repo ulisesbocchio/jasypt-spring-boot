@@ -3,14 +3,13 @@ package com.ulisesbocchio.jasyptspringboot;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableSystemEnvironmentPropertySourceWrapper;
-
+import com.ulisesbocchio.jasyptspringboot.util.ClassUtils;
+import com.ulisesbocchio.jasyptspringboot.wrapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.*;
 
 import java.lang.reflect.Modifier;
@@ -103,6 +102,8 @@ public class EncryptablePropertySourceConverter {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, propertyResolver, propertyFilter);
         } else if (propertySource instanceof EnumerablePropertySource) {
             encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<>((EnumerablePropertySource) propertySource, propertyResolver, propertyFilter);
+        } else if (ClassUtils.isAssignable(new ParameterizedTypeReference<PropertySource<Iterable<ConfigurationPropertySource>>>() {}, propertySource.getClass())) {
+            encryptablePropertySource = (PropertySource<T>) new EncryptableConfigurationPropertySourcesPropertySource((PropertySource<Iterable<ConfigurationPropertySource>>) propertySource);
         } else {
             encryptablePropertySource = new EncryptablePropertySourceWrapper<>(propertySource, propertyResolver, propertyFilter);
         }

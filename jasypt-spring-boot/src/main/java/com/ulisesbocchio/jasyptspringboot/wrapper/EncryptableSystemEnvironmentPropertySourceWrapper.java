@@ -4,6 +4,9 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
+import org.springframework.boot.origin.Origin;
+import org.springframework.boot.origin.OriginLookup;
+import org.springframework.boot.origin.SystemEnvironmentOrigin;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 
@@ -12,7 +15,7 @@ import java.util.Map;
 /**
  * @author Tomas Tulka (@ttulka)
  */
-public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnvironmentPropertySource implements EncryptablePropertySource<Map<String, Object>> {
+public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnvironmentPropertySource implements EncryptablePropertySource<Map<String, Object>>, OriginLookup<String> {
 
     private final EncryptablePropertySource<Map<String, Object>> encryptableDelegate;
 
@@ -34,5 +37,14 @@ public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnv
     @Override
     public PropertySource<Map<String, Object>> getDelegate() {
         return encryptableDelegate.getDelegate();
+    }
+
+    @Override
+    public Origin getOrigin(String key) {
+        String property = resolvePropertyName(key);
+        if (super.containsProperty(property)) {
+            return new SystemEnvironmentOrigin(property);
+        }
+        return null;
     }
 }

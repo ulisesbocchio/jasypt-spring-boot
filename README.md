@@ -607,6 +607,11 @@ You can override any spring config you support in your application when running 
 ```bash
 mvn jasypt:encrypt -Dspring.profiles.active=cloud -Djasypt.encryptor.password="the password" 
 ```
+### Multi-module maven projects
+To encrypt/decrypt properties in multi-module projects disable recursion with `-N` or `--non-recursive` on the maven command:
+```bash
+mvn jasypt:upgrade -Djasypt.plugin.path=file:server/src/test/resources/application-test.properties  -Djasypt.encryptor.password=supersecret -N
+```
 
 ## Asymmetric Encryption
 `jasypt-spring-boot:2.1.1` introduces a new feature to encrypt/decrypt properties using asymmetric encryption with a pair of private/public keys

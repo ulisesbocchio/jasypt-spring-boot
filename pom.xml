@@ -34,8 +34,8 @@
 
     <licenses>
         <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>MIT License</name>
+            <url>https://github.com/ulisesbocchio/jasypt-spring-boot/blob/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

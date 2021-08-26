@@ -36,7 +36,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
         if (cache.containsKey(name)) {
             return cache.get(name);
         }
-        synchronized (this) {
+        synchronized (name.intern()) {
             if (!cache.containsKey(name)) {
                 Object resolved = getProperty(resolver, filter, delegate, name);
                 if (resolved != null) {

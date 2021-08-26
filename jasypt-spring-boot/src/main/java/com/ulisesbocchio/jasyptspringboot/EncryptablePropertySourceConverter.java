@@ -61,10 +61,9 @@ public class EncryptablePropertySourceConverter {
     }
 
     public void convertPropertySources(MutablePropertySources propSources) {
-        StreamSupport.stream(propSources.spliterator(), false)
+        propSources.stream()
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
                 .map(this::makeEncryptable)
-                .filter(Objects::nonNull)
                 .collect(toList())
                 .forEach(ps -> propSources.replace(ps.getName(), ps));
     }
@@ -72,8 +71,10 @@ public class EncryptablePropertySourceConverter {
     @SuppressWarnings("unchecked")
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
         if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
-            log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
-            return null;
+            if (!(propertySource instanceof EncryptablePropertySource)) {
+                log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
+            }
+            return propertySource;
         }
         PropertySource<T> encryptablePropertySource = convertPropertySource(propertySource);
         log.info("Converting PropertySource {} [{}] to {}", propertySource.getName(), propertySource.getClass().getName(),
@@ -120,11 +121,12 @@ public class EncryptablePropertySourceConverter {
         PropertySource<T> encryptablePropertySource;
         if (needsProxyAnyway(propertySource)) {
             encryptablePropertySource = proxyPropertySource(propertySource);
-        } else if (propertySource instanceof  SystemEnvironmentPropertySource) {
+        } else if (propertySource instanceof SystemEnvironmentPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableSystemEnvironmentPropertySourceWrapper((SystemEnvironmentPropertySource) propertySource, propertyResolver, propertyFilter);
         } else if (propertySource instanceof MapPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, propertyResolver, propertyFilter);
-        } else if (ClassUtils.isAssignable(new ParameterizedTypeReference<PropertySource<Iterable<ConfigurationPropertySource>>>() {}, propertySource.getClass())) {
+        } else if (ClassUtils.isAssignable(new ParameterizedTypeReference<PropertySource<Iterable<ConfigurationPropertySource>>>() {
+        }, propertySource.getClass())) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableConfigurationPropertySourcesPropertySource((PropertySource<Iterable<ConfigurationPropertySource>>) propertySource);
         } else if (propertySource instanceof EnumerablePropertySource) {
             encryptablePropertySource = new EncryptableEnumerablePropertySourceWrapper<>((EnumerablePropertySource) propertySource, propertyResolver, propertyFilter);
@@ -144,12 +146,12 @@ public class EncryptablePropertySourceConverter {
     }
 
     /**
-     *  Some Spring Boot code actually casts property sources to this specific type so must be proxied.
+     * Some Spring Boot code actually casts property sources to this specific type so must be proxied.
      */
     private static boolean needsProxyAnyway(String className) {
         return Stream.of(
                 "org.springframework.boot.context.config.ConfigFileApplicationListener$ConfigurationPropertySources",
                 "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
-                ).anyMatch(className::equals);
+        ).anyMatch(className::equals);
     }
 }

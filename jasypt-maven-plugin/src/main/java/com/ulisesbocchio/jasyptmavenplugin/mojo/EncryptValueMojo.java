@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author ubocchio
  */
-@Mojo(name = "encrypt-value", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+@Mojo(name = "encrypt-value", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject=false)
 @Slf4j
 public class EncryptValueMojo extends AbstractValueJasyptMojo {
 

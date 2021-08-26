@@ -23,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -229,6 +230,12 @@ public class JasyptEncryptorConfigurationProperties {
      * @see SimpleGCMConfig#getSecretKeySalt()
      */
     private String gcmSecretKeySalt = null;
+
+    /**
+     * Specify the class names of extra {@link org.springframework.context.ApplicationEvent} events that should trigger a property cache refresh.
+     * @see com.ulisesbocchio.jasyptspringboot.caching.RefreshScopeRefreshedEventListener
+     */
+    private List<String> refreshedEventClasses = emptyList();
 
     /**
      * Specify an algorithm for the secret key when used with master password

@@ -2,6 +2,7 @@ package com.ulisesbocchio.jasyptspringboot.caching;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
+import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,10 +16,11 @@ import org.springframework.util.ClassUtils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
-public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean {
+public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean, Ordered {
 
     public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
             "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
@@ -29,15 +31,18 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
     private final EncryptablePropertySourceConverter converter;
     private final List<Class<?>> eventClasses = new ArrayList<>();
     private final Map<String, Boolean> eventTriggersCache = new ConcurrentHashMap<>();
-    public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
+    private final JasyptEncryptorConfigurationProperties config;
+
+    public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter, JasyptEncryptorConfigurationProperties config) {
         this.environment = environment;
         this.converter = converter;
+        this.config = config;
     }
 
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
-        // log.info("APPLICATION EVENT: {}", event.getClass().getName());
+//        log.info("APPLICATION EVENT: {}", event.getClass().getName());
         if (this.shouldTriggerRefresh(event)) {
             log.info("Refreshing cached encryptable property sources on {}", event.getClass().getSimpleName());
             refreshCachedProperties();
@@ -88,6 +93,14 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        EVENT_CLASS_NAMES.stream().map(this::getClassSafe).filter(Objects::nonNull).collect(Collectors.toCollection(() -> this.eventClasses));
+        Stream
+                .concat(EVENT_CLASS_NAMES.stream(), this.config.getRefreshedEventClasses().stream())
+                .map(this::getClassSafe).filter(Objects::nonNull)
+                .collect(Collectors.toCollection(() -> this.eventClasses));
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }

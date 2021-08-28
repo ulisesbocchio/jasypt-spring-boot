@@ -11,7 +11,7 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  */
 public class EncryptableEnumerablePropertySourceWrapper<T> extends EnumerablePropertySource<T> implements EncryptablePropertySource<T> {
-    private final EncryptablePropertySource<T> encryptableDelegate;
+    private final CachingDelegateEncryptablePropertySource<T> encryptableDelegate;
 
     public EncryptableEnumerablePropertySourceWrapper(EnumerablePropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
@@ -24,15 +24,11 @@ public class EncryptableEnumerablePropertySourceWrapper<T> extends EnumerablePro
     }
 
     @Override
-    public void refresh() {
-        encryptableDelegate.refresh();
-    }
-
-    @Override
     public PropertySource<T> getDelegate() {
-        return encryptableDelegate.getDelegate();
+        return encryptableDelegate;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public String[] getPropertyNames() {
         return ((EnumerablePropertySource) encryptableDelegate.getDelegate()).getPropertyNames();

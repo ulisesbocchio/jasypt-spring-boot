@@ -3,6 +3,7 @@ package com.ulisesbocchio.jasyptspringboot.encryptor;
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.SneakyThrows;
 import org.jasypt.encryption.ByteEncryptor;
+import org.jasypt.iv.IvGenerator;
 import org.jasypt.salt.SaltGenerator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -28,13 +29,12 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
     public static final int GCM_TAG_LENGTH = 128;
     private final Singleton<SecretKey> key;
     private final String algorithm;
+    private final Singleton<IvGenerator> ivGenerator;
 
     @SneakyThrows
     @Override
     public byte[] encrypt(byte[] message) {
-        byte[] iv = new byte[GCM_IV_LENGTH];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
+        byte[] iv = this.ivGenerator.get().generateIv(GCM_IV_LENGTH);
 
         Cipher cipher = Cipher.getInstance(this.algorithm);
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
@@ -106,6 +106,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
 
     public SimpleGCMByteEncryptor(SimpleGCMConfig config) {
         this.key = Singleton.from(this::loadSecretKey, config);
+        this.ivGenerator = Singleton.from(config::getActualIvGenerator);
         this.algorithm = config.getAlgorithm();
     }
 }

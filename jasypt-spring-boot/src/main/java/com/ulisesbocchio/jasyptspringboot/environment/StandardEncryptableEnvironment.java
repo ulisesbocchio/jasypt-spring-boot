@@ -26,16 +26,17 @@ import java.util.List;
 public class StandardEncryptableEnvironment extends StandardEnvironment implements ConfigurableEnvironment, EncryptableEnvironment {
 
     private MutablePropertySources encryptablePropertySources;
-    private MutablePropertySources originalPropertySources;
+    private ConfigurablePropertyResolver pr;
 
     public StandardEncryptableEnvironment() {
-        this(null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null);
     }
 
     /**
      * Create a new Encryptable Environment. All arguments are optional, provide null if default value is desired.
      *
      * @param interceptionMode          The interception method to utilize, or null (Default is {@link InterceptionMode#WRAPPER})
+     * @param propertySourcesInterceptionMode          The interception method to utilize for wrapping the {@link MutablePropertySources}, or null (Default is {@link InterceptionMode#WRAPPER})
      * @param skipPropertySourceClasses A list of {@link PropertySource} classes to skip from interception, or null (Default is empty)
      * @param resolver                  The property resolver to utilize, or null (Default is {@link DefaultLazyPropertyResolver}  which will resolve to specified configuration)
      * @param filter                    The property filter to utilize, or null (Default is {@link DefaultLazyPropertyFilter}  which will resolve to specified configuration)
@@ -43,9 +44,9 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
      * @param detector                  The property detector to utilize, or null (Default is {@link DefaultLazyPropertyDetector} which will resolve to specified configuration)
      */
     @Builder
-    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
-        EnvironmentInitializer initializer = new EnvironmentInitializer(this, interceptionMode, skipPropertySourceClasses, resolver, filter, encryptor, detector);
-        this.encryptablePropertySources = initializer.initialize();
+    public StandardEncryptableEnvironment(InterceptionMode interceptionMode, InterceptionMode propertySourcesInterceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+        EnvironmentInitializer initializer = new EnvironmentInitializer(interceptionMode, propertySourcesInterceptionMode, skipPropertySourceClasses, resolver, filter, encryptor, detector);
+        initializer.initialize(this);
     }
 
     @Override
@@ -64,7 +65,13 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
     }
 
     @Override
+    public void setEncryptablePropertySources(MutablePropertySources propertySources) {
+        this.encryptablePropertySources = propertySources;
+        ((MutableConfigurablePropertyResolver)this.getPropertyResolver()).setPropertySources(propertySources);
+    }
+
+    @Override
     protected ConfigurablePropertyResolver createPropertyResolver(MutablePropertySources propertySources) {
-        return ConfigurationPropertySources.createPropertyResolver(propertySources);
+        return EnvironmentInitializer.createPropertyResolver(propertySources);
     }
 }

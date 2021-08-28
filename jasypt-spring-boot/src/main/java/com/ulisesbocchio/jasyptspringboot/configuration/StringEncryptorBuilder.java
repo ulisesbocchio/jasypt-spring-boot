@@ -32,12 +32,12 @@ public class StringEncryptorBuilder {
         } else if (isGCMConfig()) {
             return createGCMDefault();
         } else {
-            throw new IllegalStateException("either '" + propertyPrefix + ".password' or one of ['" + propertyPrefix + ".private-key-string', '" + propertyPrefix + ".private-key-location'] must be provided for Password-based or Asymmetric encryption");
+            throw new IllegalStateException("either '" + propertyPrefix + ".password', one of ['" + propertyPrefix + ".private-key-string', '" + propertyPrefix + ".private-key-location'] for asymmetric encryption, or one of ['" + propertyPrefix + ".gcm-secret-key-string', '" + propertyPrefix + ".gcm-secret-key-location', '" + propertyPrefix + ".gcm-secret-key-password'] for AES/GCM encryption must be provided for Password-based or Asymmetric encryption");
         }
     }
 
     private boolean isGCMConfig() {
-        return configProps.getAlgorithm().matches(".*AES/GCM.*") || configProps.getGcmSecretKey() != null;
+        return configProps.getGcmSecretKeyString() != null || configProps.getGcmSecretKeyLocation() !=null || configProps.getGcmSecretKeyPassword() != null;
     }
 
     private boolean isPBEConfig() {
@@ -50,13 +50,14 @@ public class StringEncryptorBuilder {
 
     private StringEncryptor createGCMDefault() {
         SimpleGCMConfig config = new SimpleGCMConfig();
-        config.setAlgorithm(get(configProps::getAlgorithm, propertyPrefix + ".algorithm", "AES/GCM/NoPadding"));
-        config.setSecretKey(get(configProps::getGcmSecretKey, propertyPrefix + ".gcm-secret-key", null));
+//        config.setAlgorithm(get(configProps::getAlgorithm, propertyPrefix + ".algorithm", "AES/GCM/NoPadding"));
+        config.setSecretKey(get(configProps::getGcmSecretKeyString, propertyPrefix + ".gcm-secret-key-string", null));
         config.setSecretKeyLocation(get(configProps::getGcmSecretKeyLocation, propertyPrefix + ".gcm-secret-key-location", null));
-        config.setSecretKeyPassword(get(configProps::getPassword, propertyPrefix + ".password", null));
+        config.setSecretKeyPassword(get(configProps::getGcmSecretKeyPassword, propertyPrefix + ".gcm-key-password", null));
         config.setSecretKeySalt(get(configProps::getGcmSecretKeySalt, propertyPrefix + ".gcm-secret-key-salt", null));
         config.setSecretKeyAlgorithm(get(configProps::getGcmSecretKeyAlgorithm, propertyPrefix + ".gcm-secret-key-algorithm", "PBKDF2WithHmacSHA256"));
-        config.setSecretKeyIterations(get(configProps::getKeyObtentionIterationsInt, propertyPrefix + ".key-obtention-iterations", 65536));
+        config.setSecretKeyIterations(get(configProps::getKeyObtentionIterationsInt, propertyPrefix + ".key-obtention-iterations", 1000));
+        config.setIvGeneratorClassName(get(configProps::getIvGeneratorClassname, propertyPrefix + ".iv-generator-classname", "org.jasypt.iv.RandomIvGenerator"));
         return new SimpleGCMStringEncryptor(config);
     }
 

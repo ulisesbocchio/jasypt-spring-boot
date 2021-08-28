@@ -5,12 +5,13 @@ import com.ulisesbocchio.jasyptspringboot.util.Iterables;
 import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyNameException;
 import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.PropertySource;
 
 public class EncryptableConfigurationPropertySourcesPropertySource extends PropertySource<Iterable<ConfigurationPropertySource>>
-        implements OriginLookup<String>, EncryptablePropertySource<Iterable<ConfigurationPropertySource>> {
+        implements EncryptablePropertySource<Iterable<ConfigurationPropertySource>> {
 
     private final PropertySource<Iterable<ConfigurationPropertySource>> delegate;
 
@@ -44,8 +45,12 @@ public class EncryptableConfigurationPropertySourcesPropertySource extends Prope
         try {
             return findConfigurationProperty(ConfigurationPropertyName.of(name));
         }
-        catch (Exception ex) {
-            return null;
+        catch (InvalidConfigurationPropertyNameException ex) {
+            // simulate non-exposed version of ConfigurationPropertyName.of(name, nullIfInvalid)
+            if(ex.getInvalidCharacters().size() == 1 && ex.getInvalidCharacters().get(0).equals('.')) {
+                return null;
+            }
+            throw ex;
         }
     }
 

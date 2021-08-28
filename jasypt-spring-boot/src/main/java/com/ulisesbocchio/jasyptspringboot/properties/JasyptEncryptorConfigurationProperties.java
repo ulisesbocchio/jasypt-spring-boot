@@ -213,7 +213,7 @@ public class JasyptEncryptorConfigurationProperties {
      * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
      * @see SimpleGCMConfig#getSecretKey()
      */
-    private String gcmSecretKey = null;
+    private String gcmSecretKeyString = null;
 
     /**
      * Specify a secret key resource location in base64 for the GCM Algorithm
@@ -222,6 +222,14 @@ public class JasyptEncryptorConfigurationProperties {
      * @see SimpleGCMConfig#getSecretKeyLocation()
      */
     private String gcmSecretKeyLocation = null;
+
+    /**
+     * Specify a password for the GCM Algorithm
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKeyPassword()
+     */
+    private String gcmSecretKeyPassword = null;
 
     /**
      * Specify a salt base64 String when using GCM encryption when used with master password

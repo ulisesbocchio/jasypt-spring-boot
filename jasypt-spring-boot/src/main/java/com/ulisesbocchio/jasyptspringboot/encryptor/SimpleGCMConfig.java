@@ -2,6 +2,8 @@ package com.ulisesbocchio.jasyptspringboot.encryptor;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
+import org.jasypt.iv.IvGenerator;
 import org.jasypt.salt.SaltGenerator;
 import org.jasypt.salt.ZeroSaltGenerator;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,8 +26,11 @@ public class SimpleGCMConfig {
     private String secretKeySalt;
     private String algorithm = "AES/GCM/NoPadding";
     private String secretKeyAlgorithm = "PBKDF2WithHmacSHA256";
-    private int secretKeyIterations = 65536;
+    private int secretKeyIterations = 1000;
     private SecretKey actualKey = null;
+    private SaltGenerator saltGenerator = null;
+    private IvGenerator ivGenerator = null;
+    private String ivGeneratorClassName = "org.jasypt.iv.RandomIvGenerator";
 
     private Resource loadResource(Resource asResource, String asString, String asLocation) {
         return Optional.ofNullable(asResource)
@@ -47,6 +52,19 @@ public class SimpleGCMConfig {
     }
 
     public SaltGenerator getSecretKeySaltGenerator() {
-        return secretKeySalt == null ? new ZeroSaltGenerator() : new FixedBase64ByteArraySaltGenerator(secretKeySalt);
+        return saltGenerator != null ?
+                saltGenerator :
+                (secretKeySalt == null ?
+                        new ZeroSaltGenerator() :
+                        new FixedBase64ByteArraySaltGenerator(secretKeySalt));
+    }
+
+    @SneakyThrows
+    private IvGenerator instantiateIvGenerator() {
+        return (IvGenerator)Class.forName(this.ivGeneratorClassName).newInstance();
+    }
+
+    public IvGenerator getActualIvGenerator() {
+        return Optional.ofNullable(ivGenerator).orElseGet(this::instantiateIvGenerator);
     }
 }

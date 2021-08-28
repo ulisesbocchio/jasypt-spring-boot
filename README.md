@@ -434,6 +434,22 @@ wrapped/proxied by this plugin and thereby properties contained in them won't su
 ```properties
 jasypt.encryptor.skip-property-sources=org.springframework.boot.env.RandomValuePropertySource,org.springframework.boot.ansi.AnsiPropertySource
 ```
+## Encryptable Properties cache refresh
+Encrypted properties are cached within your application and in certain scenarios, like when using externalized configuration
+from a config server the properties need to be refreshed when they changed. For this `jasypt-spring-boot` registers a
+`RefreshScopeRefreshedEventListener` that listens to the following events by default to clear the encrypted properties cache:
+```java
+public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
+            "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
+            "org.springframework.cloud.context.environment.EnvironmentChangeEvent",
+            "org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent"
+    );
+```
+Should you need to register extra events that you would like to trigger an encrypted cache invalidation you can add them
+using the following property (separate by comma if more than one needed):
+```properties
+jasypt.encryptor.refreshed-event-classes=org.springframework.boot.context.event.ApplicationStartedEvent
+```
 
 ## Maven Plugin
 
@@ -757,7 +773,59 @@ public class PropertyEncryptor {
     }
 }
 ```
-
+## AES 256-GCM Encryption
+As of version 3.0.4, AES 256-GCM Encryption is supported. To use this type of encryption, set the property `jasypt.encryptor.gcm-secret-key-string`, `jasypt.encryptor.gcm-secret-key-location` or `jasypt.encryptor.gcm-secret-key-password`. </br>
+The underlying algorithm used is `AES/GCM/NoPadding` so make sure that's installed in your JDK.<br/>
+The `SimpleGCMByteEncryptor` uses a `IVGenerator` to encrypt properties. You can configure that with property `jasypt.encryptor.iv-generator-classname` if you don't want to
+use the default implementation `RandomIvGenerator`
+### Using a key
+When using a key via `jasypt.encryptor.gcm-secret-key-string` or `jasypt.encryptor.gcm-secret-key-location`, make sure you encode your key in base64.
+The base64 string value could set to `jasypt.encryptor.gcm-secret-key-string`, or just can save it in a file and use a spring resource locator to that file in property `jasypt.encryptor.gcm-secret-key-location`. For instance:
+```properties
+jasypt.encryptor.gcm-secret-key-string="PNG5egJcwiBrd+E8go1tb9PdPvuRSmLSV3jjXBmWlIU="
+#OR
+jasypt.encryptor.gcm-secret-key-location=classpath:secret_key.b64
+#OR
+jasypt.encryptor.gcm-secret-key-location=file:/full/path/secret_key.b64
+#OR
+jasypt.encryptor.gcm-secret-key-location=file:relative/path/secret_key.b64
+```
+Optionally, you can create your own `StringEncryptor` bean:
+```java
+@Bean("encryptorBean")
+public StringEncryptor stringEncryptor() {
+    SimpleGCMConfig config = new SimpleGCMConfig();
+	config.setSecretKey("PNG5egJcwiBrd+E8go1tb9PdPvuRSmLSV3jjXBmWlIU=");
+	return new SimpleGCMStringEncryptor(config);
+}
+```
+### Using a password
+Alternatively, you can use a password to encrypt/decrypt properties using AES 256-GCM. The password is used to generate a
+key on startup, so there a few properties you need to/can set, these are:
+```properties
+jasypt.encryptor.gcm-secret-key-password="chupacabras"
+#Optional, defaults to "1000"
+jasypt.encryptor.key-obtention-iterations="1000"
+#Optional, defaults to 0, no salt. If provided, specify the salt string in ba64 format
+jasypt.encryptor.gcm-secret-key-salt="HrqoFr44GtkAhhYN+jP8Ag=="
+#Optional, defaults to PBKDF2WithHmacSHA256
+jasypt.encryptor.gcm-secret-key-algorithm="PBKDF2WithHmacSHA256"
+```
+Make sure this parameters are the same if you're encrypting your secrets with external tools.
+Optionally, you can create your own `StringEncryptor` bean:
+```java
+@Bean("encryptorBean")
+public StringEncryptor stringEncryptor() {
+    SimpleGCMConfig config = new SimpleGCMConfig();
+	config.setSecretKeyPassword("chupacabras");
+	config.setSecretKeyIterations(1000);
+	config.setSecretKeySalt("HrqoFr44GtkAhhYN+jP8Ag==");
+	config.setSecretKeyAlgorithm("PBKDF2WithHmacSHA256");
+	return new SimpleGCMStringEncryptor(config);
+}
+```
+### Encrypting properties with AES GCM-256
+You can use the [Maven Plugin](#maven-plugin) or follow a similar strategy as explained in [Asymmetric Encryption](#asymmetric-encryption)'s [Encrypting Properties](#encrypting-properties) 
 ## Demo App
 The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.
 The main [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) Demo app explicitly sets a System property with the encryption password before the app runs.

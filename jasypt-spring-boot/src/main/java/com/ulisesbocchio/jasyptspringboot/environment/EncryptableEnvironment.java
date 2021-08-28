@@ -5,4 +5,5 @@ import org.springframework.core.env.MutablePropertySources;
 
 public interface EncryptableEnvironment extends ConfigurableEnvironment {
     MutablePropertySources getOriginalPropertySources();
+    void setEncryptablePropertySources(MutablePropertySources propertySources);
 }

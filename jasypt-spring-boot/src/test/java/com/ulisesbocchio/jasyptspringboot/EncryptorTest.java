@@ -7,6 +7,7 @@ import org.jasypt.salt.RandomSaltGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
@@ -14,9 +15,16 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EncryptorTest {
@@ -36,6 +44,7 @@ public class EncryptorTest {
     private SimpleGCMConfig gcmPasswordEncryptorConfig = null;
     private SimpleGCMConfig gcmPasswordNoSaltEncryptorConfig = null;
     private SimpleGCMStringEncryptor gcmPasswordNoSaltEncryptor = null;
+    private PooledStringEncryptor gcmPooledKeyEncryptor = null;
 
     @BeforeAll
     public static void setupClass() {
@@ -50,7 +59,7 @@ public class EncryptorTest {
 //            for (String key: provider.stringPropertyNames())
 //                System.out.println("\t" + key + "\t" + provider.getProperty(key));
 //        }
-//        System.out.println("===========================");
+        System.out.println("===========================");
         gcmKey = SimpleGCMByteEncryptor.generateBase64EncodedSecretKey();
         System.out.println("GCM KEY");
         System.out.println(gcmKey);
@@ -70,6 +79,7 @@ public class EncryptorTest {
         setup_gcmKeyLocationEncryptor();
         setup_gcmPasswordEncryptor();
         setup_gcmPasswordNoSaltEncryptor();
+        setup_pooledGcmKeyEncryptor();
     }
 
     @SneakyThrows
@@ -78,7 +88,9 @@ public class EncryptorTest {
         config.setSecretKeyPassword("sumbudrule");
         byte[] salt = new byte[16];
         SecureRandom.getInstanceStrong().nextBytes(salt);
-        config.setSecretKeySalt(Base64.getEncoder().encodeToString(salt));
+        String saltb = Base64.getEncoder().encodeToString(salt);
+        System.out.println("SALT base64 " + saltb);
+        config.setSecretKeySalt(saltb);
         gcmPasswordEncryptorConfig = config;
         gcmPasswordEncryptor = new SimpleGCMStringEncryptor(config);
     }
@@ -89,6 +101,14 @@ public class EncryptorTest {
         config.setSecretKeyPassword("sumbudrule");
         gcmPasswordNoSaltEncryptorConfig = config;
         gcmPasswordNoSaltEncryptor = new SimpleGCMStringEncryptor(config);
+    }
+
+    private void setup_pooledGcmKeyEncryptor() {
+        gcmPooledKeyEncryptor = new PooledStringEncryptor(10, () -> {
+            SimpleGCMConfig config = new SimpleGCMConfig();
+            config.setSecretKey(gcmKey);
+            return new SimpleGCMStringEncryptor(config);
+        });
     }
 
     private void setup_gcmKeyEncryptor() {
@@ -286,6 +306,8 @@ public class EncryptorTest {
 
         final String ciphertext = gcmKeyLocationEncryptor.encrypt(message);
 
+        System.out.println(ciphertext);
+
         final String decrypted = gcmKeyLocationEncryptor.decrypt(ciphertext);
 
         assertEquals(message, decrypted);
@@ -296,6 +318,8 @@ public class EncryptorTest {
         final String message = "This is the secret message... BOOHOOO!";
 
         final String ciphertext = gcmPasswordEncryptor.encrypt(message);
+
+        System.out.println(ciphertext);
 
         final String decrypted = gcmPasswordEncryptor.decrypt(ciphertext);
 
@@ -322,6 +346,8 @@ public class EncryptorTest {
 
         final String ciphertext = gcmPasswordNoSaltEncryptor.encrypt(message);
 
+        System.out.println(ciphertext);
+
         final String decrypted = gcmPasswordNoSaltEncryptor.decrypt(ciphertext);
 
         assertEquals(message, decrypted);
@@ -339,5 +365,42 @@ public class EncryptorTest {
         final String decrypted = encryptor.decrypt(ciphertext);
 
         assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmPooledEncryptor_encryption() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        final String ciphertext = gcmPooledKeyEncryptor.encrypt(message);
+
+        final String decrypted = gcmPooledKeyEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    @SneakyThrows
+    public void test_GcmPooledEncryptor_encryption_concurrency() {
+        final String message = "This is the secret message... BOOHOOO!";
+
+        ForkJoinPool customThreadPool = new ForkJoinPool(20);
+        try {
+            List<String> cipherText = customThreadPool.submit(() -> IntStream
+                    .range(0, 100)
+                    .boxed()
+                    .parallel()
+                    .map(v -> gcmPooledKeyEncryptor.encrypt(message))
+                    .collect(Collectors.toList())).get();
+            List<String> decrypted = customThreadPool.submit(() ->
+                    cipherText
+                            .stream()
+                            .parallel()
+                            .map(gcmPooledKeyEncryptor::decrypt)
+                            .collect(Collectors.toList())
+            ).get();
+            assertAll(decrypted.stream().map((v -> () -> assertEquals(message, v))));
+        } finally {
+            customThreadPool.shutdown();
+        }
     }
 }

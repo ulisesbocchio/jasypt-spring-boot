@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jasypt-spring-boot-parent</artifactId>
         <groupId>com.github.ulisesbocchio</groupId>
-        <version>3.0.5-SNAPSHOT</version>
+        <version>3.0.4</version>
     </parent>
 
     <artifactId>jasypt-maven-plugin</artifactId>

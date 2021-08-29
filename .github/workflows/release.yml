@@ -18,11 +18,19 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-      - name: Cache Maven repository
+      - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: maven
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Install gpg secret key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
       - name: Set up Maven Credentials
         uses: actions/setup-java@v2
         with:
@@ -34,12 +42,6 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - name: Install gpg secret key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
       - name: Publish package
         run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
         #        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"

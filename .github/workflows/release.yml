@@ -29,5 +29,6 @@ jobs:
       - name: Publish package
         run: mvn --no-transfer-progress -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} --batch-mode release:prepare release:perform
         env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}

@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-#        with:
-#          token: ${{ secrets.ACTIONS_PAT }}
+      #        with:
+      #          token: ${{ secrets.ACTIONS_PAT }}
       - name: Setup Git Client
         run: |
           git config --global user.name 'Github Actions Bot'
@@ -18,12 +18,17 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Cache Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}
       - name: Set up Maven Credentials
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
-          cache: 'maven'
+          cache: maven-${{ runner.os }}
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
@@ -37,9 +42,9 @@ jobs:
           passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
       - name: Publish package
         run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
-#        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"
+        #        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"
         env:
-#          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
+          #          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}

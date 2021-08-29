@@ -12,32 +12,37 @@ jobs:
 #          token: ${{ secrets.ACTIONS_PAT }}
       - name: Setup Git Client
         run: |
-          git config --global user.name 'Ulises Bocchio'
-          git config --global user.email 'ulisesbocchio@users.noreply.github.com'
-      - name: Set up Maven Central Repository
+          git config --global user.name 'Github Actions Bot'
+          git config --global user.email 'actions@users.noreply.github.com'
+      - name: Setup Git Credentials
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Set up Maven Credentials
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
+          cache: 'maven'
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      - name: Install gpg secret key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+#      - name: Install gpg secret key
+#        id: import_gpg
+#        uses: crazy-max/ghaction-import-gpg@v3
+#        with:
+#          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+#          passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 #        run: |
 #          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
 #          gpg --list-secret-keys --keyid-format LONG
-      - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
       - name: Publish package
-        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.email }}"
+        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
+#        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.email }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
+#          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}

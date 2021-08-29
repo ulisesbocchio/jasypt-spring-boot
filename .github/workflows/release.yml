@@ -27,10 +27,9 @@ jobs:
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: unnecessary #special value
+          ssh-private-key: ${{ secrets.SSH_KEY }}
       - name: Publish package
         run: mvn --no-transfer-progress -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} --batch-mode release:prepare release:perform
         env:

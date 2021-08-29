@@ -8,6 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACTIONS_PAT }}
+      - name: Setup Git Client
+        run: |
+          git config --global user.name 'Ulises Bocchio'
+          git config --global user.email 'ulisesbocchio@users.noreply.github.com'
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v2
         with:
@@ -16,8 +22,7 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      - id: install-secret-key
-        name: Install gpg secret key
+      - name: Install gpg secret key
         run: |
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG

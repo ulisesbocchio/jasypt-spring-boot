@@ -22,8 +22,18 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Simply adding the starter jar `jasypt-spring-boot-starter` to your classpath if using `@SpringBootApplication` or `@EnableAutoConfiguration` will enable encryptable properties across the entire Spring Environment
 - Adding `jasypt-spring-boot` to your classpath and adding `@EnableEncryptableProperties` to your main Configuration class to enable encryptable properties across the entire Spring Environment
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
-
 ## What's new?
+### Update 08/28/2021: Version 3.0.4 Release Includes
+* Spring Boot 2.5.4
+* Spring cloud 2020.0.3
+* Removed double property source config from spring ConfigurationPropertySource and added wrapper that lead to stack overflows and circular dependencies
+* StubPropertySource bug fixed
+* Deadlock on properties cache fixed
+* Added Origin support to config properties source wrappers
+* RefreshedScope listener `Class.forName()` caching for improved performance
+* AES/GCM Support ([Guide](#aes-256-gcm-encryption))
+* ability to skip property sources by class ([Guide](#filter-out-propertysource-classes-from-being-introspected))
+
 ### Update 05/31/2020: Version 3.0.3 Release Includes
 * Minor bug fixes
 * Documentation fixes
@@ -77,7 +87,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.4</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -86,7 +96,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.4</version>
     </dependency>
 	```
 
@@ -107,7 +117,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.4</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -463,7 +473,7 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.4</version>
     </plugin>
   </plugins>
 </build>

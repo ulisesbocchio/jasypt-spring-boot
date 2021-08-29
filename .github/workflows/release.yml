@@ -18,12 +18,17 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Cache Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}
       - name: Set up Maven Credentials
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
-          cache: 'maven'
+          cache: maven-${{ runner.os }}
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD

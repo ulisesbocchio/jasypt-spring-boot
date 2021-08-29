@@ -31,6 +31,8 @@ jobs:
         with:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          git-user-signingkey: true
+          git-commit-gpgsign: true
       - name: Set up Maven Credentials
         uses: actions/setup-java@v2
         with:

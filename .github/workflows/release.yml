@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.ACTIONS_PAT }}
+#        with:
+#          token: ${{ secrets.ACTIONS_PAT }}
       - name: Setup Git Client
         run: |
           git config --global user.name 'Ulises Bocchio'

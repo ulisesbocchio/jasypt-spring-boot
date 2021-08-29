@@ -5,7 +5,7 @@
     <groupId>com.github.ulisesbocchio</groupId>
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.5-SNAPSHOT</version>
+    <version>3.0.4-SNAPSHOT</version>
     <name>Jasypt Spring Boot Parent</name>
     <description>Jasypt Spring Boot Parent</description>
     <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
@@ -134,8 +134,8 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6.6</version>
-                        <extensions>true</extensions>
+                        <version>1.6</version>
+<!--                        <extensions>true</extensions>-->
                         <configuration>
                             <gpgArguments>
                                 <arg>--pinentry-mode</arg>

@@ -43,8 +43,9 @@ jobs:
 #          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package
-        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
-        #        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"
+        run: cat ~/.m2/settings.xml
+#        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
+#        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"
         env:
           #          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}

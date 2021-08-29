@@ -43,9 +43,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package
-        run: echo "encrypt me" | gpg --batch --yes --passphrase "$MAVEN_GPG_PASSPHRASE" --local-user "0535A3B603C08EAED1E2C0F45B936CCB4ECCF8F" --output doc.sig -c
-#        run: mvn --no-transfer-progress package
-#        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
+        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform
 #        run: mvn --no-transfer-progress --batch-mode release:prepare release:perform -Darguments="-Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Dgpg.keyname=${{ steps.import_gpg.outputs.keyid }}"
         env:
           #          GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}

@@ -6,6 +6,9 @@ import org.springframework.core.env.MutablePropertySources;
 
 import java.util.function.Function;
 
+/**
+ * @author boccs002
+ */
 public class MutableConfigurablePropertyResolver implements ConfigurablePropertyResolver {
 
     private final Function<MutablePropertySources, ConfigurablePropertyResolver> factory;

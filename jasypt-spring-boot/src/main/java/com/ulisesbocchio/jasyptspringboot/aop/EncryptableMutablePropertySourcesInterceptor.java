@@ -34,20 +34,23 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
         Object[] arguments = invocation.getArguments();
         switch (method) {
             case "addFirst":
-                envCopy.get().getPropertySources().addFirst((PropertySource<?>) arguments[0]);
+                envCopy.addFirst((PropertySource<?>) arguments[0]);
                 return invocation.getMethod().invoke(invocation.getThis(), makeEncryptable(arguments[0]));
             case "addLast":
-                envCopy.get().getPropertySources().addLast((PropertySource<?>) arguments[0]);
+                envCopy.addLast((PropertySource<?>) arguments[0]);
                 return invocation.getMethod().invoke(invocation.getThis(), makeEncryptable(arguments[0]));
             case "addBefore":
-                envCopy.get().getPropertySources().addBefore((String) arguments[0], (PropertySource<?>) arguments[1]);
+                envCopy.addBefore((String) arguments[0], (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
             case "addAfter":
-                envCopy.get().getPropertySources().addAfter((String) arguments[0], (PropertySource<?>) arguments[1]);
+                envCopy.addAfter((String) arguments[0], (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
             case "replace":
-                envCopy.get().getPropertySources().replace((String) arguments[0], (PropertySource<?>) arguments[1]);
+                envCopy.replace((String) arguments[0], (PropertySource<?>) arguments[1]);
                 return invocation.getMethod().invoke(invocation.getThis(), arguments[0], makeEncryptable(arguments[1]));
+            case "remove":
+                envCopy.remove((String) arguments[0]);
+                return invocation.proceed();
             default:
                 return invocation.proceed();
         }

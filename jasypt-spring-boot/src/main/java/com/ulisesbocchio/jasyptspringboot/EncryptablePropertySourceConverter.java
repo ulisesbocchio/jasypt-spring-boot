@@ -3,18 +3,19 @@ package com.ulisesbocchio.jasyptspringboot;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableMapPropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
-import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableSystemEnvironmentPropertySourceWrapper;
-
+import com.ulisesbocchio.jasyptspringboot.util.ClassUtils;
+import com.ulisesbocchio.jasyptspringboot.wrapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.*;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -26,6 +27,11 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class EncryptablePropertySourceConverter {
 
+    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+    private static final List<String> DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES = Arrays.asList(
+            "org.springframework.core.env.PropertySource$StubPropertySource",
+            "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
+    );
     private final InterceptionMode interceptionMode;
     private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
     private final EncryptablePropertyResolver propertyResolver;
@@ -33,13 +39,30 @@ public class EncryptablePropertySourceConverter {
 
     public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
         this.interceptionMode = interceptionMode;
-        this.skipPropertySourceClasses = skipPropertySourceClasses;
+        this.skipPropertySourceClasses = Stream.concat(skipPropertySourceClasses.stream(), defaultSkipPropertySourceClasses().stream()).collect(toList());
         this.propertyResolver = propertyResolver;
         this.propertyFilter = propertyFilter;
     }
 
+    static List<Class<PropertySource<?>>> defaultSkipPropertySourceClasses() {
+        return DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES.stream().map(EncryptablePropertySourceConverter::getPropertiesClass).collect(toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Class<PropertySource<?>> getPropertiesClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (PropertySource.class.isAssignableFrom(clazz)) {
+                return (Class<PropertySource<?>>) clazz;
+            }
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s does not implement %s", className, PropertySource.class.getName()));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(String.format("Invalid jasypt.encryptor.skip-property-sources: Class %s not found", className), e);
+        }
+    }
+
     public void convertPropertySources(MutablePropertySources propSources) {
-        StreamSupport.stream(propSources.spliterator(), false)
+        propSources.stream()
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
                 .map(this::makeEncryptable)
                 .collect(toList())
@@ -49,7 +72,9 @@ public class EncryptablePropertySourceConverter {
     @SuppressWarnings("unchecked")
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
         if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
-            log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
+            if (!(propertySource instanceof EncryptablePropertySource)) {
+                log.info("Skipping PropertySource {} [{}", propertySource.getName(), propertySource.getClass());
+            }
             return propertySource;
         }
         PropertySource<T> encryptablePropertySource = convertPropertySource(propertySource);
@@ -58,7 +83,7 @@ public class EncryptablePropertySourceConverter {
         return encryptablePropertySource;
     }
 
-    public MutablePropertySources proxyPropertySources(MutablePropertySources propertySources, EnvCopy envCopy) {
+    public MutablePropertySources proxyMutablePropertySources(MutablePropertySources propertySources, EnvCopy envCopy) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(MutablePropertySources.class);
         proxyFactory.setProxyTargetClass(true);
@@ -68,6 +93,12 @@ public class EncryptablePropertySourceConverter {
         return (MutablePropertySources) proxyFactory.getProxy();
     }
 
+    public MutablePropertySources convertMutablePropertySources(InterceptionMode mode, MutablePropertySources originalPropertySources, EnvCopy envCopy) {
+        return InterceptionMode.PROXY == mode ?
+            proxyMutablePropertySources(originalPropertySources, envCopy) :
+            new EncryptableMutablePropertySourcesWrapper(originalPropertySources, this, envCopy);
+    }
+
     private <T> PropertySource<T> convertPropertySource(PropertySource<T> propertySource) {
         return interceptionMode == InterceptionMode.PROXY
                 ? proxyPropertySource(propertySource) : instantiatePropertySource(propertySource);
@@ -75,8 +106,7 @@ public class EncryptablePropertySourceConverter {
 
     @SuppressWarnings("unchecked")
     private <T> PropertySource<T> proxyPropertySource(PropertySource<T> propertySource) {
-        //Silly Chris Beams for making CommandLinePropertySource getProperty and containsProperty methods final. Those methods
-        //can't be proxied with CGLib because of it. So fallback to wrapper for Command Line Arguments only.
+        //can't be proxied with CGLib because of methods being final. So fallback to wrapper for Command Line Arguments only.
         if (CommandLinePropertySource.class.isAssignableFrom(propertySource.getClass())
                 // Other PropertySource classes like org.springframework.boot.env.OriginTrackedMapPropertySource
                 // are final classes as well
@@ -97,7 +127,7 @@ public class EncryptablePropertySourceConverter {
         PropertySource<T> encryptablePropertySource;
         if (needsProxyAnyway(propertySource)) {
             encryptablePropertySource = proxyPropertySource(propertySource);
-        } else if (propertySource instanceof  SystemEnvironmentPropertySource) {
+        } else if (propertySource instanceof SystemEnvironmentPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableSystemEnvironmentPropertySourceWrapper((SystemEnvironmentPropertySource) propertySource, propertyResolver, propertyFilter);
         } else if (propertySource instanceof MapPropertySource) {
             encryptablePropertySource = (PropertySource<T>) new EncryptableMapPropertySourceWrapper((MapPropertySource) propertySource, propertyResolver, propertyFilter);
@@ -119,12 +149,14 @@ public class EncryptablePropertySourceConverter {
     }
 
     /**
-     *  Some Spring Boot code actually casts property sources to this specific type so must be proxied.
+     * Some Spring Boot code actually casts property sources to this specific type so must be proxied.
      */
+    @SuppressWarnings({"ConstantConditions", "SimplifyStreamApiCallChains"})
     private static boolean needsProxyAnyway(String className) {
+        // Turned off for now
         return Stream.of(
-                "org.springframework.boot.context.config.ConfigFileApplicationListener$ConfigurationPropertySources",
-                "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
-                ).anyMatch(className::equals);
+//                "org.springframework.boot.context.config.ConfigFileApplicationListener$ConfigurationPropertySources",
+//                "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
+        ).anyMatch(className::equals);
     }
 }

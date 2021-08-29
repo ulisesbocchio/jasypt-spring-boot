@@ -16,16 +16,11 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  */
 public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
-    private final EncryptablePropertySource<T> encryptableDelegate;
+    private final CachingDelegateEncryptablePropertySource<T> encryptableDelegate;
 
     public EncryptablePropertySourceWrapper(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
         encryptableDelegate = new CachingDelegateEncryptablePropertySource<>(delegate, resolver, filter);
-    }
-
-    @Override
-    public void refresh() {
-        encryptableDelegate.refresh();
     }
 
     @Override
@@ -35,6 +30,6 @@ public class EncryptablePropertySourceWrapper<T> extends PropertySource<T> imple
 
     @Override
     public PropertySource<T> getDelegate() {
-        return encryptableDelegate.getDelegate();
+        return encryptableDelegate;
     }
 }

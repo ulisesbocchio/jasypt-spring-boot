@@ -2,8 +2,10 @@ package com.ulisesbocchio.jasyptspringboot.caching;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
+import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
@@ -11,29 +13,49 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.*;
 import org.springframework.util.ClassUtils;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
-public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent> {
+public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean, Ordered {
 
-    public static final String REFRESHED_EVENT_CLASS = "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent";
-    public static final String ENVIRONMENT_EVENT_CLASS = "org.springframework.cloud.context.environment.EnvironmentChangeEvent";
+    public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
+            "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
+            "org.springframework.cloud.context.environment.EnvironmentChangeEvent",
+            "org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent"
+    );
     private final ConfigurableEnvironment environment;
     private final EncryptablePropertySourceConverter converter;
-    private Boolean cloudDependencyExists = true;
+    private final List<Class<?>> eventClasses = new ArrayList<>();
+    private final Map<String, Boolean> eventTriggersCache = new ConcurrentHashMap<>();
+    private final JasyptEncryptorConfigurationProperties config;
 
-    public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
+    public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter, JasyptEncryptorConfigurationProperties config) {
         this.environment = environment;
         this.converter = converter;
+        this.config = config;
     }
 
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
-        if (isAssignable(ENVIRONMENT_EVENT_CLASS, event) || isAssignable(REFRESHED_EVENT_CLASS, event)) {
-            log.info("Refreshing cached encryptable property sources");
+//        log.info("APPLICATION EVENT: {}", event.getClass().getName());
+        if (this.shouldTriggerRefresh(event)) {
+            log.info("Refreshing cached encryptable property sources on {}", event.getClass().getSimpleName());
             refreshCachedProperties();
             decorateNewSources();
         }
+    }
+
+    private boolean shouldTriggerRefresh(ApplicationEvent event) {
+        String className = event.getClass().getName();
+        if (!eventTriggersCache.containsKey(className)) {
+            eventTriggersCache.put(className, eventClasses.stream().anyMatch(clazz -> this.isAssignable(clazz, event)));
+        }
+        return eventTriggersCache.get(className);
     }
 
     private void decorateNewSources() {
@@ -41,13 +63,8 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         converter.convertPropertySources(propSources);
     }
 
-    boolean isAssignable(String className, Object value) {
-        try {
-            return cloudDependencyExists && ClassUtils.isAssignableValue(ClassUtils.forName(className, null), value);
-        } catch (ClassNotFoundException e) {
-            cloudDependencyExists = false;
-            return false;
-        }
+    boolean isAssignable(Class<?> clazz, Object value) {
+        return ClassUtils.isAssignableValue(clazz, value);
     }
 
     private void refreshCachedProperties() {
@@ -64,5 +81,26 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
             EncryptablePropertySource eps = (EncryptablePropertySource) propertySource;
             eps.refresh();
         }
+    }
+
+    private Class<?> getClassSafe(String className) {
+        try {
+            return ClassUtils.forName(className, null);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Stream
+                .concat(EVENT_CLASS_NAMES.stream(), this.config.getRefreshedEventClasses().stream())
+                .map(this::getClassSafe).filter(Objects::nonNull)
+                .collect(Collectors.toCollection(() -> this.eventClasses));
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }

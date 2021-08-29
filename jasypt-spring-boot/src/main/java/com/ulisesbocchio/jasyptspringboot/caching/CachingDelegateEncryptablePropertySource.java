@@ -5,9 +5,12 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 
+@Slf4j
 public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
     private final PropertySource<T> delegate;
     private final EncryptablePropertyResolver resolver;
@@ -36,7 +39,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
         if (cache.containsKey(name)) {
             return cache.get(name);
         }
-        synchronized (this) {
+        synchronized (name.intern()) {
             if (!cache.containsKey(name)) {
                 Object resolved = getProperty(resolver, filter, delegate, name);
                 if (resolved != null) {
@@ -49,6 +52,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
 
     @Override
     public void refresh() {
+        log.info("Property Source {} refreshed", delegate.getName());
         cache.clear();
     }
 }

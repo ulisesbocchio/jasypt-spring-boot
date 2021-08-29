@@ -4,6 +4,7 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.annotation.EncryptablePropertySources;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertySourceWrapper;
+import com.ulisesbocchio.jasyptspringboot.wrapper.OriginTrackedCompositePropertySource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -83,7 +84,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
         String name = generateName(attributes.getString("name"));
         String[] locations = attributes.getStringArray("value");
         boolean ignoreResourceNotFound = attributes.getBoolean("ignoreResourceNotFound");
-        CompositePropertySource compositePropertySource = new CompositePropertySource(name);
+        CompositePropertySource compositePropertySource = new OriginTrackedCompositePropertySource(name);
         Assert.isTrue(locations.length > 0, "At least one @PropertySource(value) location is required");
         for (String location : locations) {
             String resolvedLocation = environment.resolveRequiredPlaceholders(location);

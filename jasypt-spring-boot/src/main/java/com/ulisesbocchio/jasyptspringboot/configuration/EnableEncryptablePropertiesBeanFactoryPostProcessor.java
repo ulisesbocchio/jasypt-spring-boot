@@ -2,6 +2,7 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -23,9 +24,9 @@ import org.springframework.core.env.PropertySource;
  *
  * @author Ulises Bocchio
  */
+@Slf4j
 public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EnableEncryptablePropertiesBeanFactoryPostProcessor.class);
     private final ConfigurableEnvironment environment;
     private final EncryptablePropertySourceConverter converter;
 
@@ -36,7 +37,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        LOG.info("Post-processing PropertySource instances");
+        log.info("Post-processing PropertySource instances");
         MutablePropertySources propSources = environment.getPropertySources();
         converter.convertPropertySources(propSources);
     }

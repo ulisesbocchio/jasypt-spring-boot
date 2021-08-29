@@ -1,6 +1,8 @@
 package com.ulisesbocchio.jasyptspringboot.properties;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
+import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricConfig;
+import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMConfig;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -74,7 +77,9 @@ public class JasyptEncryptorConfigurationProperties {
      * Master Password used for Encryption/Decryption of properties.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getPassword()
+     * @see SimpleGCMConfig#getSecretKeyPassword()
      */
     private String password;
 
@@ -83,7 +88,9 @@ public class JasyptEncryptorConfigurationProperties {
      * <a href="http://www.jasypt.org/cli.html"/>Jasypt CLI Tools Page</a>. Default Value is {@code "PBEWITHHMACSHA512ANDAES_256"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getAlgorithm()
+     * @see SimpleGCMConfig#getAlgorithm()
      */
     private String algorithm = "PBEWITHHMACSHA512ANDAES_256";
 
@@ -91,7 +98,9 @@ public class JasyptEncryptorConfigurationProperties {
      * Number of hashing iterations to obtain the signing key. Default Value is {@code "1000"}.
      *
      * @see org.jasypt.encryption.pbe.PBEStringEncryptor
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
      * @see org.jasypt.encryption.pbe.config.StringPBEConfig#getKeyObtentionIterations()
+     * @see SimpleGCMConfig#getSecretKeyIterations()
      */
     private String keyObtentionIterations = "1000";
 
@@ -151,37 +160,105 @@ public class JasyptEncryptorConfigurationProperties {
     /**
      * Specify a PEM/DER base64 encoded string. PEM encoded keys can simply omit the "BEGIN/END PRIVATE KEY" header/footer
      * and just specify the base64 encoded key. This property takes precedence over {@link #setPrivateKeyLocation(String)}
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPrivateKey()
      */
     private String privateKeyString = null;
 
     /**
      * Specify a PEM/DER private key location, in Spring's resource nomenclature (i.e. classpath:resource/path or file://path/to/file)
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPrivateKeyLocation()
      */
     private String privateKeyLocation = null;
 
     /**
      * Specify the private key format to use: DER (default) or PEM
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPrivateKeyFormat()
      */
     private KeyFormat privateKeyFormat = KeyFormat.DER;
 
     /**
      * Specify a PEM/DER base64 encoded string. PEM encoded keys can simply omit the "BEGIN/END PUBLIC KEY" header/footer
      * and just specify the base64 encoded key. This property takes precedence over {@link #setPrivateKeyLocation(String)}
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPublicKey()
      */
     private String publicKeyString = null;
 
     /**
      * Specify a PEM/DER public key location, in Spring's resource nomenclature (i.e. classpath:resource/path or file://path/to/file)
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPublicKeyLocation()
      */
     private String publicKeyLocation = null;
 
     /**
      * Specify the public key format to use: DER (default) or PEM
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor
+     * @see SimpleAsymmetricConfig#getPublicKeyFormat()
      */
     private KeyFormat publicKeyFormat = KeyFormat.DER;
 
+    /**
+     * Specify a secret key String in base64 for the GCM Algorithm
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKey()
+     */
+    private String gcmSecretKeyString = null;
+
+    /**
+     * Specify a secret key resource location in base64 for the GCM Algorithm
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKeyLocation()
+     */
+    private String gcmSecretKeyLocation = null;
+
+    /**
+     * Specify a password for the GCM Algorithm
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKeyPassword()
+     */
+    private String gcmSecretKeyPassword = null;
+
+    /**
+     * Specify a salt base64 String when using GCM encryption when used with master password
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKeySalt()
+     */
+    private String gcmSecretKeySalt = null;
+
+    /**
+     * Specify the class names of extra {@link org.springframework.context.ApplicationEvent} events that should trigger a property cache refresh.
+     * @see com.ulisesbocchio.jasyptspringboot.caching.RefreshScopeRefreshedEventListener
+     */
+    private List<String> refreshedEventClasses = emptyList();
+
+    /**
+     * Specify an algorithm for the secret key when used with master password
+     *
+     * @see com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMStringEncryptor
+     * @see SimpleGCMConfig#getSecretKeyAlgorithm() ()
+     */
+    private String gcmSecretKeyAlgorithm = "PBKDF2WithHmacSHA256";
+
     @NestedConfigurationProperty
     private PropertyConfigurationProperties property = new PropertyConfigurationProperties();
+
+    public int getKeyObtentionIterationsInt() {
+        return Integer.parseInt(keyObtentionIterations);
+    }
 
     @Data
     public static class PropertyConfigurationProperties {

@@ -13,10 +13,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <spring.boot.version>2.2.1.RELEASE</spring.boot.version>
-        <spring.cloud.version>Greenwich.SR3</spring.cloud.version>
+        <spring.boot.version>2.5.4</spring.boot.version>
+        <spring.cloud.version>2020.0.3</spring.cloud.version>
         <jasypt.version>1.9.3</jasypt.version>
-        <maven.compiler.version>3.7.0</maven.compiler.version>
+        <maven.compiler.version>3.8.1</maven.compiler.version>
         <system.rules.version>1.19.0</system.rules.version>
         <start-class>Application</start-class>
     </properties>
@@ -34,8 +34,8 @@
 
     <licenses>
         <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>MIT License</name>
+            <url>https://github.com/ulisesbocchio/jasypt-spring-boot/blob/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -82,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0-M4</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -120,7 +120,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

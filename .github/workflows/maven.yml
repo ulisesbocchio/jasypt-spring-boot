@@ -8,13 +8,28 @@ jobs:
     strategy:
       matrix:
         java: [ '8', '11', '12', '13', '15' ]
-    name: Java ${{ matrix.Java }} build
+    name: Java ${{ matrix.java }} Zulu build
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Java
+    - name: Set up Java ${{ matrix.java }} Zulu
       uses: actions/setup-java@v2
       with:
-        distribution: 'adopt'
+        distribution: 'zulu'
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+  build_2:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
+    name: Java ${{ matrix.Java }} Temurin
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java ${{ matrix.java }} Temurin
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: ${{ matrix.java }}
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml 

@@ -10,17 +10,25 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.*;
+import org.springframework.core.env.CompositePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.util.ClassUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Slf4j
-public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean, Ordered {
+public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean {
 
     public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
             "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
@@ -97,10 +105,5 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
                 .concat(EVENT_CLASS_NAMES.stream(), this.config.getRefreshedEventClasses().stream())
                 .map(this::getClassSafe).filter(Objects::nonNull)
                 .collect(Collectors.toCollection(() -> this.eventClasses));
-    }
-
-    @Override
-    public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
     }
 }

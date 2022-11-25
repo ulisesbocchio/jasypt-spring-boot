@@ -51,4 +51,4 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - name: Build with Maven
-        run: mvn -B package --file pom.xml -Dspring.boot.version=3.0.0-SNAPSHOT -Dspring.cloud.version=2022.0.0-SNAPSHOT
+        run: mvn -B package --file pom.xml -Dspring.boot.version=3.0.0 -Dspring.cloud.version=2022.0.0-M5

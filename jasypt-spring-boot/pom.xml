@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -68,10 +69,10 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>instrument</id>
+                        <id>cobertura</id>
                         <phase>site</phase>
                         <goals>
-                            <goal>instrument</goal>
+                            <!--                            <goal>instrument</goal>-->
                             <goal>cobertura</goal>
                         </goals>
                     </execution>
@@ -86,9 +87,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.4.1</version>
                 <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    <!--                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>-->
                 </configuration>
             </plugin>
             <!-- Cobertura Code Coverage Plugin -->
@@ -104,7 +105,16 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
+                    <check/>
                 </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>cobertura-report</id>
+                        <reports>
+                            <report>cobertura</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
         </plugins>
     </reporting>

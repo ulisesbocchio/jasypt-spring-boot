@@ -14,7 +14,7 @@ jobs:
         java: [ '8', '11', '12', '13', '15', '16', '17', '19' ]
     name: Java ${{ matrix.java }} Zulu build
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Java ${{ matrix.java }} Zulu
       uses: actions/setup-java@v2
       with:
@@ -22,6 +22,18 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Install artifact locally
+      run: mvn -B install --file pom.xml
+    - name: Checkout sample projects
+      uses: actions/checkout@v3
+      with:
+        repository: ulisesbocchio/jasypt-spring-boot-samples
+        path: jasypt-spring-boot-samples
+        ref: master
+        token: {{ secrets.CHECKOUT_PAT }}
+    - name: Test sample projects
+      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml
+
   build_2:
     runs-on: ubuntu-latest
     strategy:
@@ -29,7 +41,7 @@ jobs:
         java: [ '8', '11' ]
     name: Java ${{ matrix.Java }} Temurin
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Java ${{ matrix.java }} Temurin
       uses: actions/setup-java@v2
       with:
@@ -44,7 +56,7 @@ jobs:
         java: [ '17', '18', '19' ]
     name: Java ${{ matrix.java }} Zulu build w/ Spring Boot 3
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Java ${{ matrix.java }} Zulu
         uses: actions/setup-java@v2
         with:

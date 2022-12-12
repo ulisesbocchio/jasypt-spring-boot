@@ -56,7 +56,7 @@ public abstract class AbstractJasyptMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         Map<String, Object> defaultProperties = new HashMap<>();
-        defaultProperties.put("spring.config.location", "file:./src/main/resources/");
+        defaultProperties.put("spring.config.location", "optional:file:./src/main/resources/");
 
         ConfigurableApplicationContext context = new SpringApplicationBuilder()
                 .sources(Application.class)

@@ -811,7 +811,7 @@ public StringEncryptor stringEncryptor() {
 ```
 ### Using a password
 Alternatively, you can use a password to encrypt/decrypt properties using AES 256-GCM. The password is used to generate a
-key on startup, so there a few properties you need to/can set, these are:
+key on startup, so there is a few properties you need to/can set, these are:
 ```properties
 jasypt.encryptor.gcm-secret-key-password="chupacabras"
 #Optional, defaults to "1000"

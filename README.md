@@ -811,7 +811,7 @@ public StringEncryptor stringEncryptor() {
 ```
 ### Using a password
 Alternatively, you can use a password to encrypt/decrypt properties using AES 256-GCM. The password is used to generate a
-key on startup, so there a few properties you need to/can set, these are:
+key on startup, so there is a few properties you need to/can set, these are:
 ```properties
 jasypt.encryptor.gcm-secret-key-password="chupacabras"
 #Optional, defaults to "1000"
@@ -869,7 +869,7 @@ This is also available in the Demo app. So you can run the Demo app like this:
 JASYPT_ENCRYPTOR_PASSWORD=password java -jar target/jasypt-spring-boot-demo-1.5-SNAPSHOT.jar
 ```
 
-**Note:** When using Gradle as build tool, processResources task fails because of '$' character, to solve this you just need to scape this variable like this '\$'.
+**Note:** When using Gradle as build tool, processResources task fails because of '$' character, to solve this you just need to scape this variable like this '\\$'.
 
 ## Other Demo Apps
 While [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) is a comprehensive Demo that showcases all possible ways to encrypt/decrypt properties, there are other multiple Demos that demo isolated scenarios. 

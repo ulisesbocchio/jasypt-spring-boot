@@ -30,7 +30,7 @@ jobs:
         repository: ulisesbocchio/jasypt-spring-boot-samples
         path: jasypt-spring-boot-samples
         ref: master
-        token: {{ secrets.CHECKOUT_PAT }}
+        token: ${{ secrets.CHECKOUT_PAT }}
     - name: Test sample projects
       run: mvn -B test --file jasypt-spring-boot-samples/pom.xml
 

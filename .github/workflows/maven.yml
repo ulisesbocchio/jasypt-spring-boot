@@ -2,12 +2,16 @@ name: Java CI
 
 on: [push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '8', '11', '12', '13', '15' ]
+        java: [ '8', '11', '12', '13', '15', '16', '17', '19' ]
     name: Java ${{ matrix.java }} Zulu build
     steps:
     - uses: actions/checkout@v2
@@ -33,3 +37,18 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml 
+  build_3:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17', '18', '19' ]
+    name: Java ${{ matrix.java }} Zulu build w/ Spring Boot 3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Java ${{ matrix.java }} Zulu
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java }}
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml -Dspring.boot.version=3.0.0 -Dspring.cloud.version=2022.0.0-RC2

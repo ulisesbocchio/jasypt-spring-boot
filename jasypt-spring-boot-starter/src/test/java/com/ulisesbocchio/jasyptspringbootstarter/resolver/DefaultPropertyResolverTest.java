@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -32,29 +31,30 @@ class TestApp {
 }
 @SpringBootTest(
         properties = {
-                "spring.config.use-legacy-processing=true"
+                "spring.config.use-legacy-processing=true",
+                "server.port=9625"
         },
         classes = TestApp.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DefaultPropertyResolverTest {
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+        )
+class DefaultPropertyResolverTest {
 
     @Value("${spring.cloud.config.server.svn.password}")
     public String secret;
 
-    @LocalServerPort
-    public int port;
+    public int port = 9625;
 
     @Autowired
     private Environment env;
 
     @Test
-    public void encryptedPropertyIsDecryptedInEnvironment() {
+    void encryptedPropertyIsDecryptedInEnvironment() {
         assertThat(env.getProperty("spring.cloud.config.server.svn.password")).isEqualTo("mypassword");
         assertThat(secret).isEqualTo("mypassword");
     }
 
     @Test
-    public void propertiesAreAccessibleFromEnvActuator() {
+    void propertiesAreAccessibleFromEnvActuator() {
         ResponseEntity<?> response = new RestTemplateBuilder()
                 .errorHandler(ErrorHandler.DEFAULT)
                 .build().exchange(RequestEntity

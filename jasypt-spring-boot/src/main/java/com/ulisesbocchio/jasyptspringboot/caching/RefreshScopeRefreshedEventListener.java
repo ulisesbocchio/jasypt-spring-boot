@@ -101,6 +101,6 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }

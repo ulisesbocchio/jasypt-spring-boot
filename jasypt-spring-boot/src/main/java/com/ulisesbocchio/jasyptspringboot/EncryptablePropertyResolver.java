@@ -4,6 +4,7 @@ package com.ulisesbocchio.jasyptspringboot;
  * An interface to resolve property values that may be encrypted.
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public interface EncryptablePropertyResolver {
 

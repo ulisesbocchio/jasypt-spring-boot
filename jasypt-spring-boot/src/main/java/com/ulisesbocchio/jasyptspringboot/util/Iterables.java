@@ -5,16 +5,49 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * <p>Iterables class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 public class Iterables {
 
+    /**
+     * <p>decorate.</p>
+     *
+     * @param source a {@link java.lang.Iterable} object
+     * @param transform a {@link java.util.function.Function} object
+     * @param filter a {@link java.util.function.Predicate} object
+     * @param <U> a U class
+     * @param <T> a T class
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
+     */
     static public <U, T> IterableDecorator<U, T> decorate(Iterable<U> source, Function<U, T> transform, Predicate<U> filter) {
         return new IterableDecorator<>(source, transform, filter);
     }
 
+    /**
+     * <p>transform.</p>
+     *
+     * @param source a {@link java.lang.Iterable} object
+     * @param transform a {@link java.util.function.Function} object
+     * @param <U> a U class
+     * @param <T> a T class
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
+     */
     static public <U, T> IterableDecorator<U, T> transform(Iterable<U> source, Function<U, T> transform) {
         return new IterableDecorator<>(source, transform, v -> true);
     }
 
+    /**
+     * <p>filter.</p>
+     *
+     * @param source a {@link java.lang.Iterable} object
+     * @param filter a {@link java.util.function.Predicate} object
+     * @param <T> a T class
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
+     */
     static public <T> IterableDecorator<T, T> filter(Iterable<T> source, Predicate<T> filter) {
         return new IterableDecorator<>(source, Function.identity(), filter);
     }

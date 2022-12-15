@@ -15,6 +15,12 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+/**
+ * <p>SimpleGCMConfig class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Data
 @NoArgsConstructor
 public class SimpleGCMConfig {
@@ -43,14 +49,29 @@ public class SimpleGCMConfig {
                                                 .orElseThrow(() -> new IllegalArgumentException("Unable to load secret key. Either resource, key as string, or resource location must be provided"))));
     }
 
+    /**
+     * <p>loadSecretKeyResource.</p>
+     *
+     * @return a {@link org.springframework.core.io.Resource} object
+     */
     public Resource loadSecretKeyResource() {
         return loadResource(secretKeyResource, secretKey, secretKeyLocation);
     }
 
+    /**
+     * <p>getSecretKeyPasswordChars.</p>
+     *
+     * @return an array of {@link char} objects
+     */
     public char[] getSecretKeyPasswordChars() {
         return secretKeyPassword.toCharArray();
     }
 
+    /**
+     * <p>getSecretKeySaltGenerator.</p>
+     *
+     * @return a {@link org.jasypt.salt.SaltGenerator} object
+     */
     public SaltGenerator getSecretKeySaltGenerator() {
         return saltGenerator != null ?
                 saltGenerator :
@@ -64,6 +85,11 @@ public class SimpleGCMConfig {
         return (IvGenerator)Class.forName(this.ivGeneratorClassName).newInstance();
     }
 
+    /**
+     * <p>getActualIvGenerator.</p>
+     *
+     * @return a {@link org.jasypt.iv.IvGenerator} object
+     */
     public IvGenerator getActualIvGenerator() {
         return Optional.ofNullable(ivGenerator).orElseGet(this::instantiateIvGenerator);
     }

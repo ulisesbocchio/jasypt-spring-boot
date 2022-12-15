@@ -7,6 +7,7 @@ package com.ulisesbocchio.jasyptspringboot;
  * would return the encrypted value, the portion of the property without the prefix and suffix.
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public interface EncryptablePropertyDetector {
 

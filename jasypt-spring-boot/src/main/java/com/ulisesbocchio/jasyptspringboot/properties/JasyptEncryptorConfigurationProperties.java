@@ -27,15 +27,22 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
- * Partially used to load {@link EncryptablePropertyFilter} config.
+ * Partially used to load {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} config.
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @SuppressWarnings("ConfigurationProperties")
 @ConfigurationProperties(prefix = "jasypt.encryptor", ignoreUnknownFields = true)
 @Data
 public class JasyptEncryptorConfigurationProperties {
 
+    /**
+     * <p>bindConfigProps.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
+     */
     public static JasyptEncryptorConfigurationProperties bindConfigProps(ConfigurableEnvironment environment) {
         final BindHandler handler = new IgnoreErrorsBindHandler(BindHandler.DEFAULT);
         final MutablePropertySources propertySources = environment.getPropertySources();
@@ -256,6 +263,11 @@ public class JasyptEncryptorConfigurationProperties {
     @NestedConfigurationProperty
     private PropertyConfigurationProperties property = new PropertyConfigurationProperties();
 
+    /**
+     * <p>getKeyObtentionIterationsInt.</p>
+     *
+     * @return a int
+     */
     public int getKeyObtentionIterationsInt() {
         return Integer.parseInt(keyObtentionIterations);
     }

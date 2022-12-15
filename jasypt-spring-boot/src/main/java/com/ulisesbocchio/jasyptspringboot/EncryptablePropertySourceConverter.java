@@ -22,7 +22,10 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.toList;
 
 /**
+ * <p>EncryptablePropertySourceConverter class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Slf4j
 public class EncryptablePropertySourceConverter {
@@ -37,6 +40,14 @@ public class EncryptablePropertySourceConverter {
     private final EncryptablePropertyResolver propertyResolver;
     private final EncryptablePropertyFilter propertyFilter;
 
+    /**
+     * <p>Constructor for EncryptablePropertySourceConverter.</p>
+     *
+     * @param interceptionMode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param skipPropertySourceClasses a {@link java.util.List} object
+     * @param propertyResolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param propertyFilter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     */
     public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
         this.interceptionMode = interceptionMode;
         this.skipPropertySourceClasses = Stream.concat(skipPropertySourceClasses.stream(), defaultSkipPropertySourceClasses().stream()).collect(toList());
@@ -48,6 +59,12 @@ public class EncryptablePropertySourceConverter {
         return DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES.stream().map(EncryptablePropertySourceConverter::getPropertiesClass).collect(toList());
     }
 
+    /**
+     * <p>getPropertiesClass.</p>
+     *
+     * @param className a {@link java.lang.String} object
+     * @return a {@link java.lang.Class} object
+     */
     @SuppressWarnings("unchecked")
     public static Class<PropertySource<?>> getPropertiesClass(String className) {
         try {
@@ -61,6 +78,11 @@ public class EncryptablePropertySourceConverter {
         }
     }
 
+    /**
+     * <p>convertPropertySources.</p>
+     *
+     * @param propSources a {@link org.springframework.core.env.MutablePropertySources} object
+     */
     public void convertPropertySources(MutablePropertySources propSources) {
         propSources.stream()
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
@@ -69,6 +91,13 @@ public class EncryptablePropertySourceConverter {
                 .forEach(ps -> propSources.replace(ps.getName(), ps));
     }
 
+    /**
+     * <p>makeEncryptable.</p>
+     *
+     * @param propertySource a {@link org.springframework.core.env.PropertySource} object
+     * @param <T> a T class
+     * @return a {@link org.springframework.core.env.PropertySource} object
+     */
     @SuppressWarnings("unchecked")
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
         if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
@@ -83,6 +112,13 @@ public class EncryptablePropertySourceConverter {
         return encryptablePropertySource;
     }
 
+    /**
+     * <p>proxyMutablePropertySources.</p>
+     *
+     * @param propertySources a {@link org.springframework.core.env.MutablePropertySources} object
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @return a {@link org.springframework.core.env.MutablePropertySources} object
+     */
     public MutablePropertySources proxyMutablePropertySources(MutablePropertySources propertySources, EnvCopy envCopy) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(MutablePropertySources.class);
@@ -93,6 +129,14 @@ public class EncryptablePropertySourceConverter {
         return (MutablePropertySources) proxyFactory.getProxy();
     }
 
+    /**
+     * <p>convertMutablePropertySources.</p>
+     *
+     * @param mode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param originalPropertySources a {@link org.springframework.core.env.MutablePropertySources} object
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @return a {@link org.springframework.core.env.MutablePropertySources} object
+     */
     public MutablePropertySources convertMutablePropertySources(InterceptionMode mode, MutablePropertySources originalPropertySources, EnvCopy envCopy) {
         return InterceptionMode.PROXY == mode ?
             proxyMutablePropertySources(originalPropertySources, envCopy) :

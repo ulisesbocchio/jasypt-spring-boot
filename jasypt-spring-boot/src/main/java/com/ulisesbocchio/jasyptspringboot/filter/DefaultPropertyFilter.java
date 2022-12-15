@@ -13,6 +13,7 @@ import java.util.List;
  * </p>
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public class DefaultPropertyFilter implements EncryptablePropertyFilter {
 
@@ -21,6 +22,9 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
     private final List<String> includePropertyNames;
     private final List<String> excludePropertyNames;
 
+    /**
+     * <p>Constructor for DefaultPropertyFilter.</p>
+     */
     public DefaultPropertyFilter() {
         includeSourceNames = null;
         includePropertyNames = null;
@@ -28,6 +32,14 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
         excludePropertyNames = null;
     }
 
+    /**
+     * <p>Constructor for DefaultPropertyFilter.</p>
+     *
+     * @param includeSourceNames a {@link java.util.List} object
+     * @param excludeSourceNames a {@link java.util.List} object
+     * @param includePropertyNames a {@link java.util.List} object
+     * @param excludePropertyNames a {@link java.util.List} object
+     */
     public DefaultPropertyFilter(List<String> includeSourceNames, List<String> excludeSourceNames, List<String> includePropertyNames, List<String> excludePropertyNames) {
         this.includeSourceNames = includeSourceNames;
         this.excludeSourceNames = excludeSourceNames;
@@ -35,6 +47,7 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
         this.excludePropertyNames = excludePropertyNames;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean shouldInclude(PropertySource<?> source, String name) {
         if (isIncludeAll()) {

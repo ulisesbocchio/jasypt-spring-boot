@@ -12,13 +12,22 @@ import org.springframework.core.env.PropertySource;
 import java.util.List;
 
 /**
+ * <p>EncryptableMutablePropertySourcesInterceptor class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public class EncryptableMutablePropertySourcesInterceptor implements MethodInterceptor {
 
     private final EncryptablePropertySourceConverter propertyConverter;
     private final EnvCopy envCopy;
 
+    /**
+     * <p>Constructor for EncryptableMutablePropertySourcesInterceptor.</p>
+     *
+     * @param propertyConverter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     */
     public EncryptableMutablePropertySourcesInterceptor(EncryptablePropertySourceConverter propertyConverter, EnvCopy envCopy) {
         this.propertyConverter = propertyConverter;
         this.envCopy = envCopy;
@@ -28,6 +37,7 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
         return propertyConverter.makeEncryptable((PropertySource<?>) propertySource);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         String method = invocation.getMethod().getName();

@@ -13,6 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 
+/**
+ * <p>CachingDelegateEncryptablePropertySource class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Slf4j
 public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<T> implements EncryptablePropertySource<T> {
     private final PropertySource<T> delegate;
@@ -20,6 +26,13 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
     private final EncryptablePropertyFilter filter;
     private final Map<String, CachedValue> cache;
 
+    /**
+     * <p>Constructor for CachingDelegateEncryptablePropertySource.</p>
+     *
+     * @param delegate a {@link org.springframework.core.env.PropertySource} object
+     * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     */
     public CachingDelegateEncryptablePropertySource(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
         Assert.notNull(delegate, "PropertySource delegate cannot be null");
@@ -31,11 +44,13 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
         this.cache = new ConcurrentHashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public PropertySource<T> getDelegate() {
         return delegate;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object getProperty(String name) {
         //The purpose of this cache is to reduce the cost of decryption,
@@ -71,6 +86,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
         return originValue;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void refresh() {
         log.info("Property Source {} refreshed", delegate.getName());

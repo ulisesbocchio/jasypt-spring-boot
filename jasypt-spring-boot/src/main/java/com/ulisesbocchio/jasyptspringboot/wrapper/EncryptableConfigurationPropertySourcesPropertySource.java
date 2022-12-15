@@ -10,32 +10,47 @@ import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.PropertySource;
 
+/**
+ * <p>EncryptableConfigurationPropertySourcesPropertySource class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 public class EncryptableConfigurationPropertySourcesPropertySource extends PropertySource<Iterable<ConfigurationPropertySource>>
         implements EncryptablePropertySource<Iterable<ConfigurationPropertySource>> {
 
     private final PropertySource<Iterable<ConfigurationPropertySource>> delegate;
 
+    /**
+     * <p>Constructor for EncryptableConfigurationPropertySourcesPropertySource.</p>
+     *
+     * @param delegate a {@link org.springframework.core.env.PropertySource} object
+     */
     public EncryptableConfigurationPropertySourcesPropertySource(PropertySource<Iterable<ConfigurationPropertySource>> delegate) {
         super(delegate.getName(), Iterables.filter(delegate.getSource(), configurationPropertySource -> !configurationPropertySource.getUnderlyingSource().getClass().equals(EncryptableConfigurationPropertySourcesPropertySource.class)));
         this.delegate = delegate;
     }
 
+    /** {@inheritDoc} */
     @Override
     public PropertySource<Iterable<ConfigurationPropertySource>> getDelegate() {
         return delegate;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void refresh() {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object getProperty(String name) {
         ConfigurationProperty configurationProperty = findConfigurationProperty(name);
         return (configurationProperty != null) ? configurationProperty.getValue() : null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Origin getOrigin(String name) {
         return Origin.from(findConfigurationProperty(name));

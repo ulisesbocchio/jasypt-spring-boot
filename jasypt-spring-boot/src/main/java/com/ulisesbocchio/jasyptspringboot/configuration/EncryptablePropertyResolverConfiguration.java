@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * <p>EncryptablePropertyResolverConfiguration class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Configuration
 public class EncryptablePropertyResolverConfiguration {
@@ -38,9 +41,19 @@ public class EncryptablePropertyResolverConfiguration {
     private static final String ENCRYPTOR_BEAN_NAME = "lazyJasyptStringEncryptor";
     private static final String DETECTOR_BEAN_NAME = "lazyEncryptablePropertyDetector";
     private static final String CONFIG_SINGLETON = "configPropsSingleton";
+    /** Constant <code>RESOLVER_BEAN_NAME="lazyEncryptablePropertyResolver"</code> */
     public static final String RESOLVER_BEAN_NAME = "lazyEncryptablePropertyResolver";
+    /** Constant <code>FILTER_BEAN_NAME="lazyEncryptablePropertyFilter"</code> */
     public static final String FILTER_BEAN_NAME = "lazyEncryptablePropertyFilter";
 
+    /**
+     * <p>encryptablePropertySourceConverter.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param propertyResolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param propertyFilter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     */
     @SuppressWarnings("unchecked")
     @Bean
     public static EncryptablePropertySourceConverter encryptablePropertySourceConverter(ConfigurableEnvironment environment, @Qualifier(RESOLVER_BEAN_NAME)  EncryptablePropertyResolver propertyResolver, @Qualifier(FILTER_BEAN_NAME) EncryptablePropertyFilter propertyFilter) {
@@ -51,12 +64,25 @@ public class EncryptablePropertyResolverConfiguration {
         return new EncryptablePropertySourceConverter(interceptionMode, skipPropertySourceClasses, propertyResolver, propertyFilter);
     }
 
+    /**
+     * <p>envCopy.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     */
     @SuppressWarnings("unchecked")
     @Bean
     public EnvCopy envCopy(final ConfigurableEnvironment environment) {
         return new EnvCopy(environment);
     }
 
+    /**
+     * <p>stringEncryptor.</p>
+     *
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @return a {@link org.jasypt.encryption.StringEncryptor} object
+     */
     @Bean(name = ENCRYPTOR_BEAN_NAME)
     public StringEncryptor stringEncryptor(
             final EnvCopy envCopy,
@@ -66,6 +92,13 @@ public class EncryptablePropertyResolverConfiguration {
         return new DefaultLazyEncryptor(envCopy.get(), customEncryptorBeanName, isCustom, bf);
     }
 
+    /**
+     * <p>encryptablePropertyDetector.</p>
+     *
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
+     */
     @Bean(name = DETECTOR_BEAN_NAME)
     public EncryptablePropertyDetector encryptablePropertyDetector(
             final EnvCopy envCopy,
@@ -75,12 +108,25 @@ public class EncryptablePropertyResolverConfiguration {
         return new DefaultLazyPropertyDetector(envCopy.get(), customDetectorBeanName, isCustom, bf);
     }
 
+    /**
+     * <p>configProps.</p>
+     *
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Singleton} object
+     */
     @Bean(name = CONFIG_SINGLETON)
     public Singleton<JasyptEncryptorConfigurationProperties> configProps(
             final EnvCopy envCopy) {
         return new Singleton<>(() -> JasyptEncryptorConfigurationProperties.bindConfigProps(envCopy.get()));
     }
 
+    /**
+     * <p>encryptablePropertyFilter.</p>
+     *
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param bf a {@link org.springframework.beans.factory.config.ConfigurableBeanFactory} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     */
     @Bean(name = FILTER_BEAN_NAME)
     public EncryptablePropertyFilter encryptablePropertyFilter(
             final EnvCopy envCopy,
@@ -90,6 +136,16 @@ public class EncryptablePropertyResolverConfiguration {
         return new DefaultLazyPropertyFilter(envCopy.get(), customFilterBeanName, isCustom, bf);
     }
 
+    /**
+     * <p>encryptablePropertyResolver.</p>
+     *
+     * @param propertyDetector a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
+     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     */
     @Bean(name = RESOLVER_BEAN_NAME)
     public EncryptablePropertyResolver encryptablePropertyResolver(
             @Qualifier(DETECTOR_BEAN_NAME) final EncryptablePropertyDetector propertyDetector,

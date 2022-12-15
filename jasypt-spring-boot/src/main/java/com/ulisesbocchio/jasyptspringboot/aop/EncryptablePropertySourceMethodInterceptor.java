@@ -8,14 +8,25 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.env.PropertySource;
 
 /**
+ * <p>EncryptablePropertySourceMethodInterceptor class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public class EncryptablePropertySourceMethodInterceptor<T> extends CachingDelegateEncryptablePropertySource<T> implements MethodInterceptor {
 
+    /**
+     * <p>Constructor for EncryptablePropertySourceMethodInterceptor.</p>
+     *
+     * @param delegate a {@link org.springframework.core.env.PropertySource} object
+     * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     */
     public EncryptablePropertySourceMethodInterceptor(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate, resolver, filter);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         if (isRefreshCall(invocation)) {

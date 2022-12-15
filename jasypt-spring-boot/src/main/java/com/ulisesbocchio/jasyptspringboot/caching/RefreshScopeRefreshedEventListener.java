@@ -26,10 +26,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * <p>RefreshScopeRefreshedEventListener class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Slf4j
 public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean {
 
+    /** Constant <code>EVENT_CLASS_NAMES</code> */
     public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
             "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
             "org.springframework.cloud.context.environment.EnvironmentChangeEvent",
@@ -41,12 +48,20 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
     private final Map<String, Boolean> eventTriggersCache = new ConcurrentHashMap<>();
     private final JasyptEncryptorConfigurationProperties config;
 
+    /**
+     * <p>Constructor for RefreshScopeRefreshedEventListener.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param config a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
+     */
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter, JasyptEncryptorConfigurationProperties config) {
         this.environment = environment;
         this.converter = converter;
         this.config = config;
     }
 
+    /** {@inheritDoc} */
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
@@ -99,6 +114,7 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void afterPropertiesSet() throws Exception {
         Stream

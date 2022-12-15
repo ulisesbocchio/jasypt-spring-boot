@@ -12,11 +12,25 @@ import java.util.Optional;
 
 import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 
+/**
+ * <p>DefaultLazyPropertyFilter class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Slf4j
 public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
 
     private Singleton<EncryptablePropertyFilter> singleton;
 
+    /**
+     * <p>Constructor for DefaultLazyPropertyFilter.</p>
+     *
+     * @param e a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param customFilterBeanName a {@link java.lang.String} object
+     * @param isCustom a boolean
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     */
     public DefaultLazyPropertyFilter(ConfigurableEnvironment e, String customFilterBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customFilterBeanName)
@@ -33,6 +47,11 @@ public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
                         }));
     }
 
+    /**
+     * <p>Constructor for DefaultLazyPropertyFilter.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     */
     public DefaultLazyPropertyFilter(ConfigurableEnvironment environment) {
         singleton = new Singleton<>(() -> createDefault(environment));
     }
@@ -44,6 +63,7 @@ public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
                 filterConfig.getIncludeNames(), filterConfig.getExcludeNames());
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean shouldInclude(PropertySource<?> source, String name) {
         return singleton.get().shouldInclude(source, name);

@@ -14,6 +14,7 @@ import static java.util.regex.Pattern.DOTALL;
  * A service for encrypting and decrypting Strings.
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 @Slf4j
 public class EncryptionService {
@@ -21,6 +22,11 @@ public class EncryptionService {
     private final Pattern reCharsREP;
 
     @SuppressWarnings("ReplaceAllDot")
+    /**
+     * <p>Constructor for EncryptionService.</p>
+     *
+     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     */
     public EncryptionService(final StringEncryptor encryptor) {
         this.encryptor = encryptor;
         String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
@@ -74,6 +80,10 @@ public class EncryptionService {
      *
      * @param input the string to scan for placeholders and decrypt
      * @return the input with decrypted placeholders.
+     * @param encryptPrefix a {@link java.lang.String} object
+     * @param encryptSuffix a {@link java.lang.String} object
+     * @param decryptPrefix a {@link java.lang.String} object
+     * @param decryptSuffix a {@link java.lang.String} object
      */
     public String decrypt(final String input, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) {
         return replaceAll(input, encryptPrefix, encryptSuffix, decryptPrefix, decryptSuffix, encryptor::decrypt);
@@ -81,6 +91,7 @@ public class EncryptionService {
 
     /**
      * Decrypt a value
+     *
      * @param value the value
      * @return decrypted value
      */
@@ -93,6 +104,10 @@ public class EncryptionService {
      *
      * @param input the string to scan for placeholders and encrypt
      * @return the input with encrypted placeholders.
+     * @param encryptPrefix a {@link java.lang.String} object
+     * @param encryptSuffix a {@link java.lang.String} object
+     * @param decryptPrefix a {@link java.lang.String} object
+     * @param decryptSuffix a {@link java.lang.String} object
      */
     public String encrypt(final String input, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) {
         return replaceAll(input, decryptPrefix, decryptSuffix, encryptPrefix, encryptSuffix, encryptor::encrypt);
@@ -100,6 +115,7 @@ public class EncryptionService {
 
     /**
      * Encrypt a value
+     *
      * @param value the value
      * @return encrypted value
      */
@@ -107,6 +123,11 @@ public class EncryptionService {
         return encryptor.encrypt(value);
     }
 
+    /**
+     * <p>getEncryptableProperties.</p>
+     *
+     * @return a {@link org.jasypt.properties.EncryptableProperties} object
+     */
     public EncryptableProperties getEncryptableProperties() {
         return new EncryptableProperties(encryptor);
     }

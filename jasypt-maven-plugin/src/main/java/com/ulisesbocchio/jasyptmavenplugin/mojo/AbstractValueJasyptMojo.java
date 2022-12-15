@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * Abstract Mojo for value goals
  *
  * @author ubocchio
+ * @version $Id: $Id
  */
 @Slf4j
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})

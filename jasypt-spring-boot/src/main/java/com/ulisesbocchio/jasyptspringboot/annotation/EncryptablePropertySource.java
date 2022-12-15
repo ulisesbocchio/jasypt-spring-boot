@@ -10,6 +10,7 @@ import java.lang.annotation.*;
  *
  * @author Ulises Bocchio
  * @see org.springframework.context.annotation.PropertySource
+ * @version $Id: $Id
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

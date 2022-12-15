@@ -7,12 +7,24 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+/**
+ * <p>PooledStringEncryptor class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 public class PooledStringEncryptor implements StringEncryptor {
 
     private final int size;
     private final StringEncryptor[] pool;
     private final AtomicInteger roundRobin;
 
+    /**
+     * <p>Constructor for PooledStringEncryptor.</p>
+     *
+     * @param size a int
+     * @param encryptorFactory a {@link java.util.function.Supplier} object
+     */
     public PooledStringEncryptor(int size, Supplier<StringEncryptor> encryptorFactory) {
         this.size = size;
         this.pool = IntStream.range(0, this.size).boxed().map(v -> {
@@ -31,11 +43,13 @@ public class PooledStringEncryptor implements StringEncryptor {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public String encrypt(String message) {
         return robin(e -> e.encrypt(message));
     }
 
+    /** {@inheritDoc} */
     @Override
     public String decrypt(String encryptedMessage) {
         return robin(e -> e.decrypt(encryptedMessage));

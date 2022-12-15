@@ -14,6 +14,7 @@ import java.nio.file.Path;
  * Abstract Mojo for Files
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Slf4j

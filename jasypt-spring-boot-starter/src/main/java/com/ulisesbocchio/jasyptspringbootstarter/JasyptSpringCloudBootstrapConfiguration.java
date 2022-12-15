@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Import;
  * be explicitly turned-off by <code>jasypt.encryptor.bootstrap=false</code>
  * configuration (in bootstrap.properties or as a command line argument) in that case
  * Jasypt will be auto-configured as usual.
- * 
- * @author Fahim Farook
  *
+ * @author Fahim Farook
+ * @version $Id: $Id
  */
 @Configuration
 @ConditionalOnProperty(name = "jasypt.encryptor.bootstrap", havingValue = "true", matchIfMissing = true)

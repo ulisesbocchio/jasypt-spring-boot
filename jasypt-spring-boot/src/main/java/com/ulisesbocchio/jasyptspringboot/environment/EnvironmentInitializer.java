@@ -16,6 +16,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * <p>EnvironmentInitializer class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Slf4j
 public class EnvironmentInitializer {
     private final InterceptionMode interceptionMode;
@@ -26,6 +32,17 @@ public class EnvironmentInitializer {
     private final EncryptablePropertyDetector detector;
     private final InterceptionMode propertySourceInterceptionMode;
 
+    /**
+     * <p>Constructor for EnvironmentInitializer.</p>
+     *
+     * @param interceptionMode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param propertySourceInterceptionMode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param skipPropertySourceClasses a {@link java.util.List} object
+     * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param detector a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
+     */
     public EnvironmentInitializer(InterceptionMode interceptionMode, InterceptionMode propertySourceInterceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
 
         this.interceptionMode = interceptionMode;

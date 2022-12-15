@@ -41,7 +41,10 @@ import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptableProper
 import static com.ulisesbocchio.jasyptspringboot.configuration.EncryptablePropertyResolverConfiguration.RESOLVER_BEAN_NAME;
 
 /**
+ * <p>EncryptablePropertySourceBeanFactoryPostProcessor class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Slf4j
 public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
@@ -50,10 +53,16 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
             Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
     private ConfigurableEnvironment env;
 
+    /**
+     * <p>Constructor for EncryptablePropertySourceBeanFactoryPostProcessor.</p>
+     *
+     * @param env a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     */
     public EncryptablePropertySourceBeanFactoryPostProcessor(ConfigurableEnvironment env) {
         this.env = env;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         ResourceLoader ac = new DefaultResourceLoader();
@@ -105,7 +114,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
     }
 
     private String generateName(String name) {
-        return !StringUtils.isEmpty(name) ? name : "EncryptedPropertySource#" + System.currentTimeMillis();
+        return StringUtils.hasLength(name) ? name : "EncryptedPropertySource#" + System.currentTimeMillis();
     }
 
     private Stream<AnnotationAttributes> getEncryptablePropertySourcesMetadata(ConfigurableListableBeanFactory beanFactory) {
@@ -154,6 +163,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
                 .hasText(StringUtils.getFilenameExtension(resource.getFilename()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 100;

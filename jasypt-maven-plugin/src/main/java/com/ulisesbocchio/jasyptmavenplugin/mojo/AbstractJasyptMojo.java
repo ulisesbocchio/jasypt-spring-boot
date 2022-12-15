@@ -18,6 +18,7 @@ import java.util.Map;
  * A mojo that spins up a Spring Boot application for any encrypt/decrypt function.
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Slf4j
@@ -49,10 +50,16 @@ public abstract class AbstractJasyptMojo extends AbstractMojo {
 
     private Environment environment;
 
+    /**
+     * <p>Getter for the field <code>environment</code>.</p>
+     *
+     * @return a {@link org.springframework.core.env.Environment} object
+     */
     protected Environment getEnvironment() {
         return environment;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void execute() throws MojoExecutionException {
         Map<String, Object> defaultProperties = new HashMap<>();

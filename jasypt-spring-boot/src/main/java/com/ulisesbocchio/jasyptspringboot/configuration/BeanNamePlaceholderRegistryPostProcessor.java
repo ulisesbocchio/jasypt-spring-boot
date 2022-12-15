@@ -26,6 +26,7 @@ class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistry
         this.environment = environment;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         DefaultListableBeanFactory bf = (DefaultListableBeanFactory) registry;
@@ -41,11 +42,13 @@ class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistry
                 });
     }
 
+    /** {@inheritDoc} */
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 1;

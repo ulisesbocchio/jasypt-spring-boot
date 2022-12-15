@@ -13,11 +13,13 @@ import java.nio.file.Path;
  * Goal which encrypts demarcated values in properties files.
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 @Mojo(name = "encrypt", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class EncryptMojo extends AbstractFileJasyptMojo {
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptMojo.class);
 
+    /** {@inheritDoc} */
     @Override
     protected void run(final EncryptionService service, final Path path, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

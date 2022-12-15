@@ -21,16 +21,27 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+/**
+ * <p>SimpleGCMByteEncryptor class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 public class SimpleGCMByteEncryptor implements ByteEncryptor {
 
+    /** Constant <code>AES_KEY_SIZE=256</code> */
     public static final int AES_KEY_SIZE = 256;
+    /** Constant <code>AES_KEY_PASSWORD_SALT_LENGTH=16</code> */
     public static final int AES_KEY_PASSWORD_SALT_LENGTH = 16;
+    /** Constant <code>GCM_IV_LENGTH=12</code> */
     public static final int GCM_IV_LENGTH = 12;
+    /** Constant <code>GCM_TAG_LENGTH=128</code> */
     public static final int GCM_TAG_LENGTH = 128;
     private final Singleton<SecretKey> key;
     private final String algorithm;
     private final Singleton<IvGenerator> ivGenerator;
 
+    /** {@inheritDoc} */
     @SneakyThrows
     @Override
     public byte[] encrypt(byte[] message) {
@@ -48,6 +59,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return byteBuffer.array();
     }
 
+    /** {@inheritDoc} */
     @SneakyThrows
     @Override
     public byte[] decrypt(byte[] encryptedMessage) {
@@ -82,6 +94,11 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return new SecretKeySpec(secretKeyBytes, "AES");
     }
 
+    /**
+     * <p>generateSecretKey.</p>
+     *
+     * @return a {@link javax.crypto.SecretKey} object
+     */
     @SneakyThrows
     public static SecretKey generateSecretKey() {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
@@ -90,6 +107,11 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return keyGenerator.generateKey();
     }
 
+    /**
+     * <p>generateBase64EncodedSecretKey.</p>
+     *
+     * @return a {@link java.lang.String} object
+     */
     @SneakyThrows
     public static String generateBase64EncodedSecretKey() {
         SecretKey key = generateSecretKey();
@@ -97,6 +119,15 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return Base64.getEncoder().encodeToString(secretKeyBytes);
     }
 
+    /**
+     * <p>getAESKeyFromPassword.</p>
+     *
+     * @param password an array of {@link char} objects
+     * @param saltGenerator a {@link org.jasypt.salt.SaltGenerator} object
+     * @param iterations a int
+     * @param algorithm a {@link java.lang.String} object
+     * @return a {@link javax.crypto.SecretKey} object
+     */
     @SneakyThrows
     public static SecretKey getAESKeyFromPassword(char[] password, SaltGenerator saltGenerator, int iterations, String algorithm){
         SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm);
@@ -104,6 +135,11 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
     }
 
+    /**
+     * <p>Constructor for SimpleGCMByteEncryptor.</p>
+     *
+     * @param config a {@link com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMConfig} object
+     */
     public SimpleGCMByteEncryptor(SimpleGCMConfig config) {
         this.key = Singleton.from(this::loadSecretKey, config);
         this.ivGenerator = Singleton.from(config::getActualIvGenerator);

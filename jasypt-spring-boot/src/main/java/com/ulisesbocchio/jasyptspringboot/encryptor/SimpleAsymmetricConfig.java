@@ -23,6 +23,7 @@ import java.util.Optional;
  * A String containing the resource location that contains the public/private key
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 
 @Data
@@ -50,14 +51,29 @@ public class SimpleAsymmetricConfig {
                                                 .orElseThrow(() -> new IllegalArgumentException("Unable to load " + type + " key. Either resource, key as string, or resource location must be provided"))));
     }
 
+    /**
+     * <p>loadPrivateKeyResource.</p>
+     *
+     * @return a {@link org.springframework.core.io.Resource} object
+     */
     public Resource loadPrivateKeyResource() {
         return loadResource(privateKeyResource, privateKey, privateKeyLocation, privateKeyFormat, "Private");
     }
 
+    /**
+     * <p>loadPublicKeyResource.</p>
+     *
+     * @return a {@link org.springframework.core.io.Resource} object
+     */
     public Resource loadPublicKeyResource() {
         return loadResource(publicKeyResource, publicKey, publicKeyLocation, publicKeyFormat, "Public");
     }
 
+    /**
+     * <p>setKeyFormat.</p>
+     *
+     * @param keyFormat a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
+     */
     public void setKeyFormat(KeyFormat keyFormat) {
         setPublicKeyFormat(keyFormat);
         setPrivateKeyFormat(keyFormat);

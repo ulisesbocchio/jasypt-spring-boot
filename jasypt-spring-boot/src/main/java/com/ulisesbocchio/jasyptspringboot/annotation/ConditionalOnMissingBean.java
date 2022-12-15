@@ -10,6 +10,7 @@ import java.lang.annotation.*;
  * It only works with explicit {@link org.springframework.context.annotation.Bean} name attribute specified.
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

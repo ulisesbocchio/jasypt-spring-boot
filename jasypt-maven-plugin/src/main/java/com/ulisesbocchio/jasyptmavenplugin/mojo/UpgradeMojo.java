@@ -7,11 +7,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.springframework.core.env.Environment;
 
+/**
+ * <p>UpgradeMojo class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Mojo(name = "upgrade", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class UpgradeMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.major-version", defaultValue = "2")
     private int oldMajorVersion = 2;
 
+    /** {@inheritDoc} */
     @Override
     protected void configure(JasyptEncryptorConfigurationProperties properties) {
         Environment environment = getEnvironment();

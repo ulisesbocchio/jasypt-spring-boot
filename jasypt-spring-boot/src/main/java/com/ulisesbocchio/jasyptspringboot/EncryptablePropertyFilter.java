@@ -4,8 +4,11 @@ import org.springframework.core.env.PropertySource;
 
 /**
  * Interface that provides the contract for what property sources and/or properties should be inspected for encryption.
- * This allows a decision point before {@link EncryptablePropertyResolver} is invoked, and thereby can also be used to
+ * This allows a decision point before {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} is invoked, and thereby can also be used to
  * avoid scenarios where inspection is unwanted due to initialization conflicts, such as circular dependencies.
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
  */
 public interface EncryptablePropertyFilter {
     /**

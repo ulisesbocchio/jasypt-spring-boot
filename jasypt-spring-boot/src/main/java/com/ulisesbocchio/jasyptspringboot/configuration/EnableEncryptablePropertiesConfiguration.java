@@ -13,12 +13,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 
 /**
- * <p>Configuration class that registers a {@link BeanFactoryPostProcessor} that wraps all {@link PropertySource} defined in the {@link Environment}
- * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link StringEncryptor} for decrypting properties
+ * <p>Configuration class that registers a {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
+ * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link org.jasypt.encryption.StringEncryptor} for decrypting properties
  * that can be configured through the same properties it wraps.</p>
- * <p>The {@link StringEncryptor} bean is only defined when no other
- * bean of type {@link StringEncryptor} is present in the Application Context, thus allowing for custom definition if required.</p>
- * <p>The default {@link StringEncryptor} can be configured through the following properties: </p>
+ * <p>The {@link org.jasypt.encryption.StringEncryptor} bean is only defined when no other
+ * bean of type {@link org.jasypt.encryption.StringEncryptor} is present in the Application Context, thus allowing for custom definition if required.</p>
+ * <p>The default {@link org.jasypt.encryption.StringEncryptor} can be configured through the following properties: </p>
  * <table border="1">
  *     <tr>
  *         <td>Key</td><td>Required</td><td>Default Value</td>
@@ -52,12 +52,20 @@ import org.springframework.core.env.PropertySource;
  *
  * @author Ulises Bocchio
  * @see StringPBEConfig
+ * @version $Id: $Id
  */
 @Configuration
 @Import({EncryptablePropertyResolverConfiguration.class, CachingConfiguration.class})
 @Slf4j
 public class EnableEncryptablePropertiesConfiguration {
 
+    /**
+     * <p>enableEncryptablePropertySourcesPostProcessor.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @return a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor} object
+     */
     @Bean
     public static EnableEncryptablePropertiesBeanFactoryPostProcessor enableEncryptablePropertySourcesPostProcessor(final ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         return new EnableEncryptablePropertiesBeanFactoryPostProcessor(environment, converter);

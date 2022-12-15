@@ -12,16 +12,25 @@ import java.util.Optional;
 import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 
 /**
- * Default Lazy property detector that delegates to a custom {@link EncryptablePropertyDetector} bean or initializes a
- * default {@link DefaultPropertyDetector}.
+ * Default Lazy property detector that delegates to a custom {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} bean or initializes a
+ * default {@link com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector}.
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Slf4j
 public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector {
 
     private Singleton<EncryptablePropertyDetector> singleton;
 
+    /**
+     * <p>Constructor for DefaultLazyPropertyDetector.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param customDetectorBeanName a {@link java.lang.String} object
+     * @param isCustom a boolean
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     */
     public DefaultLazyPropertyDetector(ConfigurableEnvironment environment, String customDetectorBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customDetectorBeanName)
@@ -37,6 +46,11 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
                         }));
     }
 
+    /**
+     * <p>Constructor for DefaultLazyPropertyDetector.</p>
+     *
+     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     */
     public DefaultLazyPropertyDetector(ConfigurableEnvironment environment) {
         singleton = new Singleton<>(() -> createDefault(environment));
     }
@@ -46,11 +60,13 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
         return new DefaultPropertyDetector(props.getProperty().getPrefix(), props.getProperty().getSuffix());
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isEncrypted(String property) {
         return singleton.get().isEncrypted(property);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String unwrapEncryptedValue(String property) {
         return singleton.get().unwrapEncryptedValue(property);

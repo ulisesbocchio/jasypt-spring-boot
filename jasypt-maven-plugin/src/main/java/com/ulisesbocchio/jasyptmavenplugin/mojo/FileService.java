@@ -11,6 +11,7 @@ import java.util.Properties;
  * A service for operating on files.
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 public class FileService {
     /**
@@ -18,6 +19,7 @@ public class FileService {
      *
      * @param path the file path
      * @return the contents.
+     * @throws org.apache.maven.plugin.MojoExecutionException if any.
      */
     public static String read(final Path path) throws MojoExecutionException {
         try {
@@ -32,6 +34,7 @@ public class FileService {
      *
      * @param path     the file path
      * @param contents the contents to write
+     * @throws org.apache.maven.plugin.MojoExecutionException if any.
      */
     public static void write(final Path path, final String contents) throws MojoExecutionException {
         try {
@@ -46,6 +49,7 @@ public class FileService {
      *
      * @param path       the path
      * @param properties the properties to mutate
+     * @throws org.apache.maven.plugin.MojoExecutionException if any.
      */
     public static void load(final Path path, final Properties properties)
             throws MojoExecutionException {

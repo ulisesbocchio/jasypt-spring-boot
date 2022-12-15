@@ -6,6 +6,12 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+/**
+ * <p>ReencryptMojo class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Mojo(name = "reencrypt", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class ReencryptMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.password") private String oldPassword;
@@ -21,6 +27,7 @@ public class ReencryptMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.iv-generator-classname") private String oldIvGeneratorClassname;
     @Parameter(property = "jasypt.plugin.old.string-output-type") private String oldStringOutputType;
 
+    /** {@inheritDoc} */
     @Override
     protected void configure(JasyptEncryptorConfigurationProperties properties) {
         setIfNotNull(properties::setPassword, oldPassword);

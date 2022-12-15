@@ -10,11 +10,13 @@ import org.apache.maven.plugins.annotations.Mojo;
  * Goal which decrypts values.
  *
  * @author ubocchio
+ * @version $Id: $Id
  */
 @Mojo(name = "decrypt-value", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = false)
 @Slf4j
 public class DecryptValueMojo extends AbstractValueJasyptMojo {
 
+    /** {@inheritDoc} */
     @Override
     protected void run(final EncryptionService service, final String value, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

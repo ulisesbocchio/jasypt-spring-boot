@@ -13,17 +13,34 @@ import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 
 import java.util.function.Supplier;
 
+/**
+ * <p>StringEncryptorBuilder class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 @Slf4j
 public class StringEncryptorBuilder {
     private final JasyptEncryptorConfigurationProperties configProps;
 
     private final String propertyPrefix;
 
+    /**
+     * <p>Constructor for StringEncryptorBuilder.</p>
+     *
+     * @param configProps a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
+     * @param propertyPrefix a {@link java.lang.String} object
+     */
     public StringEncryptorBuilder(JasyptEncryptorConfigurationProperties configProps, String propertyPrefix) {
         this.configProps = configProps;
         this.propertyPrefix = propertyPrefix;
     }
 
+    /**
+     * <p>build.</p>
+     *
+     * @return a {@link org.jasypt.encryption.StringEncryptor} object
+     */
     public StringEncryptor build() {
         if (isPBEConfig()) {
             return createPBEDefault();

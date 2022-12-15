@@ -12,7 +12,10 @@ import org.springframework.util.Assert;
 import java.util.Optional;
 
 /**
+ * <p>DefaultPropertyResolver class.</p>
+ *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 public class DefaultPropertyResolver implements EncryptablePropertyResolver {
 
@@ -20,10 +23,23 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
     private StringEncryptor encryptor;
     private EncryptablePropertyDetector detector;
 
+    /**
+     * <p>Constructor for DefaultPropertyResolver.</p>
+     *
+     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param environment a {@link org.springframework.core.env.Environment} object
+     */
     public DefaultPropertyResolver(StringEncryptor encryptor, Environment environment) {
         this(encryptor, new DefaultPropertyDetector(), environment);
     }
 
+    /**
+     * <p>Constructor for DefaultPropertyResolver.</p>
+     *
+     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param detector a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
+     * @param environment a {@link org.springframework.core.env.Environment} object
+     */
     public DefaultPropertyResolver(StringEncryptor encryptor, EncryptablePropertyDetector detector, Environment environment) {
         this.environment = environment;
         Assert.notNull(encryptor, "String encryptor can't be null");
@@ -32,6 +48,7 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
         this.detector = detector;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String resolvePropertyValue(String value) {
         return Optional.ofNullable(value)

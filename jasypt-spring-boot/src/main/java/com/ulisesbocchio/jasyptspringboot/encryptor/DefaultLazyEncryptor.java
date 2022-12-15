@@ -14,16 +14,25 @@ import java.util.Optional;
 import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 
 /**
- * Default Lazy Encryptor that delegates to a custom {@link StringEncryptor} bean or creates a default {@link PooledPBEStringEncryptor} or {@link SimpleAsymmetricStringEncryptor}
+ * Default Lazy Encryptor that delegates to a custom {@link org.jasypt.encryption.StringEncryptor} bean or creates a default {@link org.jasypt.encryption.pbe.PooledPBEStringEncryptor} or {@link com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricStringEncryptor}
  * based on what properties are provided
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  */
 @Slf4j
 public class DefaultLazyEncryptor implements StringEncryptor {
 
     private final Singleton<StringEncryptor> singleton;
 
+    /**
+     * <p>Constructor for DefaultLazyEncryptor.</p>
+     *
+     * @param e a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param customEncryptorBeanName a {@link java.lang.String} object
+     * @param isCustom a boolean
+     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     */
     public DefaultLazyEncryptor(final ConfigurableEnvironment e, final String customEncryptorBeanName, boolean isCustom, final BeanFactory bf) {
         singleton = new Singleton<>(() ->
                 Optional.of(customEncryptorBeanName)
@@ -39,6 +48,11 @@ public class DefaultLazyEncryptor implements StringEncryptor {
                         }));
     }
 
+    /**
+     * <p>Constructor for DefaultLazyEncryptor.</p>
+     *
+     * @param e a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     */
     public DefaultLazyEncryptor(final ConfigurableEnvironment e) {
         singleton = new Singleton<>(() -> createDefault(e));
     }
@@ -47,11 +61,13 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         return new StringEncryptorBuilder(JasyptEncryptorConfigurationProperties.bindConfigProps(e), "jasypt.encryptor").build();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String encrypt(final String message) {
         return singleton.get().encrypt(message);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String decrypt(final String encryptedMessage) {
         return singleton.get().decrypt(encryptedMessage);

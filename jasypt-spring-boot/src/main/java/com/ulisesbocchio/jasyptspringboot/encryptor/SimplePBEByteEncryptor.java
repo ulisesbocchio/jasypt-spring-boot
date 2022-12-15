@@ -11,6 +11,12 @@ import javax.crypto.spec.PBEKeySpec;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 
+/**
+ * <p>SimplePBEByteEncryptor class.</p>
+ *
+ * @author Sergio.U.Bocchio
+ * @version $Id: $Id
+ */
 public class SimplePBEByteEncryptor implements PBEByteEncryptor {
 
     private String password = null;
@@ -18,6 +24,7 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
     private int iterations;
     private String algorithm = null;
 
+    /** {@inheritDoc} */
     @Override
     @SneakyThrows
     public byte[] encrypt(byte[] message) {
@@ -45,6 +52,7 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
                 .array();
     }
 
+    /** {@inheritDoc} */
     @Override
     @SneakyThrows
     public byte[] decrypt(byte[] encryptedMessage) {
@@ -76,19 +84,35 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
         return cipherDecrypt.doFinal(message);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * <p>Setter for the field <code>saltGenerator</code>.</p>
+     *
+     * @param saltGenerator a {@link org.jasypt.salt.SaltGenerator} object
+     */
     public void setSaltGenerator(SaltGenerator saltGenerator) {
         this.saltGenerator = saltGenerator;
     }
 
+    /**
+     * <p>Setter for the field <code>iterations</code>.</p>
+     *
+     * @param iterations a int
+     */
     public void setIterations(int iterations) {
         this.iterations = iterations;
     }
 
+    /**
+     * <p>Setter for the field <code>algorithm</code>.</p>
+     *
+     * @param algorithm a {@link java.lang.String} object
+     */
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
     }

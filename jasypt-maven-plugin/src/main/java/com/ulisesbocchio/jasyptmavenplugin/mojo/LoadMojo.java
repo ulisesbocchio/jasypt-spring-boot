@@ -18,6 +18,7 @@ import java.util.Properties;
  * or the mybatis generator.
  *
  * @author Rupert Madden-Abbott
+ * @version $Id: $Id
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Mojo(name = "load", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
@@ -34,6 +35,7 @@ public class LoadMojo extends AbstractFileJasyptMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
+    /** {@inheritDoc} */
     @Override
     protected void run(final EncryptionService service, final Path path, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

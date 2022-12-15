@@ -1,5 +1,5 @@
 # jasypt-spring-boot
-**[Jasypt](http://www.jasypt.org)** integration for Spring boot 1.4.X , 1.5.X and 2.0.X
+**[Jasypt](http://www.jasypt.org)** integration for Spring boot 2.x and 3.0.0
 
 [![Build Status](https://app.travis-ci.com/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://app.travis-ci.com/ulisesbocchio/jasypt-spring-boot)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -23,61 +23,7 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 - Adding `jasypt-spring-boot` to your classpath and adding `@EnableEncryptableProperties` to your main Configuration class to enable encryptable properties across the entire Spring Environment
 - Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
 ## What's new?
-### Update 08/28/2021: Version 3.0.4 Release Includes
-* Spring Boot 2.5.4
-* Spring cloud 2020.0.3
-* Removed double property source config from spring ConfigurationPropertySource and added wrapper that lead to stack overflows and circular dependencies
-* StubPropertySource bug fixed
-* Deadlock on properties cache fixed
-* Added Origin support to config properties source wrappers
-* RefreshedScope listener `Class.forName()` caching for improved performance
-* AES/GCM Support ([Guide](#aes-256-gcm-encryption))
-* ability to skip property sources by class ([Guide](#filter-out-propertysource-classes-from-being-introspected))
-
-### Update 05/31/2020: Version 3.0.3 Release Includes
-* Minor bug fixes
-* Documentation fixes
-* Refresh event fix for spring cloud config
-### Update 01/11/2020: Version 3.0.2 Release Includes
-* Allows unresolvable properties from env actuator (Thanks [@thorntonrp](https://github.com/thorntonrp))
-* Fixes [jasypt-maven-plugin](#maven-plugin) issues
-* Adds support to [jasypt-maven-plugin](#maven-plugin) for encryption/decryption of single values
-### Update 12/31/2019: Version 3.0.1 Release Includes
-* Adds support for [skipping classes](#filter-out-propertysource-classes-from-being-introspected) from being introspected
-* Usage of `replacePlaceHolders` instead of `replaceRequiredPlaceholders` on property resolver to mirror Spring's default behavior
-* Refactored `StandardEncryptableEnvironment` to use builder pattern and lazy load resolver/filter/detector/encryptor
-* Removed deprecated `EncryptableENvironment`
-### Update 11/24/2019: Version 3.0.0 Release Includes
-* Adds support for Spring Boot 2.1.X
-* Spring Boot 1.5.X No longer supported
-* Changed default encryption to PBEWITHHMACSHA512ANDAES_256 (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
-* Switched properties cache to HashMap to avoid concurrency issues (Thanks [@krm1312](https://github.com/krm1312))
-* Higher priority for Properties post processor (Thanks [@ttulka](https://github.com/ttulka))
-* Jasypt Spring Boot [Maven Plugin](#maven-plugin) (Thanks [@rupert-madden-abbott](https://github.com/rupert-madden-abbott))
-* To keep your encrypted properties with previous default config use:
-```yaml
-jasypt:
-  encryptor:
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator
-```
-### Update 9/8/2019: Version 2.1.2 Release Includes
-* jasypt 1.9.3 rollback with IV Generators (thanks [@tkalmar](https://github.com/tkalmar))
-* interpolation inside `ENC()` and `${}` blocks (thanks [@ttulka](https://github.com/ttulka))
-* fixes for relaxed bindings, fail on custom bean not found, filters, and double app listener
-
-### Update 1/8/2019: Version 2.1.1 Release Including
-* [Asymmetric Encryption](#asymmetric-encryption)
-* and support for JSB96 with IV Generators (Thanks [@melloware](https://github.com/melloware)!!)
-
-### Update 7/17/2018: Version 2.1.0 Release Including
-* [Filters](#using-filters)
-
-### Update 3/17/2018: Version 2.0.0 has been released supporting
-* Spring Boot 2.0.X.RELEASE. [SemVer](https://semver.org/) adopted.
-
-### Update 7/18/2015: `jasypt-spring-boot` is now in Maven Central!
-
+### Go to [Releases](https://github.com/ulisesbocchio/jasypt-spring-boot/releases)
 ## What to do First?
 Use one of the following 3 methods (briefly explained above):
 
@@ -87,7 +33,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.4</version>
+            <version>3.0.5</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -96,7 +42,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.4</version>
+            <version>3.0.5</version>
     </dependency>
 	```
 
@@ -117,7 +63,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.4</version>
+            <version>3.0.5</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -473,7 +419,7 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.4</version>
+      <version>3.0.5</version>
     </plugin>
   </plugins>
 </build>
@@ -784,7 +730,7 @@ public class PropertyEncryptor {
 }
 ```
 ## AES 256-GCM Encryption
-As of version 3.0.4, AES 256-GCM Encryption is supported. To use this type of encryption, set the property `jasypt.encryptor.gcm-secret-key-string`, `jasypt.encryptor.gcm-secret-key-location` or `jasypt.encryptor.gcm-secret-key-password`. </br>
+As of version 3.0.5, AES 256-GCM Encryption is supported. To use this type of encryption, set the property `jasypt.encryptor.gcm-secret-key-string`, `jasypt.encryptor.gcm-secret-key-location` or `jasypt.encryptor.gcm-secret-key-password`. </br>
 The underlying algorithm used is `AES/GCM/NoPadding` so make sure that's installed in your JDK.<br/>
 The `SimpleGCMByteEncryptor` uses a `IVGenerator` to encrypt properties. You can configure that with property `jasypt.encryptor.iv-generator-classname` if you don't want to
 use the default implementation `RandomIvGenerator`

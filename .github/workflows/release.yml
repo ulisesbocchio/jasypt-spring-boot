@@ -15,7 +15,7 @@ jobs:
           git config --global user.name 'Github Actions Bot'
           git config --global user.email 'actions@users.noreply.github.com'
       - name: Setup Git Credentials
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       - name: Cache local Maven repository

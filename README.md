@@ -15,6 +15,7 @@
 
 [![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9J2V5HJT8AZF8)
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/ulisesbd)
 
 Jasypt Spring Boot provides Encryption support for property sources in Spring Boot Applications.<br/>
 There are 3 ways to integrate `jasypt-spring-boot` in your project:
@@ -820,6 +821,6 @@ JASYPT_ENCRYPTOR_PASSWORD=password java -jar target/jasypt-spring-boot-demo-1.5-
 ## Other Demo Apps
 While [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) is a comprehensive Demo that showcases all possible ways to encrypt/decrypt properties, there are other multiple Demos that demo isolated scenarios. 
 
-## Flattr
+[//]: # (## Flattr)
 
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/@ubocchio/github/ulisesbocchio)
+[//]: # ([![Flattr this git repo]&#40;http://api.flattr.com/button/flattr-badge-large.png&#41;]&#40;https://flattr.com/@ubocchio/github/ulisesbocchio&#41;)

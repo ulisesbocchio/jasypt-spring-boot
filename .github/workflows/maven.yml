@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build_zulu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,7 +23,7 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Install artifact locally
-      run: mvn -B install --file pom.xml
+      run: mvn -B install -DskipTests --file pom.xml
     - name: Checkout sample projects
       uses: actions/checkout@v3
       with:
@@ -32,9 +32,9 @@ jobs:
         ref: master
         token: ${{ secrets.CHECKOUT_PAT }}
     - name: Test sample projects
-      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml
+      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
 
-  build_2:
+  build_temurin:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,8 +48,19 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ matrix.java }}
     - name: Build with Maven
-      run: mvn -B package --file pom.xml 
-  build_3:
+      run: mvn -B package --file pom.xml
+    - name: Install artifact locally
+      run: mvn -B install -DskipTests --file pom.xml
+    - name: Checkout sample projects
+      uses: actions/checkout@v3
+      with:
+        repository: ulisesbocchio/jasypt-spring-boot-samples
+        path: jasypt-spring-boot-samples
+        ref: master
+        token: ${{ secrets.CHECKOUT_PAT }}
+    - name: Test sample projects
+      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
+  build_zulu_boot3:
     runs-on: ubuntu-latest
     strategy:
       matrix:

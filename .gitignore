@@ -29,3 +29,6 @@ target
 # IntelliJ
 .idea/
 *.iml
+
+# Flattened POMs
+**/.flattened-pom.xml

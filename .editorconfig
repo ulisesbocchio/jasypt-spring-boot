@@ -18,6 +18,7 @@ max_line_length = 120
 insert_final_newline = true
 
 [*.xml]
+indent_size = 4
 max_line_length = 4096
 
 [*.{yml,yaml}]

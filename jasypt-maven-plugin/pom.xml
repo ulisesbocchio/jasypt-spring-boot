@@ -3,20 +3,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>jasypt-spring-boot-parent</artifactId>
         <groupId>com.github.ulisesbocchio</groupId>
-        <version>3.0.6-SNAPSHOT</version>
+        <artifactId>jasypt-spring-boot-parent</artifactId>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>jasypt-maven-plugin</artifactId>
-    <name>Jasypt Maven Plugin</name>
     <packaging>maven-plugin</packaging>
+    <name>Jasypt Maven Plugin</name>
 
     <properties>
-        <maven.api.version>3.8.6</maven.api.version>
-        <maven.project.version>2.2.1</maven.project.version>
-        <maven-plugin-annotations.version>3.3</maven-plugin-annotations.version>
-        <maven-plugin-plugin.version>3.7.0</maven-plugin-plugin.version>
+        <maven-core.version>3.9.6</maven-core.version>
+        <maven-plugin-annotations.version>3.11.0</maven-plugin-annotations.version>
+        <maven-plugin-plugin.version>3.11.0</maven-plugin-plugin.version>
+        <maven.api.version>3.9.6</maven.api.version>
     </properties>
 
     <dependencies>
@@ -28,21 +28,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <scope>provided</scope>
-            <version>${maven.api.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>${maven.project.version}</version>
+            <artifactId>maven-core</artifactId>
+            <version>${maven-core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

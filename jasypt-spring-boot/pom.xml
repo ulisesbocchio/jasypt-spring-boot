@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.ulisesbocchio</groupId>
         <artifactId>jasypt-spring-boot-parent</artifactId>
-        <version>3.0.6-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>jasypt-spring-boot</artifactId>
@@ -20,6 +20,16 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -29,19 +39,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -61,18 +61,18 @@
                 <executions>
                     <execution>
                         <id>clean</id>
-                        <phase>pre-site</phase>
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                        <phase>pre-site</phase>
                     </execution>
                     <execution>
                         <id>cobertura</id>
-                        <phase>site</phase>
                         <goals>
                             <!--                            <goal>instrument</goal>-->
                             <goal>cobertura</goal>
                         </goals>
+                        <phase>site</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -85,7 +85,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.4.1</version>
                 <configuration>
                     <!--                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>-->
                 </configuration>
@@ -103,7 +102,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
                 <reportSets>
                     <reportSet>

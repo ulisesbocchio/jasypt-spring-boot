@@ -75,6 +75,8 @@ public class StringEncryptorBuilder {
         config.setSecretKeyAlgorithm(get(configProps::getGcmSecretKeyAlgorithm, propertyPrefix + ".gcm-secret-key-algorithm", "PBKDF2WithHmacSHA256"));
         config.setSecretKeyIterations(get(configProps::getKeyObtentionIterationsInt, propertyPrefix + ".key-obtention-iterations", 1000));
         config.setIvGeneratorClassName(get(configProps::getIvGeneratorClassname, propertyPrefix + ".iv-generator-classname", "org.jasypt.iv.RandomIvGenerator"));
+        config.setProviderName(get(configProps::getProviderName, propertyPrefix + ".provider-name", null));
+        config.setProviderClassName(get(configProps::getProviderClassName, propertyPrefix + ".provider-class-name", null));
         return new SimpleGCMStringEncryptor(config);
     }
 

@@ -781,8 +781,18 @@ public StringEncryptor stringEncryptor() {
 	return new SimpleGCMStringEncryptor(config);
 }
 ```
+
+### Supply custom provider
+Different provider can be configured as shown below.
+```properties
+jasypt.encryptor.provider-class-name=<FQCN>
+#OR
+jasypt.encryptor.provider-name=<Provider name>
+```
+
 ### Encrypting properties with AES GCM-256
-You can use the [Maven Plugin](#maven-plugin) or follow a similar strategy as explained in [Asymmetric Encryption](#asymmetric-encryption)'s [Encrypting Properties](#encrypting-properties) 
+You can use the [Maven Plugin](#maven-plugin) or follow a similar strategy as explained in [Asymmetric Encryption](#asymmetric-encryption)'s [Encrypting Properties](#encrypting-properties)
+
 ## Demo App
 The [jasypt-spring-boot-demo-samples](https://github.com/ulisesbocchio/jasypt-spring-boot-samples) repo contains working Spring Boot app examples.
 The main [jasypt-spring-boot-demo](https://github.com/ulisesbocchio/jasypt-spring-boot-samples/tree/master/jasypt-spring-boot-demo) Demo app explicitly sets a System property with the encryption password before the app runs.

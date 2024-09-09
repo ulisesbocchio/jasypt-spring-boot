@@ -17,9 +17,12 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
+import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * <p>SimpleGCMByteEncryptor class.</p>
@@ -40,6 +43,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
     private final Singleton<SecretKey> key;
     private final String algorithm;
     private final Singleton<IvGenerator> ivGenerator;
+    private final Supplier<Cipher> cipherSupplier;
 
     /** {@inheritDoc} */
     @SneakyThrows
@@ -47,7 +51,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
     public byte[] encrypt(byte[] message) {
         byte[] iv = this.ivGenerator.get().generateIv(GCM_IV_LENGTH);
 
-        Cipher cipher = Cipher.getInstance(this.algorithm);
+        Cipher cipher = cipherSupplier.get();
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
         cipher.init(Cipher.ENCRYPT_MODE, key.get(), gcmParameterSpec);
 
@@ -63,7 +67,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
     @SneakyThrows
     @Override
     public byte[] decrypt(byte[] encryptedMessage) {
-        Cipher cipher = Cipher.getInstance(this.algorithm);
+        Cipher cipher = cipherSupplier.get();
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, encryptedMessage, 0, GCM_IV_LENGTH);
         cipher.init(Cipher.DECRYPT_MODE, key.get(), gcmParameterSpec);
         return cipher.doFinal(encryptedMessage, GCM_IV_LENGTH, encryptedMessage.length - GCM_IV_LENGTH);
@@ -135,6 +139,21 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
     }
 
+    @SneakyThrows
+    private Cipher instantiateCipher(Provider provider) {
+        return Cipher.getInstance(this.algorithm, provider);
+    }
+
+    @SneakyThrows
+    private Cipher instantiateCipher(String providerName) {
+        return Cipher.getInstance(this.algorithm, providerName);
+    }
+
+    @SneakyThrows
+    private Cipher instantiateCipher() {
+        return Cipher.getInstance(this.algorithm);
+    }
+
     /**
      * <p>Constructor for SimpleGCMByteEncryptor.</p>
      *
@@ -144,5 +163,10 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
         this.key = Singleton.from(this::loadSecretKey, config);
         this.ivGenerator = Singleton.from(config::getActualIvGenerator);
         this.algorithm = config.getAlgorithm();
+        this.cipherSupplier = config.getActualProvider()
+                .<Supplier<Cipher>>map(p -> () -> this.instantiateCipher(p))
+                .orElseGet(() -> Optional.ofNullable(config.getProviderName()).filter(e -> !e.trim().isEmpty())
+                        .<Supplier<Cipher>>map(e -> () -> instantiateCipher(config.getProviderName())).orElseGet(() -> this::instantiateCipher)
+                );
     }
 }

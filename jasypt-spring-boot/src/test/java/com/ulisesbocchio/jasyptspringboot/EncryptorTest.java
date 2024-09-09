@@ -3,29 +3,32 @@ package com.ulisesbocchio.jasyptspringboot;
 import com.ulisesbocchio.jasyptspringboot.encryptor.*;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography;
 import lombok.SneakyThrows;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.jasypt.salt.RandomSaltGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EncryptorTest {
 
@@ -402,5 +405,58 @@ public class EncryptorTest {
         } finally {
             customThreadPool.shutdown();
         }
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"    ", "\t", "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"})
+    public void test_GcmKeyProviderClsEncryptor_encryption(String providerClassName) {
+        final String message = "This is the secret message... BOOHOOO!";
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKey(gcmKey);
+        config.setProviderClassName(providerClassName);
+        SimpleGCMStringEncryptor gcmKeyProviderClsEncryptor = new SimpleGCMStringEncryptor(config);
+
+        final String ciphertext = gcmKeyProviderClsEncryptor.encrypt(message);
+
+        final String decrypted = gcmKeyProviderClsEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", BouncyCastleFipsProvider.PROVIDER_NAME})
+    public void test_GcmKeyProviderNameEncryptor_encryption(String providerName) {
+        final String message = "This is the secret message... BOOHOOO!";
+        Security.addProvider(new BouncyCastleFipsProvider());
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKey(gcmKey);
+        config.setProviderName(providerName);
+        SimpleGCMStringEncryptor gcmKeyProviderNameEncryptor = new SimpleGCMStringEncryptor(config);
+
+        final String ciphertext = gcmKeyProviderNameEncryptor.encrypt(message);
+
+        final String decrypted = gcmKeyProviderNameEncryptor.decrypt(ciphertext);
+
+        assertEquals(message, decrypted);
+    }
+
+    @Test
+    public void test_GcmKeyProviderClsEncryptor_encryptionfails() {
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKey(gcmKey);
+        config.setProviderClassName("unkown.class.name");
+        assertThrows(ClassNotFoundException.class, () -> new SimpleGCMStringEncryptor(config));
+    }
+
+    @Test
+    public void test_GcmKeyProviderNameEncryptor_encryptionfails() {
+        final String message = "This is the secret message... BOOHOOO!";
+        SimpleGCMConfig config = new SimpleGCMConfig();
+        config.setSecretKey(gcmKey);
+        config.setProviderName("unknown provider name");
+        SimpleGCMStringEncryptor gcmKeyProviderNameEncryptor = new SimpleGCMStringEncryptor(config);
+        assertThrows(NoSuchProviderException.class, () -> gcmKeyProviderNameEncryptor.encrypt(message));
     }
 }

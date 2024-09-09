@@ -13,6 +13,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.Provider;
 import java.util.Optional;
 
 /**
@@ -37,6 +38,8 @@ public class SimpleGCMConfig {
     private SaltGenerator saltGenerator = null;
     private IvGenerator ivGenerator = null;
     private String ivGeneratorClassName = "org.jasypt.iv.RandomIvGenerator";
+    private String providerClassName;
+    private String providerName;
 
     private Resource loadResource(Resource asResource, String asString, String asLocation) {
         return Optional.ofNullable(asResource)
@@ -92,5 +95,14 @@ public class SimpleGCMConfig {
      */
     public IvGenerator getActualIvGenerator() {
         return Optional.ofNullable(ivGenerator).orElseGet(this::instantiateIvGenerator);
+    }
+
+    @SneakyThrows
+    private Provider instantiateProvider(String className) {
+        return (Provider) Class.forName(this.providerClassName).newInstance();
+    }
+
+    public Optional<Provider> getActualProvider() {
+        return Optional.ofNullable(this.providerClassName).filter(e -> !e.trim().isEmpty()).map(this::instantiateProvider);
     }
 }

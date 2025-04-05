@@ -10,6 +10,8 @@ import org.springframework.core.env.PropertySource;
 /**
  * <p>EncryptableEnumerablePropertySourceWrapper class.</p>
  *
+ * @param <T> encryptableDelegate.
+ *
  * @author Ulises Bocchio
  * @version $Id: $Id
  */

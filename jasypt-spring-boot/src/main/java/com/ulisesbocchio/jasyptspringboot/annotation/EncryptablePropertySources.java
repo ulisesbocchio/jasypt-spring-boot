@@ -24,5 +24,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Import(EncryptablePropertySourceConfiguration.class)
 public @interface EncryptablePropertySources {
+
+    /**
+     * EncryptablePropertySource.
+     *
+     * @return value.
+     */
     EncryptablePropertySource[] value();
 }

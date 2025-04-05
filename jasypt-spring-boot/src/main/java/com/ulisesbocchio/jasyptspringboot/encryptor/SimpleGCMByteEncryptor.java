@@ -122,7 +122,7 @@ public class SimpleGCMByteEncryptor implements ByteEncryptor {
     /**
      * <p>getAESKeyFromPassword.</p>
      *
-     * @param password an array of {@link char} objects
+     * @param password an array of char objects
      * @param saltGenerator a {@link org.jasypt.salt.SaltGenerator} object
      * @param iterations a int
      * @param algorithm a {@link java.lang.String} object

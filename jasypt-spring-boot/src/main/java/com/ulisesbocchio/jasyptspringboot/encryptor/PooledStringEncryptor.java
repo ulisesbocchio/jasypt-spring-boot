@@ -55,9 +55,17 @@ public class PooledStringEncryptor implements StringEncryptor {
         return robin(e -> e.decrypt(encryptedMessage));
     }
 
+    /**
+     * ThreadSafeStringEncryptor.
+     */
     public static class ThreadSafeStringEncryptor implements StringEncryptor {
         private final StringEncryptor delegate;
 
+        /**
+         * ThreadSafeStringEncryptor.
+         *
+         * @param delegate encryptor.
+         */
         public ThreadSafeStringEncryptor(StringEncryptor delegate) {
             this.delegate = delegate;
         }

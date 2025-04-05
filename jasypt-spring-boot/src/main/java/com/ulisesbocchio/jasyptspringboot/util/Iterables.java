@@ -52,6 +52,12 @@ public class Iterables {
         return new IterableDecorator<>(source, Function.identity(), filter);
     }
 
+    /**
+     * IterableDecorator.
+     *
+     * @param <U> u.
+     * @param <T> t.
+     */
     public static class IterableDecorator<U, T> implements Iterable<T> {
         private final Function<U, T> transform;
         private final Predicate<U> filter;
@@ -76,6 +82,13 @@ public class Iterables {
         private final Predicate<U> filter;
         private T next = null;
 
+        /**
+         * IteratorDecorator.
+         *
+         * @param source source
+         * @param transform transform
+         * @param filter filter
+         */
         public IteratorDecorator(Iterator<U> source, Function<U, T> transform, Predicate<U> filter) {
             this.source = source;
             this.transform = transform;
@@ -97,12 +110,10 @@ public class Iterables {
         }
 
         private void maybeFetchNext() {
-            if (next == null) {
-                if (source.hasNext()) {
-                    U val = source.next();
-                    if (filter.test(val)) {
-                        next = transform.apply(val);
-                    }
+            if (next == null && source.hasNext()) {
+                U val = source.next();
+                if (filter.test(val)) {
+                    next = transform.apply(val);
                 }
             }
         }

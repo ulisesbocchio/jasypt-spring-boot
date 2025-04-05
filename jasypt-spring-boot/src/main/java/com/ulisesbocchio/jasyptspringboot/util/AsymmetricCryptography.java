@@ -26,6 +26,8 @@ public class AsymmetricCryptography {
     private static final String PUBLIC_KEY_HEADER = "-----BEGIN PUBLIC KEY-----";
     private static final String PRIVATE_KEY_FOOTER = "-----END PRIVATE KEY-----";
     private static final String PUBLIC_KEY_FOOTER = "-----END PUBLIC KEY-----";
+    private static final String KEYFACTORY_RSA = "RSA";
+    private static final String CIPHER_RSA = "RSA";
     private final ResourceLoader resourceLoader;
 
     /**
@@ -77,7 +79,7 @@ public class AsymmetricCryptography {
             keyBytes = decodePem(keyBytes, PRIVATE_KEY_HEADER, PRIVATE_KEY_FOOTER);
         }
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        KeyFactory kf = KeyFactory.getInstance(KEYFACTORY_RSA);
         return kf.generatePrivate(spec);
     }
 
@@ -107,20 +109,20 @@ public class AsymmetricCryptography {
             keyBytes = decodePem(keyBytes, PUBLIC_KEY_HEADER, PUBLIC_KEY_FOOTER);
         }
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        KeyFactory kf = KeyFactory.getInstance(KEYFACTORY_RSA);
         return kf.generatePublic(spec);
     }
 
     /**
      * <p>encrypt.</p>
      *
-     * @param msg an array of {@link byte} objects
+     * @param msg an array of byte objects
      * @param key a {@link java.security.PublicKey} object
-     * @return an array of {@link byte} objects
+     * @return an array of byte objects
      */
     @SneakyThrows
     public byte[] encrypt(byte[] msg, PublicKey key) {
-        final Cipher cipher = Cipher.getInstance("RSA");
+        final Cipher cipher = Cipher.getInstance(CIPHER_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher.doFinal(msg);
     }
@@ -128,19 +130,28 @@ public class AsymmetricCryptography {
     /**
      * <p>decrypt.</p>
      *
-     * @param msg an array of {@link byte} objects
+     * @param msg an array of byte objects
      * @param key a {@link java.security.PrivateKey} object
-     * @return an array of {@link byte} objects
+     * @return an array of byte objects
      */
     @SneakyThrows
     public byte[] decrypt(byte[] msg, PrivateKey key) {
-        final Cipher cipher = Cipher.getInstance("RSA");
+        final Cipher cipher = Cipher.getInstance(CIPHER_RSA);
         cipher.init(Cipher.DECRYPT_MODE, key);
         return cipher.doFinal(msg);
     }
 
+    /**
+     * Key format.
+     */
     public enum KeyFormat {
+        /**
+         * DER format.
+         */
         DER,
+        /**
+         * PEM format.
+         */
         PEM;
     }
 }

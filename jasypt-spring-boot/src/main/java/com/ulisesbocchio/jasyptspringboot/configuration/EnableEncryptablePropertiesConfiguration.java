@@ -20,6 +20,7 @@ import org.springframework.core.env.PropertySource;
  * bean of type {@link org.jasypt.encryption.StringEncryptor} is present in the Application Context, thus allowing for custom definition if required.</p>
  * <p>The default {@link org.jasypt.encryption.StringEncryptor} can be configured through the following properties: </p>
  * <table border="1">
+ *     <caption>Table of Defaults</caption>
  *     <tr>
  *         <td>Key</td><td>Required</td><td>Default Value</td>
  *     </tr>

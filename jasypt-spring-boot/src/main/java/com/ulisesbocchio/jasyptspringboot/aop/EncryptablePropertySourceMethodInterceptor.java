@@ -10,6 +10,8 @@ import org.springframework.core.env.PropertySource;
 /**
  * <p>EncryptablePropertySourceMethodInterceptor class.</p>
  *
+ * @param <T> propertySource delegate.
+ *
  * @author Ulises Bocchio
  * @version $Id: $Id
  */

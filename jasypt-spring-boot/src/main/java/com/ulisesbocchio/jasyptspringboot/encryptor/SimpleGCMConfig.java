@@ -61,7 +61,7 @@ public class SimpleGCMConfig {
     /**
      * <p>getSecretKeyPasswordChars.</p>
      *
-     * @return an array of {@link char} objects
+     * @return an array of char objects
      */
     public char[] getSecretKeyPasswordChars() {
         return secretKeyPassword.toCharArray();

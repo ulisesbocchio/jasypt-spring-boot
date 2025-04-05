@@ -16,6 +16,8 @@ import org.springframework.util.Assert;
 /**
  * <p>CachingDelegateEncryptablePropertySource class.</p>
  *
+ * @param <T> propertySource delegate.
+ *
  * @author Sergio.U.Bocchio
  * @version $Id: $Id
  */

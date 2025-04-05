@@ -5,18 +5,18 @@
     <groupId>com.github.ulisesbocchio</groupId>
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.6-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <name>Jasypt Spring Boot Parent</name>
     <description>Jasypt Spring Boot Parent</description>
     <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <spring.boot.version>2.7.6</spring.boot.version>
-        <spring.cloud.version>2021.0.5</spring.cloud.version>
+        <java.version>11</java.version>
+        <spring.boot.version>3.4.4</spring.boot.version>
+        <spring.cloud.version>2024.0.1</spring.cloud.version>
         <jasypt.version>1.9.3</jasypt.version>
-        <maven.compiler.version>3.10.1</maven.compiler.version>
+        <maven.compiler.version>3.14.0</maven.compiler.version>
         <system.rules.version>1.19.0</system.rules.version>
     </properties>
 
@@ -81,12 +81,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>4.0.0-M4</version>
+                <version>4.0.0-M16</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.1.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -104,12 +104,19 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.38</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.5.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -123,7 +130,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.2.7</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- Prevent gpg from using pinentry programs -->
@@ -145,7 +152,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.2.1</version>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -158,7 +165,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
+                        <version>3.11.2</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -171,6 +178,26 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>12.1.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <failBuildOnCVSS>6</failBuildOnCVSS>
+                            <format>ALL</format>
+<!--                            <outputDirectory>${dependency.check.report.dir}</outputDirectory>-->
+                        </configuration>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>

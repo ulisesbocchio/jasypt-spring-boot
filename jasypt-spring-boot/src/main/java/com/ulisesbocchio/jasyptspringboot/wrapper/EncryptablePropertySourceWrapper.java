@@ -13,6 +13,8 @@ import org.springframework.core.env.PropertySource;
  * property is encrypted or not using the Jasypt convention of surrounding encrypted values with "ENC()".</p>
  * <p>When an encrypted property is detected, it is decrypted using the provided {@link org.jasypt.encryption.StringEncryptor}</p>
  *
+ * @param <T> encryptableDelegate.
+ *
  * @author Ulises Bocchio
  * @version $Id: $Id
  */

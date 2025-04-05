@@ -7,6 +7,8 @@ import org.springframework.core.env.PropertySource;
 /**
  * <p>EncryptablePropertySource interface.</p>
  *
+ * @param <T> delegate.
+ *
  * @author Ulises Bocchio
  * @version $Id: $Id
  */

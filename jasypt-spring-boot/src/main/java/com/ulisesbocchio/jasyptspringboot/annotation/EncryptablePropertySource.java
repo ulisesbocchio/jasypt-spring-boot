@@ -22,6 +22,8 @@ public @interface EncryptablePropertySource {
      * will be generated based on the description of the underlying
      * resource.
      *
+     * @return name.
+     *
      * @see org.springframework.core.env.PropertySource#getName()
      * @see org.springframework.core.io.Resource#getDescription()
      */
@@ -38,6 +40,8 @@ public @interface EncryptablePropertySource {
      * examples.
      * <p>Each location will be added to the enclosing {@code Environment} as its own
      * property source, and in the order declared.
+     *
+     * @return value.
      */
     String[] value();
 
@@ -46,6 +50,8 @@ public @interface EncryptablePropertySource {
      * ignored.
      * <p>{@code true} is appropriate if the properties file is completely optional.
      * Default is {@code false}.
+     *
+     * @return whether to ignore not found resource.
      */
     boolean ignoreResourceNotFound() default false;
 

@@ -73,6 +73,7 @@ class DefaultPropertyResolverTest {
         }
 
         @Override
+        @SuppressWarnings("removal")
         default void handleError(ClientHttpResponse response) throws IOException {
             // Do nothing by default
         }

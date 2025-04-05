@@ -10,6 +10,8 @@ import java.util.function.Supplier;
  * has been initialized or not, but after initialization the instance supplier is changed to avoid extra logic
  * execution.
  *
+ * @param <R> supplier.
+ *
  * @author Sergio.U.Bocchio
  * @version $Id: $Id
  */

@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 /**
  * <p>Annotation that enables Jasypt for properties decryption by annotating {@link org.springframework.context.annotation.Configuration} classes.
  * Only one occurrence of this annotation is needed.</p>
- * <p>
+ * <p>&nbsp;</p>
  * <p>This works well in conjunction with the {@link org.springframework.context.annotation.PropertySource} annotation.
  * For instance:</p>
  * <pre>
@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  * not only the ones defined with the {@link org.springframework.context.annotation.PropertySource} annotation, but also
  * all system properties, command line properties, and those auto-magically picked up from application.properties and application.yml
  * if they exist.</p>
- * <p>
+ * <p>&nbsp;</p>
  * <p>This Configuration class basically registers a {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
  * with {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper} and defines a default {@link org.jasypt.encryption.StringEncryptor} for decrypting properties
  * that can be configured through the same properties it wraps.</p>

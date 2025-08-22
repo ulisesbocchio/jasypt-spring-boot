@@ -12,8 +12,10 @@ import lombok.Builder;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.core.env.*;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +32,6 @@ import java.util.List;
 public class StandardEncryptableServletEnvironment extends StandardServletEnvironment implements ConfigurableEnvironment, EncryptableEnvironment {
 
     private MutablePropertySources encryptablePropertySources;
-    private MutablePropertySources originalPropertySources;
 
     /**
      * <p>Constructor for StandardEncryptableServletEnvironment.</p>
@@ -52,8 +53,19 @@ public class StandardEncryptableServletEnvironment extends StandardServletEnviro
      */
     @Builder
     public StandardEncryptableServletEnvironment(InterceptionMode interceptionMode, InterceptionMode propertySourcesInterceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
+        super();
         EnvironmentInitializer initializer = new EnvironmentInitializer(interceptionMode, propertySourcesInterceptionMode, skipPropertySourceClasses, resolver, filter, encryptor, detector);
         initializer.initialize(this);
+    }
+
+    @Override
+    public void merge(ConfigurableEnvironment parent) {
+        for (PropertySource<?> ps : parent.getPropertySources()) {
+            if (!this.getPropertySources().contains(ps.getName())) {
+                this.getPropertySources().addLast(ps);
+            }
+        }
+        super.merge(parent);
     }
 
     /** {@inheritDoc} */

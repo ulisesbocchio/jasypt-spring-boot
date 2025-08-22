@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
 import org.springframework.core.env.MutablePropertySources;
@@ -61,6 +62,12 @@ public class EncryptableMutablePropertySourcesWrapper extends MutablePropertySou
     }
 
     /** {@inheritDoc} */
+    public void addLastClean(PropertySource<?> propertySource) {
+        envCopy.addLast(propertySource);
+        super.addLast(propertySource);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void addBefore(String relativePropertySourceName, PropertySource<?> propertySource) {
         envCopy.addBefore(relativePropertySourceName, propertySource);
@@ -85,6 +92,14 @@ public class EncryptableMutablePropertySourcesWrapper extends MutablePropertySou
     @Override
     public PropertySource<?> remove(String name) {
         envCopy.remove(name);
-        return super.remove(name);
+        PropertySource<?> ps = super.remove(name);
+        // Return the original source unwrapping the Encryptable wrappers. Spring boot does some weird things
+        // with property sources by type on its initialization. In particular, BootstrapApplicationListener
+        // reorders property sources by removing sources by name and applies type checks which break when
+        // the returned property source type is not what Spring Boot expects.
+        while (ps instanceof EncryptablePropertySource) {
+            ps = ((EncryptablePropertySource<?>) ps).getDelegate();
+        }
+        return ps;
     }
 }

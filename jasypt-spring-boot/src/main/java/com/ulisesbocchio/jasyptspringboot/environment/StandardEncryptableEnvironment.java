@@ -61,6 +61,16 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         super.customizePropertySources(propertySources);
     }
 
+    @Override
+    public void merge(ConfigurableEnvironment parent) {
+        for (PropertySource<?> ps : parent.getPropertySources()) {
+            if (!this.getPropertySources().contains(ps.getName())) {
+                this.getPropertySources().addLast(ps);
+            }
+        }
+        super.merge(parent);
+    }
+
     /** {@inheritDoc} */
     @Override
     public MutablePropertySources getPropertySources() {

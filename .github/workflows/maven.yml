@@ -11,20 +11,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '17', '21' ]
-    name: Java ${{ matrix.java }} build
+        java: [ '17', '18', '19', '21' ]
+        distribution: [ 'zulu', 'temurin' ]
+    name: Java ${{ matrix.java }} ${{ matrix.distribution }} build
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Java ${{ matrix.java }}
+    - name: Set up Java ${{ matrix.java }} ${{ matrix.distribution }}
       uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
+        distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Install artifact locally
       run: mvn -B install -DskipTests --file pom.xml
-    - name: Checkout sample projects
+    - name: Extract branch name
+      id: extract_branch
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+    - name: Checkout jasypt-spring-boot-samples on branch ${{ steps.extract_branch.outputs.branch }}
+      uses: actions/checkout@v4
+      with:
+        repository: ulisesbocchio/jasypt-spring-boot-samples
+        path: jasypt-spring-boot-samples
+        ref: ${{ steps.extract_branch.outputs.branch }}
+        token: ${{ secrets.CHECKOUT_PAT }}
+      continue-on-error: true
+    - name: Checkout jasypt-spring-boot-samples on main branch (fallback)
+      if: failure()
       uses: actions/checkout@v4
       with:
         repository: ulisesbocchio/jasypt-spring-boot-samples

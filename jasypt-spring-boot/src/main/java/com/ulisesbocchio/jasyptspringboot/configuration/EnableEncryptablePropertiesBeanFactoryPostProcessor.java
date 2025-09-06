@@ -1,30 +1,26 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
-import org.springframework.boot.logging.LogFile;
-import org.springframework.boot.logging.LoggingInitializationContext;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.LoggingSystemProperty;
-import org.springframework.boot.system.ApplicationPid;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * <p>{@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
@@ -48,7 +44,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
      * <p>Constructor for EnableEncryptablePropertiesBeanFactoryPostProcessor.</p>
      *
      * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
-     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param converter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
      */
     public EnableEncryptablePropertiesBeanFactoryPostProcessor(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter) {
         this.environment = environment;
@@ -65,10 +61,12 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
                 .map(LoggingApplicationListener.class::cast)
                 .findFirst()
                 .orElse(null);
-        
+
         SpringApplication springApplication = BootstrapSpringApplicationListener.getSpringApplication();
         if (loggingListener != null && springApplication != null) {
+            LoggingSystem loggingSystem = LoggingSystem.get(springApplication.getClassLoader());
             // Reset logging system
+            loggingSystem.cleanUp();
             for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
                 System.clearProperty(property.getEnvironmentVariableName());
             }
@@ -77,7 +75,9 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         log.info("Post-processing PropertySource instances");
@@ -86,7 +86,9 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
         this.reinitializeLoggingSystem();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 100;

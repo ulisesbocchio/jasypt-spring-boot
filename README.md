@@ -386,7 +386,7 @@ properties.
 
 ## Filter out `PropertySource` classes from being introspected
 Define a comma-separated list of fully-qualified class names to be skipped from introspection. This classes will not be
-wrapped/proxied by this plugin and thereby properties contained in them won't supported encryption/decryption:
+wrapped/proxied by this plugin and thereby properties contained in them won't be supported encryption/decryption:
 
 ```properties
 jasypt.encryptor.skip-property-sources=org.springframework.boot.env.RandomValuePropertySource,org.springframework.boot.ansi.AnsiPropertySource

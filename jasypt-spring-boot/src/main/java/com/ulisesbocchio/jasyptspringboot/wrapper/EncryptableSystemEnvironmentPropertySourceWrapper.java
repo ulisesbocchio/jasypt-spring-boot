@@ -8,6 +8,7 @@ import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.SystemEnvironmentOrigin;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
+import org.springframework.lang.NonNull;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import java.util.Map;
  * <p>EncryptableSystemEnvironmentPropertySourceWrapper class.</p>
  *
  * @author Tomas Tulka (@ttulka)
+ * @author Uli
  * @version $Id: $Id
  */
 public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnvironmentPropertySource implements EncryptablePropertySource<Map<String, Object>> {
@@ -24,28 +26,34 @@ public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnv
     /**
      * <p>Constructor for EncryptableSystemEnvironmentPropertySourceWrapper.</p>
      *
-     * @param delegate a {@link org.springframework.core.env.SystemEnvironmentPropertySource} object
-     * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param delegate a {@link SystemEnvironmentPropertySource} object
+     * @param resolver a {@link EncryptablePropertyResolver} object
+     * @param filter   a {@link EncryptablePropertyFilter} object
      */
     public EncryptableSystemEnvironmentPropertySourceWrapper(SystemEnvironmentPropertySource delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
         encryptableDelegate = new CachingDelegateEncryptablePropertySource<>(delegate, resolver, filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty(@NonNull String name) {
         return encryptableDelegate.getProperty(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PropertySource<Map<String, Object>> getDelegate() {
         return encryptableDelegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Origin getOrigin(String key) {
         Origin fromSuper = EncryptablePropertySource.super.getOrigin(key);
@@ -57,5 +65,20 @@ public class EncryptableSystemEnvironmentPropertySourceWrapper extends SystemEnv
             return new SystemEnvironmentOrigin(property);
         }
         return null;
+    }
+
+    /**
+     * <p>Set whether getSource() should wrap the source Map in an EncryptableMapWrapper.</p>
+     *
+     * @param wrapGetSource true to wrap the source Map
+     */
+    public void setWrapGetSource(boolean wrapGetSource) {
+        encryptableDelegate.setWrapGetSource(wrapGetSource);
+    }
+
+    @Override
+    @NonNull
+    public Map<String, Object> getSource() {
+        return encryptableDelegate.getSource();
     }
 }

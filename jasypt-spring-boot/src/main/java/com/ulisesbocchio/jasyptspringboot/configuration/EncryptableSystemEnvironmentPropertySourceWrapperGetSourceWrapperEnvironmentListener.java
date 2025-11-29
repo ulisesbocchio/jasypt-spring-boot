@@ -16,13 +16,19 @@ import org.springframework.core.env.StandardEnvironment;
  * {@link org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor} to enable the wrapping of `getSource`
  * to a {@link EncryptableMapWrapper}. This can't be done before because Spring, of course.
  * Spring for some unknown reason converts immediately after environment initialization the system environment property source to a
- * {@link org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor.OriginAwareSystemEnvironmentPropertySource}
+ * OriginAwareSystemEnvironmentPropertySource (a private inner class).
  * @see org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor
  */
 @Slf4j
 public class EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEnvironmentListener implements EnvironmentPostProcessor, Ordered {
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+
+    /**
+     * Static method to enable getSource wrapping on EncryptableSystemEnvironmentPropertySourceWrapper.
+     * Can be called from both EnvironmentPostProcessor and BeanFactoryPostProcessor contexts.
+     *
+     * @param environment the ConfigurableEnvironment to process
+     */
+    public static void enableGetSourceWrapping(ConfigurableEnvironment environment) {
         String sourceName = StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;
         PropertySource<?> propertySource = environment.getPropertySources().get(sourceName);
         log.info("Attempting to bootstrap EncryptableSystemEnvironmentPropertySourceWrapper");
@@ -30,6 +36,11 @@ public class EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEn
             log.info("EncryptableSystemEnvironmentPropertySourceWrapper found! Bootstrapping...");
             ((EncryptableSystemEnvironmentPropertySourceWrapper)propertySource).setWrapGetSource(true);
         }
+    }
+
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        enableGetSourceWrapping(environment);
     }
 
     @Override

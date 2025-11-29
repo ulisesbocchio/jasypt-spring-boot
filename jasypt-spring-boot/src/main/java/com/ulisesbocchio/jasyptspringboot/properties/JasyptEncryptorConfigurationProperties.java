@@ -45,10 +45,7 @@ public class JasyptEncryptorConfigurationProperties {
      */
     public static JasyptEncryptorConfigurationProperties bindConfigProps(ConfigurableEnvironment environment) {
         final BindHandler handler = new IgnoreErrorsBindHandler(BindHandler.DEFAULT);
-        final MutablePropertySources propertySources = environment.getPropertySources();
-        final Binder binder = new Binder(ConfigurationPropertySources.from(propertySources),
-                new PropertySourcesPlaceholdersResolver(propertySources),
-                ApplicationConversionService.getSharedInstance());
+        final Binder binder = Binder.get(environment);
         final JasyptEncryptorConfigurationProperties config = new JasyptEncryptorConfigurationProperties();
 
         final ResolvableType type = ResolvableType.forClass(JasyptEncryptorConfigurationProperties.class);

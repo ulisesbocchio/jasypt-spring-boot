@@ -15,6 +15,11 @@ import org.springframework.core.env.PropertySource;
 import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitializer.JASYPT_INITIALIZER_INSTANCE;
 import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitializer.JASYPT_INITIALIZER_SOURCE_NAME;
 
+/**
+ * We inject a special property source within EnvironmentInitializer in the custom environment.
+ * This allows BootstrapSpringApplicationListener to detect the custom environment on a bootstrap (cloud) environment
+ * and initialize it also, so all bootstrap property sources can be encryptable.
+ */
 @Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
 public class BootstrapSpringApplicationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {

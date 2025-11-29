@@ -71,6 +71,12 @@ public class EnvironmentInitializer {
         EncryptablePropertySourceConverter converter = createConverter(environment, envCopy);
         converter.convertPropertySources(environment.getOriginalPropertySources());
         MutablePropertySources encryptableSources = converter.convertMutablePropertySources(propertySourceInterceptionMode, environment.getOriginalPropertySources(), envCopy);
+        // We inject a special property source with this initializer in the custom environment.
+        // This allows BootstrapSpringApplicationListener to detect the custom environment on a bootstrap (cloud) environment
+        // and initialize it also, so all bootstrap property sources can be encryptable.
+        // Also, EncryptableLoggingEnvironmentListener uses this hook to detect the custom environment and
+        // re-initializes the logging environment which would have been populated with encrypted values
+        // that should have been decrypted.
         MapPropertySource initializerSource = new MapPropertySource(JASYPT_INITIALIZER_SOURCE_NAME,
                 Map.of(JASYPT_INITIALIZER_INSTANCE, this));
         if (encryptableSources instanceof EncryptableMutablePropertySourcesWrapper) {

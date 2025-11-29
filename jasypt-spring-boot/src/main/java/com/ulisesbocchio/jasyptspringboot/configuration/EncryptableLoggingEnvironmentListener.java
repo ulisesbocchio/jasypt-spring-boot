@@ -15,6 +15,10 @@ import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitiali
 
 /**
  * Needs to run after {@link org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor} and {@link org.springframework.cloud.bootstrap.BootstrapConfigFileApplicationListener}
+ * This listener detects the custom environment created by {@link EnvironmentInitializer} and re-initializes the logging environment property sources
+ * which would have been populated without the encryptable wrapper.
+ * The {@link EnableEncryptablePropertiesBeanFactoryPostProcessor} then effectively re-initializes the logging {@link org.springframework.boot.logging.LoggingSystem}
+ * @see EnvironmentInitializer
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 13)
 @Slf4j

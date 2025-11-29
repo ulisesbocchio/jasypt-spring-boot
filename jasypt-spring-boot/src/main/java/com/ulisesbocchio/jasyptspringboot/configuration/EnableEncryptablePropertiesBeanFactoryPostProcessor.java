@@ -21,6 +21,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.StandardEnvironment;
 
 /**
  * <p>{@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
@@ -76,6 +77,17 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
     }
 
     /**
+     * Make sure the system environment wrapper is initialized with setWrapGetSource=true
+     * For custom environments this is done early on in {@link EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEnvironmentListener}
+     * We'll force the call to that logic here via the static method.
+     */
+    private void enableSystemEnvironmentSourceEncryptableMapWrapper() {
+        log.info("Re-initializing EncryptableSystemEnvironmentPropertySourceWrapper map delegation");
+        EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEnvironmentListener.enableGetSourceWrapping(environment);
+        log.info("EncryptableSystemEnvironmentPropertySourceWrapper map delegation re-initialized");
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -83,6 +95,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
         log.info("Post-processing PropertySource instances");
         MutablePropertySources propSources = environment.getPropertySources();
         converter.convertPropertySources(propSources);
+        this.enableSystemEnvironmentSourceEncryptableMapWrapper();
         this.reinitializeLoggingSystem();
     }
 

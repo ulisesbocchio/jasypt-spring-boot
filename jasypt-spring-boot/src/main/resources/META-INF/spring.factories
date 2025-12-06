@@ -1,0 +1,5 @@
+org.springframework.context.ApplicationListener=\
+com.ulisesbocchio.jasyptspringboot.configuration.BootstrapSpringApplicationListener
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.ulisesbocchio.jasyptspringboot.configuration.EncryptableLoggingEnvironmentListener,\
+com.ulisesbocchio.jasyptspringboot.configuration.EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEnvironmentListener

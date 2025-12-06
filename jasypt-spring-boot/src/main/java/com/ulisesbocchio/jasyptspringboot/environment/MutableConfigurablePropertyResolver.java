@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * <p>MutableConfigurablePropertyResolver class.</p>
  *
- * @author boccs002
+ * @author Uli
  * @version $Id: $Id
  */
 public class MutableConfigurablePropertyResolver implements ConfigurablePropertyResolver {

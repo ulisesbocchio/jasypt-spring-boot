@@ -29,6 +29,7 @@ jobs:
       id: extract_branch
       run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
     - name: Checkout jasypt-spring-boot-samples on branch ${{ steps.extract_branch.outputs.branch }}
+      id: checkout_samples_branch
       uses: actions/checkout@v4
       with:
         repository: ulisesbocchio/jasypt-spring-boot-samples
@@ -37,7 +38,7 @@ jobs:
         token: ${{ secrets.CHECKOUT_PAT }}
       continue-on-error: true
     - name: Checkout jasypt-spring-boot-samples on main branch (fallback)
-      if: failure()
+      if: steps.checkout_samples_branch.outcome == 'failure'
       uses: actions/checkout@v4
       with:
         repository: ulisesbocchio/jasypt-spring-boot-samples

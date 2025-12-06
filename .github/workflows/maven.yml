@@ -47,3 +47,32 @@ jobs:
         token: ${{ secrets.CHECKOUT_PAT }}
     - name: Test sample projects
       run: mvn -B test --file jasypt-spring-boot-samples/pom.xml -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+  # Optional: Trigger release workflow after successful CI on master
+  release-ready:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    steps:
+      - name: Release is ready
+        run: |
+          echo "✅ CI passed on master!"
+          echo "🚀 Ready to release: https://github.com/${{ github.repository }}/actions/workflows/release.yml"
+          echo ""
+          echo "To trigger release, visit the link above and click 'Run workflow'"
+      
+      # Create a deployment status to show release button in GitHub UI
+      - name: Create deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'maven-central',
+              description: 'Ready to release to Maven Central',
+              auto_merge: false,
+              required_contexts: [],
+              task: 'release'
+            });

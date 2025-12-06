@@ -19,6 +19,7 @@
     </properties>
 
     <dependencies>
+        <!-- Exclude logback and log4j in favor of slf4j-simple to keep plugin lightweight -->
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>

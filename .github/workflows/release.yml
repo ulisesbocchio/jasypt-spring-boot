@@ -23,7 +23,7 @@ jobs:
       - name: Set up Java and Maven settings
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
           server-id: ossrh

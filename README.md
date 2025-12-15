@@ -1,5 +1,7 @@
 # jasypt-spring-boot
-**[Jasypt](http://www.jasypt.org)** integration for Spring boot 2.x and 3.0.0
+**[Jasypt](http://www.jasypt.org)** integration for Spring Boot 3.5+
+
+**Requirements:** Java 17+ and Spring Boot 3.5+
 
 [![Build Status](https://app.travis-ci.com/ulisesbocchio/jasypt-spring-boot.svg?branch=master)](https://app.travis-ci.com/ulisesbocchio/jasypt-spring-boot)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ulisesbocchio/jasypt-spring-boot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -22,7 +24,7 @@ There are 3 ways to integrate `jasypt-spring-boot` in your project:
 
 - Simply adding the starter jar `jasypt-spring-boot-starter` to your classpath if using `@SpringBootApplication` or `@EnableAutoConfiguration` will enable encryptable properties across the entire Spring Environment
 - Adding `jasypt-spring-boot` to your classpath and adding `@EnableEncryptableProperties` to your main Configuration class to enable encryptable properties across the entire Spring Environment
-- Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncrytablePropertySource`
+- Adding `jasypt-spring-boot` to your classpath and declaring individual encryptable property sources with `@EncryptablePropertySource`
 ## What's new?
 ### Go to [Releases](https://github.com/ulisesbocchio/jasypt-spring-boot/releases)
 ## What to do First?
@@ -34,7 +36,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.5</version>
+            <version>4.0.3</version>
     </dependency>
 	```
 2. IF you don't use `@SpringBootApplication` or `@EnableAutoConfiguration` Auto Configuration annotations then add this dependency to your project:
@@ -43,7 +45,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.5</version>
+            <version>4.0.3</version>
     </dependency>
 	```
 
@@ -64,7 +66,7 @@ Use one of the following 3 methods (briefly explained above):
     <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot</artifactId>
-            <version>3.0.5</version>
+            <version>4.0.3</version>
     </dependency>
 	```
 	And then add as many `@EncryptablePropertySource` annotations as you want in your Configuration files. Just like you do with Spring's `@PropertySource` annotation. For instance:
@@ -420,7 +422,7 @@ To use the plugin, just add the following to your pom.xml:
     <plugin>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-maven-plugin</artifactId>
-      <version>3.0.5</version>
+      <version>4.0.3</version>
     </plugin>
   </plugins>
 </build>
@@ -731,7 +733,7 @@ public class PropertyEncryptor {
 }
 ```
 ## AES 256-GCM Encryption
-As of version 3.0.5, AES 256-GCM Encryption is supported. To use this type of encryption, set the property `jasypt.encryptor.gcm-secret-key-string`, `jasypt.encryptor.gcm-secret-key-location` or `jasypt.encryptor.gcm-secret-key-password`. </br>
+As of version 3.0.5, AES 256-GCM Encryption is supported. To use this type of encryption, set the property `jasypt.encryptor.gcm-secret-key-string`, `jasypt.encryptor.gcm-secret-key-location`, or `jasypt.encryptor.gcm-secret-key-password`.<br/>
 The underlying algorithm used is `AES/GCM/NoPadding` so make sure that's installed in your JDK.<br/>
 The `SimpleGCMByteEncryptor` uses a `IVGenerator` to encrypt properties. You can configure that with property `jasypt.encryptor.iv-generator-classname` if you don't want to
 use the default implementation `RandomIvGenerator`

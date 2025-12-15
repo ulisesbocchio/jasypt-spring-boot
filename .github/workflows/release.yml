@@ -38,3 +38,24 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNANE }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+      - name: Extract version and find previous tag
+        id: version
+        run: |
+          # Get current version from released tag
+          CURRENT_TAG=$(git describe --tags --abbrev=0)
+          VERSION=${CURRENT_TAG#jasypt-spring-boot-parent-}
+          
+          # Find previous tag
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep "^jasypt-spring-boot-parent-" | grep -v "${CURRENT_TAG}" | head -1)
+          
+          echo "current_tag=${CURRENT_TAG}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "previous_tag=${PREVIOUS_TAG:-}" >> $GITHUB_OUTPUT
+      - name: Create GitHub Release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.current_tag }}" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --generate-notes

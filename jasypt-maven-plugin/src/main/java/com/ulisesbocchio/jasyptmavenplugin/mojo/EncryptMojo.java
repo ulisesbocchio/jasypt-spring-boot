@@ -19,7 +19,9 @@ import java.nio.file.Path;
 public class EncryptMojo extends AbstractFileJasyptMojo {
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptMojo.class);
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void run(final EncryptionService service, final Path path, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

@@ -3,21 +3,16 @@ package com.ulisesbocchio.jasyptspringboot;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptableMutablePropertySourcesInterceptor;
 import com.ulisesbocchio.jasyptspringboot.aop.EncryptablePropertySourceMethodInterceptor;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
-import com.ulisesbocchio.jasyptspringboot.util.ClassUtils;
 import com.ulisesbocchio.jasyptspringboot.wrapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.*;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
@@ -30,7 +25,6 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class EncryptablePropertySourceConverter {
 
-    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     private static final List<String> DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES = Arrays.asList(
             "org.springframework.core.env.PropertySource$StubPropertySource",
             "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
@@ -43,10 +37,10 @@ public class EncryptablePropertySourceConverter {
     /**
      * <p>Constructor for EncryptablePropertySourceConverter.</p>
      *
-     * @param interceptionMode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param interceptionMode          a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
      * @param skipPropertySourceClasses a {@link java.util.List} object
-     * @param propertyResolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param propertyFilter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param propertyResolver          a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
+     * @param propertyFilter            a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
      */
     public EncryptablePropertySourceConverter(InterceptionMode interceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver propertyResolver, EncryptablePropertyFilter propertyFilter) {
         this.interceptionMode = interceptionMode;
@@ -78,6 +72,27 @@ public class EncryptablePropertySourceConverter {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static boolean needsProxyAnyway(PropertySource<?> ps) {
+        return needsProxyAnyway((Class<? extends PropertySource<?>>) ps.getClass());
+    }
+
+    private static boolean needsProxyAnyway(Class<? extends PropertySource<?>> psClass) {
+        return needsProxyAnyway(psClass.getName());
+    }
+
+    /**
+     * Some Spring Boot code actually casts property sources to this specific type so must be proxied.
+     */
+    @SuppressWarnings({"ConstantConditions", "SimplifyStreamApiCallChains"})
+    private static boolean needsProxyAnyway(String className) {
+        // Turned off for now
+        return Stream.of(
+//                "org.springframework.boot.context.config.ConfigFileApplicationListener$ConfigurationPropertySources",
+//                "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
+        ).anyMatch(className::equals);
+    }
+
     /**
      * <p>convertPropertySources.</p>
      *
@@ -87,7 +102,7 @@ public class EncryptablePropertySourceConverter {
         propSources.stream()
                 .filter(ps -> !(ps instanceof EncryptablePropertySource))
                 .map(this::makeEncryptable)
-                .collect(toList())
+                .toList()
                 .forEach(ps -> propSources.replace(ps.getName(), ps));
     }
 
@@ -95,10 +110,9 @@ public class EncryptablePropertySourceConverter {
      * <p>makeEncryptable.</p>
      *
      * @param propertySource a {@link org.springframework.core.env.PropertySource} object
-     * @param <T> a T class
+     * @param <T>            a T class
      * @return a {@link org.springframework.core.env.PropertySource} object
      */
-    @SuppressWarnings("unchecked")
     public <T> PropertySource<T> makeEncryptable(PropertySource<T> propertySource) {
         if (propertySource instanceof EncryptablePropertySource || skipPropertySourceClasses.stream().anyMatch(skipClass -> skipClass.equals(propertySource.getClass()))) {
             if (!(propertySource instanceof EncryptablePropertySource)) {
@@ -116,7 +130,7 @@ public class EncryptablePropertySourceConverter {
      * <p>proxyMutablePropertySources.</p>
      *
      * @param propertySources a {@link org.springframework.core.env.MutablePropertySources} object
-     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param envCopy         a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
      * @return a {@link org.springframework.core.env.MutablePropertySources} object
      */
     public MutablePropertySources proxyMutablePropertySources(MutablePropertySources propertySources, EnvCopy envCopy) {
@@ -132,15 +146,15 @@ public class EncryptablePropertySourceConverter {
     /**
      * <p>convertMutablePropertySources.</p>
      *
-     * @param mode a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
+     * @param mode                    a {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode} object
      * @param originalPropertySources a {@link org.springframework.core.env.MutablePropertySources} object
-     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param envCopy                 a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
      * @return a {@link org.springframework.core.env.MutablePropertySources} object
      */
     public MutablePropertySources convertMutablePropertySources(InterceptionMode mode, MutablePropertySources originalPropertySources, EnvCopy envCopy) {
         return InterceptionMode.PROXY == mode ?
-            proxyMutablePropertySources(originalPropertySources, envCopy) :
-            new EncryptableMutablePropertySourcesWrapper(originalPropertySources, this, envCopy);
+                proxyMutablePropertySources(originalPropertySources, envCopy) :
+                new EncryptableMutablePropertySourcesWrapper(originalPropertySources, this, envCopy);
     }
 
     private <T> PropertySource<T> convertPropertySource(PropertySource<T> propertySource) {
@@ -181,26 +195,5 @@ public class EncryptablePropertySourceConverter {
             encryptablePropertySource = new EncryptablePropertySourceWrapper<>(propertySource, propertyResolver, propertyFilter);
         }
         return encryptablePropertySource;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static boolean needsProxyAnyway(PropertySource<?> ps) {
-        return needsProxyAnyway((Class<? extends PropertySource<?>>) ps.getClass());
-    }
-
-    private static boolean needsProxyAnyway(Class<? extends PropertySource<?>> psClass) {
-        return needsProxyAnyway(psClass.getName());
-    }
-
-    /**
-     * Some Spring Boot code actually casts property sources to this specific type so must be proxied.
-     */
-    @SuppressWarnings({"ConstantConditions", "SimplifyStreamApiCallChains"})
-    private static boolean needsProxyAnyway(String className) {
-        // Turned off for now
-        return Stream.of(
-//                "org.springframework.boot.context.config.ConfigFileApplicationListener$ConfigurationPropertySources",
-//                "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
-        ).anyMatch(className::equals);
     }
 }

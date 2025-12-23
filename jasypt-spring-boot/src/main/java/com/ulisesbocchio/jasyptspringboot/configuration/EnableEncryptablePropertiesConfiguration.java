@@ -2,15 +2,11 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.config.StringPBEConfig;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertySource;
 
 /**
  * <p>Configuration class that registers a {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
@@ -51,8 +47,8 @@ import org.springframework.core.env.PropertySource;
  * <p>For mor information about the configuration properties</p>
  *
  * @author Ulises Bocchio
- * @see StringPBEConfig
  * @version $Id: $Id
+ * @see StringPBEConfig
  */
 @Configuration
 @Import({EncryptablePropertyResolverConfiguration.class, CachingConfiguration.class})
@@ -63,7 +59,7 @@ public class EnableEncryptablePropertiesConfiguration {
      * <p>enableEncryptablePropertySourcesPostProcessor.</p>
      *
      * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
-     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param converter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
      * @return a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor} object
      */
     @Bean

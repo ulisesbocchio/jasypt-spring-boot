@@ -28,7 +28,7 @@ public class StringEncryptorBuilder {
     /**
      * <p>Constructor for StringEncryptorBuilder.</p>
      *
-     * @param configProps a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
+     * @param configProps    a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
      * @param propertyPrefix a {@link java.lang.String} object
      */
     public StringEncryptorBuilder(JasyptEncryptorConfigurationProperties configProps, String propertyPrefix) {
@@ -54,7 +54,7 @@ public class StringEncryptorBuilder {
     }
 
     private boolean isGCMConfig() {
-        return configProps.getGcmSecretKeyString() != null || configProps.getGcmSecretKeyLocation() !=null || configProps.getGcmSecretKeyPassword() != null;
+        return configProps.getGcmSecretKeyString() != null || configProps.getGcmSecretKeyLocation() != null || configProps.getGcmSecretKeyPassword() != null;
     }
 
     private boolean isPBEConfig() {

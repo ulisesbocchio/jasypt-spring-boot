@@ -26,14 +26,18 @@ public class ByteEncryptorStringEncryptorDelegate implements StringEncryptor {
         this.delegate = delegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public String encrypt(String message) {
         return Base64.getEncoder().encodeToString(delegate.encrypt(message.getBytes(StandardCharsets.UTF_8)));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public String decrypt(String encryptedMessage) {

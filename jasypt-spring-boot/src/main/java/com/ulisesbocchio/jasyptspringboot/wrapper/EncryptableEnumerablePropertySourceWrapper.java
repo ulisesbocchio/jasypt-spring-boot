@@ -1,9 +1,10 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
-import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
+import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 
@@ -21,26 +22,32 @@ public class EncryptableEnumerablePropertySourceWrapper<T> extends EnumerablePro
      *
      * @param delegate a {@link org.springframework.core.env.EnumerablePropertySource} object
      * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param filter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
      */
     public EncryptableEnumerablePropertySourceWrapper(EnumerablePropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
         encryptableDelegate = new CachingDelegateEncryptablePropertySource<>(delegate, resolver, filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty(@NonNull String name) {
         return encryptableDelegate.getProperty(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PropertySource<T> getDelegate() {
         return encryptableDelegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("rawtypes")
     @Override
     public String[] getPropertyNames() {

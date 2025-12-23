@@ -24,7 +24,9 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
     private int iterations;
     private String algorithm = null;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public byte[] encrypt(byte[] message) {
@@ -52,7 +54,9 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
                 .array();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public byte[] decrypt(byte[] encryptedMessage) {
@@ -84,7 +88,9 @@ public class SimplePBEByteEncryptor implements PBEByteEncryptor {
         return cipherDecrypt.doFinal(message);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPassword(String password) {
         this.password = password;

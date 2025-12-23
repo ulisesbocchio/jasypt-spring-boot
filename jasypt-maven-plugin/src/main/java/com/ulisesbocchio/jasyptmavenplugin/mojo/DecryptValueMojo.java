@@ -16,7 +16,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Slf4j
 public class DecryptValueMojo extends AbstractValueJasyptMojo {
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void run(final EncryptionService service, final String value, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

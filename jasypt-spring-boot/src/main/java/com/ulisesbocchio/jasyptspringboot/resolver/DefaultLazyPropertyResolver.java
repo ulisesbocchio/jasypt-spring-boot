@@ -21,17 +21,17 @@ import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 @Slf4j
 public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver {
 
-    private Singleton<EncryptablePropertyResolver> singleton;
+    private final Singleton<EncryptablePropertyResolver> singleton;
 
     /**
      * <p>Constructor for DefaultLazyPropertyResolver.</p>
      *
-     * @param propertyDetector a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
-     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param propertyDetector       a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
+     * @param encryptor              a {@link org.jasypt.encryption.StringEncryptor} object
      * @param customResolverBeanName a {@link java.lang.String} object
-     * @param isCustom a boolean
-     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
-     * @param environment a {@link org.springframework.core.env.Environment} object
+     * @param isCustom               a boolean
+     * @param bf                     a {@link org.springframework.beans.factory.BeanFactory} object
+     * @param environment            a {@link org.springframework.core.env.Environment} object
      */
     public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, String customResolverBeanName, boolean isCustom, BeanFactory bf, Environment environment) {
         singleton = new Singleton<>(() ->
@@ -52,8 +52,8 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
      * <p>Constructor for DefaultLazyPropertyResolver.</p>
      *
      * @param propertyDetector a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector} object
-     * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
-     * @param environment a {@link org.springframework.core.env.Environment} object
+     * @param encryptor        a {@link org.jasypt.encryption.StringEncryptor} object
+     * @param environment      a {@link org.springframework.core.env.Environment} object
      */
     public DefaultLazyPropertyResolver(EncryptablePropertyDetector propertyDetector, StringEncryptor encryptor, Environment environment) {
         singleton = new Singleton<>(() -> createDefault(propertyDetector, encryptor, environment));
@@ -63,7 +63,9 @@ public class DefaultLazyPropertyResolver implements EncryptablePropertyResolver 
         return new DefaultPropertyResolver(encryptor, propertyDetector, environment);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String resolvePropertyValue(String value) {
         return singleton.get().resolvePropertyValue(value);

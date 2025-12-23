@@ -35,8 +35,8 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
     /**
      * <p>Constructor for DefaultPropertyFilter.</p>
      *
-     * @param includeSourceNames a {@link java.util.List} object
-     * @param excludeSourceNames a {@link java.util.List} object
+     * @param includeSourceNames   a {@link java.util.List} object
+     * @param excludeSourceNames   a {@link java.util.List} object
      * @param includePropertyNames a {@link java.util.List} object
      * @param excludePropertyNames a {@link java.util.List} object
      */
@@ -47,7 +47,9 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
         this.excludePropertyNames = excludePropertyNames;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean shouldInclude(PropertySource<?> source, String name) {
         if (isIncludeAll()) {

@@ -2,12 +2,12 @@ package com.ulisesbocchio.jasyptspringboot.wrapper;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.util.Iterables;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyNameException;
 import org.springframework.boot.origin.Origin;
-import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.PropertySource;
 
 /**
@@ -31,26 +31,34 @@ public class EncryptableConfigurationPropertySourcesPropertySource extends Prope
         this.delegate = delegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PropertySource<Iterable<ConfigurationPropertySource>> getDelegate() {
         return delegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void refresh() {
 
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty(@NonNull String name) {
         ConfigurationProperty configurationProperty = findConfigurationProperty(name);
         return (configurationProperty != null) ? configurationProperty.getValue() : null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Origin getOrigin(String name) {
         return Origin.from(findConfigurationProperty(name));
@@ -59,10 +67,9 @@ public class EncryptableConfigurationPropertySourcesPropertySource extends Prope
     private ConfigurationProperty findConfigurationProperty(String name) {
         try {
             return findConfigurationProperty(ConfigurationPropertyName.of(name));
-        }
-        catch (InvalidConfigurationPropertyNameException ex) {
+        } catch (InvalidConfigurationPropertyNameException ex) {
             // simulate non-exposed version of ConfigurationPropertyName.of(name, nullIfInvalid)
-            if(ex.getInvalidCharacters().size() == 1 && ex.getInvalidCharacters().get(0).equals('.')) {
+            if (ex.getInvalidCharacters().size() == 1 && ex.getInvalidCharacters().get(0).equals('.')) {
                 return null;
             }
             throw ex;

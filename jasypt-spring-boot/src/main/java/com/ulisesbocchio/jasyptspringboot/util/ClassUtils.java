@@ -13,7 +13,7 @@ public class ClassUtils {
     /**
      * <p>isAssignable.</p>
      *
-     * @param type a {@link org.springframework.core.ParameterizedTypeReference} object
+     * @param type  a {@link org.springframework.core.ParameterizedTypeReference} object
      * @param clazz a {@link java.lang.Class} object
      * @return a boolean
      */

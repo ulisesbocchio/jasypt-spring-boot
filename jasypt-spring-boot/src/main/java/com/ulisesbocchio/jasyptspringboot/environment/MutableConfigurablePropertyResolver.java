@@ -22,7 +22,7 @@ public class MutableConfigurablePropertyResolver implements ConfigurableProperty
      * <p>Constructor for MutableConfigurablePropertyResolver.</p>
      *
      * @param propertySources a {@link org.springframework.core.env.MutablePropertySources} object
-     * @param factory a {@link java.util.function.Function} object
+     * @param factory         a {@link java.util.function.Function} object
      */
     public MutableConfigurablePropertyResolver(MutablePropertySources propertySources, Function<MutablePropertySources, ConfigurablePropertyResolver> factory) {
         this.factory = factory;

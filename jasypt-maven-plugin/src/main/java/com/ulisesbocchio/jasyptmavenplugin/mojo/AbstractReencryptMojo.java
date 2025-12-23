@@ -18,7 +18,9 @@ import java.util.function.Consumer;
  */
 @Slf4j
 public abstract class AbstractReencryptMojo extends AbstractFileJasyptMojo {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     protected void run(final EncryptionService newService, final Path path, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws MojoExecutionException {
         String decryptedContents = decrypt(path, encryptPrefix, encryptSuffix, decryptPrefix, decryptSuffix);
 
@@ -61,8 +63,8 @@ public abstract class AbstractReencryptMojo extends AbstractFileJasyptMojo {
      * <p>setIfNotNull.</p>
      *
      * @param setter a {@link java.util.function.Consumer} object
-     * @param value a T object
-     * @param <T> a T class
+     * @param value  a T object
+     * @param <T>    a T class
      */
     protected <T> void setIfNotNull(Consumer<T> setter, T value) {
         if (value != null) {

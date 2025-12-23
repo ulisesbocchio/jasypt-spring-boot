@@ -17,8 +17,8 @@ import java.lang.annotation.Target;
  * {@linkplain ElementType#TYPE type}, implicitly generating this container annotation.
  *
  * @author Ulises Bocchio
- * @see EncryptablePropertySource
  * @version $Id: $Id
+ * @see EncryptablePropertySource
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

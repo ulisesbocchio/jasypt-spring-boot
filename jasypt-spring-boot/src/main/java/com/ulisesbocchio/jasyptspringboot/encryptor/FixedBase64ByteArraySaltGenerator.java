@@ -10,7 +10,7 @@ import java.util.Base64;
  * @author Sergio.U.Bocchio
  * @version $Id: $Id
  */
-public class FixedBase64ByteArraySaltGenerator  extends ByteArrayFixedSaltGenerator {
+public class FixedBase64ByteArraySaltGenerator extends ByteArrayFixedSaltGenerator {
     /**
      * <p>Constructor for FixedBase64ByteArraySaltGenerator.</p>
      *

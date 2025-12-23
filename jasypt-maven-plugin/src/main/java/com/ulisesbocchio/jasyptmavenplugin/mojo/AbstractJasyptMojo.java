@@ -59,7 +59,9 @@ public abstract class AbstractJasyptMojo extends AbstractMojo {
         return environment;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute() throws MojoExecutionException {
         Map<String, Object> defaultProperties = new HashMap<>();

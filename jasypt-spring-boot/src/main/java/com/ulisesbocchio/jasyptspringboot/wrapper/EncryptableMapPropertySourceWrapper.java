@@ -1,12 +1,10 @@
 package com.ulisesbocchio.jasyptspringboot.wrapper;
 
-import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-import org.springframework.boot.origin.Origin;
-import org.springframework.boot.origin.OriginLookup;
-import org.springframework.boot.origin.OriginTrackedValue;
+import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
@@ -27,20 +25,24 @@ public class EncryptableMapPropertySourceWrapper extends MapPropertySource imple
      *
      * @param delegate a {@link org.springframework.core.env.MapPropertySource} object
      * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param filter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
      */
     public EncryptableMapPropertySourceWrapper(MapPropertySource delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
         encryptableDelegate = new CachingDelegateEncryptablePropertySource<>(delegate, resolver, filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty(@NonNull String name) {
         return encryptableDelegate.getProperty(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PropertySource<Map<String, Object>> getDelegate() {
         return encryptableDelegate;

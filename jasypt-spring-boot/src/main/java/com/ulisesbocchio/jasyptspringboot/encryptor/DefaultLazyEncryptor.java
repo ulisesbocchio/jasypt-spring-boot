@@ -5,7 +5,6 @@ import com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfiguratio
 import com.ulisesbocchio.jasyptspringboot.util.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
-import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -28,10 +27,10 @@ public class DefaultLazyEncryptor implements StringEncryptor {
     /**
      * <p>Constructor for DefaultLazyEncryptor.</p>
      *
-     * @param e a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param e                       a {@link org.springframework.core.env.ConfigurableEnvironment} object
      * @param customEncryptorBeanName a {@link java.lang.String} object
-     * @param isCustom a boolean
-     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @param isCustom                a boolean
+     * @param bf                      a {@link org.springframework.beans.factory.BeanFactory} object
      */
     public DefaultLazyEncryptor(final ConfigurableEnvironment e, final String customEncryptorBeanName, boolean isCustom, final BeanFactory bf) {
         singleton = new Singleton<>(() ->
@@ -61,13 +60,17 @@ public class DefaultLazyEncryptor implements StringEncryptor {
         return new StringEncryptorBuilder(JasyptEncryptorConfigurationProperties.bindConfigProps(e), "jasypt.encryptor").build();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String encrypt(final String message) {
         return singleton.get().encrypt(message);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String decrypt(final String encryptedMessage) {
         return singleton.get().decrypt(encryptedMessage);

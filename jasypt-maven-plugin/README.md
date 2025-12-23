@@ -1,13 +1,14 @@
 # Jasypt Maven Plugin
 
-A Maven plugin that provides utilities for encrypting and decrypting properties using Jasypt encryption in Spring Boot applications.
+A Maven plugin that provides utilities for encrypting and decrypting properties using Jasypt encryption in Spring Boot
+applications.
 
 ## Overview
 
 The Jasypt Maven Plugin offers several goals to help manage encrypted properties in your Spring Boot projects:
 
 - **encrypt**: Encrypt properties in configuration files
-- **decrypt**: Decrypt properties in configuration files  
+- **decrypt**: Decrypt properties in configuration files
 - **encrypt-value**: Encrypt a single value
 - **decrypt-value**: Decrypt a single value
 - **reencrypt**: Re-encrypt properties with new configuration
@@ -41,27 +42,27 @@ The plugin uses the same configuration properties as jasypt-spring-boot. You can
 
 ### Common Configuration Properties
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| `jasypt.encryptor.password` | Encryption password | Required |
-| `jasypt.encryptor.algorithm` | Encryption algorithm | `PBEWITHHMACSHA512ANDAES_256` |
-| `jasypt.encryptor.key-obtention-iterations` | Key obtention iterations | `1000` |
-| `jasypt.encryptor.pool-size` | Encryptor pool size | `1` |
-| `jasypt.encryptor.provider-name` | Security provider name | `SunJCE` |
-| `jasypt.encryptor.salt-generator-classname` | Salt generator class | `org.jasypt.salt.RandomSaltGenerator` |
-| `jasypt.encryptor.iv-generator-classname` | IV generator class | `org.jasypt.iv.RandomIvGenerator` |
-| `jasypt.encryptor.string-output-type` | Output encoding | `base64` |
+| Property                                    | Description              | Default                               |
+|---------------------------------------------|--------------------------|---------------------------------------|
+| `jasypt.encryptor.password`                 | Encryption password      | Required                              |
+| `jasypt.encryptor.algorithm`                | Encryption algorithm     | `PBEWITHHMACSHA512ANDAES_256`         |
+| `jasypt.encryptor.key-obtention-iterations` | Key obtention iterations | `1000`                                |
+| `jasypt.encryptor.pool-size`                | Encryptor pool size      | `1`                                   |
+| `jasypt.encryptor.provider-name`            | Security provider name   | `SunJCE`                              |
+| `jasypt.encryptor.salt-generator-classname` | Salt generator class     | `org.jasypt.salt.RandomSaltGenerator` |
+| `jasypt.encryptor.iv-generator-classname`   | IV generator class       | `org.jasypt.iv.RandomIvGenerator`     |
+| `jasypt.encryptor.string-output-type`       | Output encoding          | `base64`                              |
 
 ### Asymmetric Encryption Properties
 
-| Property | Description |
-|----------|-------------|
-| `jasypt.encryptor.private-key-string` | Private key as string (base64 for DER) |
-| `jasypt.encryptor.private-key-location` | Private key file location |
-| `jasypt.encryptor.private-key-format` | Key format (`DER` or `PEM`) |
-| `jasypt.encryptor.public-key-string` | Public key as string |
-| `jasypt.encryptor.public-key-location` | Public key file location |
-| `jasypt.encryptor.public-key-format` | Key format (`DER` or `PEM`) |
+| Property                                | Description                            |
+|-----------------------------------------|----------------------------------------|
+| `jasypt.encryptor.private-key-string`   | Private key as string (base64 for DER) |
+| `jasypt.encryptor.private-key-location` | Private key file location              |
+| `jasypt.encryptor.private-key-format`   | Key format (`DER` or `PEM`)            |
+| `jasypt.encryptor.public-key-string`    | Public key as string                   |
+| `jasypt.encryptor.public-key-location`  | Public key file location               |
+| `jasypt.encryptor.public-key-format`    | Key format (`DER` or `PEM`)            |
 
 ## Goals
 
@@ -74,9 +75,11 @@ mvn jasypt:encrypt -Djasypt.encryptor.password="mypassword"
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.path` - File path (default: `file:src/main/resources/application.properties`)
 
 **Example:**
+
 ```properties
 # Before encryption
 database.password=DEC(mysecretpassword)
@@ -96,6 +99,7 @@ mvn jasypt:decrypt -Djasypt.encryptor.password="mypassword"
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.path` - File path (default: `file:src/main/resources/application.properties`)
 
 ### encrypt-value
@@ -107,9 +111,11 @@ mvn jasypt:encrypt-value -Djasypt.encryptor.password="mypassword" -Djasypt.plugi
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.value` - The value to encrypt (required)
 
 **Example:**
+
 ```bash
 mvn jasypt:encrypt-value -Djasypt.encryptor.password="mypassword" -Djasypt.plugin.value="mysecretpassword"
 # Output: ENC(encrypted_value_here)
@@ -124,6 +130,7 @@ mvn jasypt:decrypt-value -Djasypt.encryptor.password="mypassword" -Djasypt.plugi
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.value` - The encrypted value to decrypt (required)
 
 ### reencrypt
@@ -135,6 +142,7 @@ mvn jasypt:reencrypt -Djasypt.plugin.old.password="oldpassword" -Djasypt.encrypt
 ```
 
 **Old Configuration Parameters (prefixed with `jasypt.plugin.old.`):**
+
 - `password` - Old encryption password
 - `algorithm` - Old algorithm
 - `private-key-string` - Old private key
@@ -151,6 +159,7 @@ mvn jasypt:upgrade -Djasypt.encryptor.password="mypassword"
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.old.major-version` - Version to upgrade from (default: `2`)
 
 ### load
@@ -162,10 +171,12 @@ mvn jasypt:load flyway:migrate -Djasypt.encryptor.password="mypassword"
 ```
 
 **Parameters:**
+
 - `jasypt.plugin.path` - Properties file path (default: `file:src/main/resources/application.properties`)
 - `jasypt.plugin.keyPrefix` - Prefix to add to property names
 
 **Example with Flyway:**
+
 ```bash
 mvn jasypt:load flyway:migrate -Djasypt.encryptor.password="mypassword" -Djasypt.plugin.keyPrefix="db."
 ```
@@ -216,17 +227,21 @@ mvn jasypt:encrypt-value \
 ## Troubleshooting
 
 ### Missing Configuration
+
 If you get configuration errors, ensure:
+
 - The encryption password is provided
 - Configuration files exist and are accessible
 - Spring profiles are correctly specified
 
 ### Multi-Module Issues
+
 - Use `-N` flag to avoid recursion
 - Specify full paths to configuration files
 - Ensure parent POM dependencies are available
 
 ### Logging Conflicts
+
 The plugin includes `slf4j-simple` to avoid logging conflicts with Maven's logging system.
 
 ## Examples
@@ -234,17 +249,20 @@ The plugin includes `slf4j-simple` to avoid logging conflicts with Maven's loggi
 ### Basic Encryption Workflow
 
 1. **Add encrypted placeholders to your properties:**
+
 ```properties
 database.password=DEC(mysecretpassword)
 api.key=DEC(myapikey)
 ```
 
 2. **Encrypt the file:**
+
 ```bash
 mvn jasypt:encrypt -Djasypt.encryptor.password="mypassword"
 ```
 
 3. **Result:**
+
 ```properties
 database.password=ENC(encrypted_value_1)
 api.key=ENC(encrypted_value_2)

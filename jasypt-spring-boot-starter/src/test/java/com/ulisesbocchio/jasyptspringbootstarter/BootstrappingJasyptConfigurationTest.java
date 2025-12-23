@@ -40,7 +40,7 @@ public class BootstrappingJasyptConfigurationTest {
 
             @Override
             public void onApplicationEvent(final ApplicationStartedEvent event) {
-                assertEquals( "mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"), "ENC() value is not decrypted during bootstrap phase");
+                assertEquals("mypassword", event.getApplicationContext().getEnvironment().getProperty("spring.cloud.config.server.svn.password"), "ENC() value is not decrypted during bootstrap phase");
             }
         }, "--spring.cloud.bootstrap.enabled=true", "--jasypt.encryptor.bootstrap=false");
 

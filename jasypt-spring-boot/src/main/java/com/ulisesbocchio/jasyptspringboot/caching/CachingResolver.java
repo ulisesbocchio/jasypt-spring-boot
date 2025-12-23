@@ -23,9 +23,7 @@ public class CachingResolver {
     private final EncryptablePropertyFilter filter;
     /**
      * -- GETTER --
-     *  <p>Get the delegate PropertySource.</p>
-     *
-     * @return the delegate PropertySource
+     * <p>Get the delegate PropertySource.</p>
      */
     @Getter
     private final PropertySource<?> delegate;
@@ -57,7 +55,7 @@ public class CachingResolver {
     public Object resolveProperty(String name) {
         Object originalValue = delegate.getProperty(name);
 
-        if (!(originalValue instanceof String)) {
+        if (!(originalValue instanceof String originStringValue)) {
             //Because we read the original property every time, if it isn't a String,
             // there's no point in caching it.
             return originalValue;
@@ -71,7 +69,6 @@ public class CachingResolver {
 
         //originalValue must be String here
         if (filter.shouldInclude(delegate, name)) {
-            String originStringValue = (String) originalValue;
             String resolved = resolver.resolvePropertyValue(originStringValue);
             CachedValue newCachedValue = new CachedValue(originStringValue, resolved);
             //If the mapping relationship in the cache changes during

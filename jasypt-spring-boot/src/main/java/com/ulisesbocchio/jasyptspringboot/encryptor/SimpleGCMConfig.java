@@ -82,7 +82,7 @@ public class SimpleGCMConfig {
 
     @SneakyThrows
     private IvGenerator instantiateIvGenerator() {
-        return (IvGenerator)Class.forName(this.ivGeneratorClassName).newInstance();
+        return (IvGenerator) Class.forName(this.ivGeneratorClassName).getDeclaredConstructor().newInstance();
     }
 
     /**

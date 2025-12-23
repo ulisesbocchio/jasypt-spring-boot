@@ -18,7 +18,9 @@ public class UpgradeMojo extends AbstractReencryptMojo {
     @Parameter(property = "jasypt.plugin.old.major-version", defaultValue = "2")
     private int oldMajorVersion = 2;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void configure(JasyptEncryptorConfigurationProperties properties) {
         Environment environment = getEnvironment();

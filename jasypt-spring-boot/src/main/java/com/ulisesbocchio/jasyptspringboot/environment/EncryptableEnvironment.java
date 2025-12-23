@@ -16,6 +16,7 @@ public interface EncryptableEnvironment extends ConfigurableEnvironment {
      * @return a {@link org.springframework.core.env.MutablePropertySources} object
      */
     MutablePropertySources getOriginalPropertySources();
+
     /**
      * <p>setEncryptablePropertySources.</p>
      *

@@ -21,12 +21,12 @@ public class EncryptionService {
     private final StringEncryptor encryptor;
     private final Pattern reCharsREP;
 
-    @SuppressWarnings("ReplaceAllDot")
     /**
      * <p>Constructor for EncryptionService.</p>
      *
      * @param encryptor a {@link org.jasypt.encryption.StringEncryptor} object
      */
+    @SuppressWarnings("ReplaceAllDot")
     public EncryptionService(final StringEncryptor encryptor) {
         this.encryptor = encryptor;
         String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
@@ -59,10 +59,10 @@ public class EncryptionService {
             final String targetSuffix,
             final Function<String, String> mutator
     ) {
-      String regex = quoteRegExSpecialChars(sourcePrefix) + "(.*?)" + quoteRegExSpecialChars(sourceSuffix);
-      Pattern pattern = Pattern.compile(regex, DOTALL);
+        String regex = quoteRegExSpecialChars(sourcePrefix) + "(.*?)" + quoteRegExSpecialChars(sourceSuffix);
+        Pattern pattern = Pattern.compile(regex, DOTALL);
         Matcher matcher = pattern.matcher(templateText);
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String replacement;
         while (matcher.find()) {
             String matched = matcher.group(1);
@@ -78,12 +78,12 @@ public class EncryptionService {
     /**
      * Decrypt all placeholders in the input.
      *
-     * @param input the string to scan for placeholders and decrypt
-     * @return the input with decrypted placeholders.
+     * @param input         the string to scan for placeholders and decrypt
      * @param encryptPrefix a {@link java.lang.String} object
      * @param encryptSuffix a {@link java.lang.String} object
      * @param decryptPrefix a {@link java.lang.String} object
      * @param decryptSuffix a {@link java.lang.String} object
+     * @return the input with decrypted placeholders.
      */
     public String decrypt(final String input, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) {
         return replaceAll(input, encryptPrefix, encryptSuffix, decryptPrefix, decryptSuffix, encryptor::decrypt);
@@ -102,12 +102,12 @@ public class EncryptionService {
     /**
      * Encrypt all placeholders in the input.
      *
-     * @param input the string to scan for placeholders and encrypt
-     * @return the input with encrypted placeholders.
+     * @param input         the string to scan for placeholders and encrypt
      * @param encryptPrefix a {@link java.lang.String} object
      * @param encryptSuffix a {@link java.lang.String} object
      * @param decryptPrefix a {@link java.lang.String} object
      * @param decryptSuffix a {@link java.lang.String} object
+     * @return the input with encrypted placeholders.
      */
     public String encrypt(final String input, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) {
         return replaceAll(input, decryptPrefix, decryptSuffix, encryptPrefix, encryptSuffix, encryptor::encrypt);

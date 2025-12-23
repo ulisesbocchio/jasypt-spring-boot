@@ -20,8 +20,8 @@ public class CachingConfiguration {
      * <p>refreshScopeRefreshedEventListener.</p>
      *
      * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
-     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
-     * @param config a {@link com.ulisesbocchio.jasyptspringboot.util.Singleton} object
+     * @param converter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param config      a {@link com.ulisesbocchio.jasyptspringboot.util.Singleton} object
      * @return a {@link com.ulisesbocchio.jasyptspringboot.caching.RefreshScopeRefreshedEventListener} object
      */
     @Bean

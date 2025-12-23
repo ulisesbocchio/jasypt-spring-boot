@@ -4,13 +4,9 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
-import com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector;
-import com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor;
-import com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter;
-import com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver;
 import lombok.Builder;
 import org.jasypt.encryption.StringEncryptor;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.*;
 
 import java.util.List;
@@ -41,13 +37,13 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
     /**
      * Create a new Encryptable Environment. All arguments are optional, provide null if default value is desired.
      *
-     * @param interceptionMode          The interception method to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode#WRAPPER})
-     * @param propertySourcesInterceptionMode          The interception method to utilize for wrapping the {@link org.springframework.core.env.MutablePropertySources}, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode#WRAPPER})
-     * @param skipPropertySourceClasses A list of {@link org.springframework.core.env.PropertySource} classes to skip from interception, or null (Default is empty)
-     * @param resolver                  The property resolver to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver}  which will resolve to specified configuration)
-     * @param filter                    The property filter to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter}  which will resolve to specified configuration)
-     * @param encryptor                 The string encryptor to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor} which will resolve to specified configuration)
-     * @param detector                  The property detector to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector} which will resolve to specified configuration)
+     * @param interceptionMode                The interception method to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode#WRAPPER})
+     * @param propertySourcesInterceptionMode The interception method to utilize for wrapping the {@link org.springframework.core.env.MutablePropertySources}, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.InterceptionMode#WRAPPER})
+     * @param skipPropertySourceClasses       A list of {@link org.springframework.core.env.PropertySource} classes to skip from interception, or null (Default is empty)
+     * @param resolver                        The property resolver to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.resolver.DefaultLazyPropertyResolver}  which will resolve to specified configuration)
+     * @param filter                          The property filter to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.filter.DefaultLazyPropertyFilter}  which will resolve to specified configuration)
+     * @param encryptor                       The string encryptor to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor} which will resolve to specified configuration)
+     * @param detector                        The property detector to utilize, or null (Default is {@link com.ulisesbocchio.jasyptspringboot.detector.DefaultLazyPropertyDetector} which will resolve to specified configuration)
      */
     @Builder
     public StandardEncryptableEnvironment(InterceptionMode interceptionMode, InterceptionMode propertySourcesInterceptionMode, List<Class<PropertySource<?>>> skipPropertySourceClasses, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, StringEncryptor encryptor, EncryptablePropertyDetector detector) {
@@ -55,9 +51,11 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         initializer.initialize(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void customizePropertySources(MutablePropertySources propertySources) {
+    protected void customizePropertySources(@NonNull MutablePropertySources propertySources) {
         super.customizePropertySources(propertySources);
     }
 
@@ -71,28 +69,38 @@ public class StandardEncryptableEnvironment extends StandardEnvironment implemen
         super.merge(parent);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
     @Override
     public MutablePropertySources getPropertySources() {
         return this.encryptablePropertySources;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MutablePropertySources getOriginalPropertySources() {
         return super.getPropertySources();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setEncryptablePropertySources(MutablePropertySources propertySources) {
         this.encryptablePropertySources = propertySources;
-        ((MutableConfigurablePropertyResolver)this.getPropertyResolver()).setPropertySources(propertySources);
+        ((MutableConfigurablePropertyResolver) this.getPropertyResolver()).setPropertySources(propertySources);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
     @Override
-    protected ConfigurablePropertyResolver createPropertyResolver(MutablePropertySources propertySources) {
+    protected ConfigurablePropertyResolver createPropertyResolver(@NonNull MutablePropertySources propertySources) {
         return EnvironmentInitializer.createPropertyResolver(propertySources);
     }
 }

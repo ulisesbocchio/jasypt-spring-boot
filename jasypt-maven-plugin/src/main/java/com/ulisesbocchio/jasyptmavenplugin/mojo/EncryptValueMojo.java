@@ -12,11 +12,13 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @author ubocchio
  * @version $Id: $Id
  */
-@Mojo(name = "encrypt-value", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject=false)
+@Mojo(name = "encrypt-value", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = false)
 @Slf4j
 public class EncryptValueMojo extends AbstractValueJasyptMojo {
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void run(final EncryptionService service, final String value, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

@@ -31,13 +31,17 @@ public class SimpleAsymmetricByteEncryptor implements ByteEncryptor {
         publicKey = Singleton.fromLazy(crypto::getPublicKey, config::loadPublicKeyResource, config::getPublicKeyFormat);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] encrypt(byte[] message) {
         return this.crypto.encrypt(message, publicKey.get());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] decrypt(byte[] encryptedMessage) {
         return this.crypto.decrypt(encryptedMessage, privateKey.get());

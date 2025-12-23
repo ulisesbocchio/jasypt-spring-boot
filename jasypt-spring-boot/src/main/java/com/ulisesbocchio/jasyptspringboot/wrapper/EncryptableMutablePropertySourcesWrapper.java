@@ -3,6 +3,7 @@ package com.ulisesbocchio.jasyptspringboot.wrapper;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
@@ -20,9 +21,9 @@ public class EncryptableMutablePropertySourcesWrapper extends MutablePropertySou
     /**
      * <p>Constructor for EncryptableMutablePropertySourcesWrapper.</p>
      *
-     * @param propertySources a {@link org.springframework.core.env.PropertySources} object
+     * @param propertySources   a {@link org.springframework.core.env.PropertySources} object
      * @param propertyConverter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
-     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param envCopy           a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
      */
     public EncryptableMutablePropertySourcesWrapper(PropertySources propertySources, EncryptablePropertySourceConverter propertyConverter, EnvCopy envCopy) {
         this(propertyConverter, envCopy);
@@ -35,7 +36,7 @@ public class EncryptableMutablePropertySourcesWrapper extends MutablePropertySou
      * <p>Constructor for EncryptableMutablePropertySourcesWrapper.</p>
      *
      * @param propertyConverter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
-     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param envCopy           a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
      */
     public EncryptableMutablePropertySourcesWrapper(EncryptablePropertySourceConverter propertyConverter, EnvCopy envCopy) {
         super();
@@ -47,50 +48,64 @@ public class EncryptableMutablePropertySourcesWrapper extends MutablePropertySou
         return propertyConverter.makeEncryptable(propertySource);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addFirst(PropertySource<?> propertySource) {
+    public void addFirst(@NonNull PropertySource<?> propertySource) {
         envCopy.addFirst(propertySource);
         super.addFirst(makeEncryptable(propertySource));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addLast(PropertySource<?> propertySource) {
+    public void addLast(@NonNull PropertySource<?> propertySource) {
         envCopy.addLast(propertySource);
         super.addLast(makeEncryptable(propertySource));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void addLastClean(PropertySource<?> propertySource) {
         envCopy.addLast(propertySource);
         super.addLast(propertySource);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addBefore(String relativePropertySourceName, PropertySource<?> propertySource) {
+    public void addBefore(@NonNull String relativePropertySourceName, @NonNull PropertySource<?> propertySource) {
         envCopy.addBefore(relativePropertySourceName, propertySource);
         super.addBefore(relativePropertySourceName, makeEncryptable(propertySource));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addAfter(String relativePropertySourceName, PropertySource<?> propertySource) {
+    public void addAfter(@NonNull String relativePropertySourceName, @NonNull PropertySource<?> propertySource) {
         envCopy.addAfter(relativePropertySourceName, propertySource);
         super.addAfter(relativePropertySourceName, makeEncryptable(propertySource));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void replace(String name, PropertySource<?> propertySource) {
+    public void replace(@NonNull String name, @NonNull PropertySource<?> propertySource) {
         envCopy.replace(name, propertySource);
         super.replace(name, makeEncryptable(propertySource));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public PropertySource<?> remove(String name) {
+    public PropertySource<?> remove(@NonNull String name) {
         envCopy.remove(name);
         PropertySource<?> ps = super.remove(name);
         // Return the original source unwrapping the Encryptable wrappers. Spring boot does some weird things

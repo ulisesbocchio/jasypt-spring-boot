@@ -10,18 +10,10 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.CompositePropertySource;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.PropertySources;
+import org.springframework.core.env.*;
 import org.springframework.util.ClassUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,7 +28,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class RefreshScopeRefreshedEventListener implements ApplicationListener<ApplicationEvent>, InitializingBean {
 
-    /** Constant <code>EVENT_CLASS_NAMES</code> */
+    /**
+     * Constant <code>EVENT_CLASS_NAMES</code>
+     */
     public static final List<String> EVENT_CLASS_NAMES = Arrays.asList(
             "org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent",
             "org.springframework.cloud.context.environment.EnvironmentChangeEvent",
@@ -52,8 +46,8 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
      * <p>Constructor for RefreshScopeRefreshedEventListener.</p>
      *
      * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
-     * @param converter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
-     * @param config a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
+     * @param converter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
+     * @param config      a {@link com.ulisesbocchio.jasyptspringboot.properties.JasyptEncryptorConfigurationProperties} object
      */
     public RefreshScopeRefreshedEventListener(ConfigurableEnvironment environment, EncryptablePropertySourceConverter converter, JasyptEncryptorConfigurationProperties config) {
         this.environment = environment;
@@ -61,7 +55,9 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         this.config = config;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public void onApplicationEvent(ApplicationEvent event) {
@@ -97,11 +93,9 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
 
     @SuppressWarnings("rawtypes")
     private void refreshPropertySource(PropertySource<?> propertySource) {
-        if (propertySource instanceof CompositePropertySource) {
-            CompositePropertySource cps = (CompositePropertySource) propertySource;
+        if (propertySource instanceof CompositePropertySource cps) {
             cps.getPropertySources().forEach(this::refreshPropertySource);
-        } else if (propertySource instanceof EncryptablePropertySource) {
-            EncryptablePropertySource eps = (EncryptablePropertySource) propertySource;
+        } else if (propertySource instanceof EncryptablePropertySource eps) {
             eps.refresh();
         }
     }
@@ -114,7 +108,9 @@ public class RefreshScopeRefreshedEventListener implements ApplicationListener<A
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         Stream

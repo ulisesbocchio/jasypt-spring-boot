@@ -1,15 +1,10 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
-import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
-import com.ulisesbocchio.jasyptspringboot.InterceptionMode;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.env.PropertySource;
-
-import java.util.List;
 
 /**
  * <p>EncryptableMutablePropertySourcesInterceptor class.</p>
@@ -26,7 +21,7 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
      * <p>Constructor for EncryptableMutablePropertySourcesInterceptor.</p>
      *
      * @param propertyConverter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter} object
-     * @param envCopy a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
+     * @param envCopy           a {@link com.ulisesbocchio.jasyptspringboot.configuration.EnvCopy} object
      */
     public EncryptableMutablePropertySourcesInterceptor(EncryptablePropertySourceConverter propertyConverter, EnvCopy envCopy) {
         this.propertyConverter = propertyConverter;
@@ -37,7 +32,9 @@ public class EncryptableMutablePropertySourcesInterceptor implements MethodInter
         return propertyConverter.makeEncryptable((PropertySource<?>) propertySource);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         String method = invocation.getMethod().getName();

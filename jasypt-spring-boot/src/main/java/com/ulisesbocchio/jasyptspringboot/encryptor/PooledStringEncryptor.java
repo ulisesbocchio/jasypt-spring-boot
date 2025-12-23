@@ -22,7 +22,7 @@ public class PooledStringEncryptor implements StringEncryptor {
     /**
      * <p>Constructor for PooledStringEncryptor.</p>
      *
-     * @param size a int
+     * @param size             a int
      * @param encryptorFactory a {@link java.util.function.Supplier} object
      */
     public PooledStringEncryptor(int size, Supplier<StringEncryptor> encryptorFactory) {
@@ -38,18 +38,22 @@ public class PooledStringEncryptor implements StringEncryptor {
     }
 
     private <T> T robin(Function<StringEncryptor, T> producer) {
-        int position = this.roundRobin.getAndUpdate(value ->  (value + 1) % this.size);
+        int position = this.roundRobin.getAndUpdate(value -> (value + 1) % this.size);
         return producer.apply(this.pool[position]);
 
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String encrypt(String message) {
         return robin(e -> e.encrypt(message));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String decrypt(String encryptedMessage) {
         return robin(e -> e.decrypt(encryptedMessage));

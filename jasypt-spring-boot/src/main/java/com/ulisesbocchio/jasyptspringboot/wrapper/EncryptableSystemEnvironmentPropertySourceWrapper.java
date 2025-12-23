@@ -4,11 +4,11 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.SystemEnvironmentOrigin;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
-import org.springframework.lang.NonNull;
 
 import java.util.Map;
 

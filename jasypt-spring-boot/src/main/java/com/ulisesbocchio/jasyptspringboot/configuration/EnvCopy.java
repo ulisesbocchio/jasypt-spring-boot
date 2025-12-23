@@ -2,9 +2,6 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.environment.EncryptableEnvironment;
-import com.ulisesbocchio.jasyptspringboot.util.ClassUtils;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
@@ -78,7 +75,7 @@ public class EnvCopy {
      * <p>addBefore.</p>
      *
      * @param relativePropertySourceName a {@link java.lang.String} object
-     * @param propertySource a {@link org.springframework.core.env.PropertySource} object
+     * @param propertySource             a {@link org.springframework.core.env.PropertySource} object
      */
     public void addBefore(String relativePropertySourceName, PropertySource<?> propertySource) {
         if (isAllowed(propertySource)) {
@@ -91,7 +88,7 @@ public class EnvCopy {
      * <p>addAfter.</p>
      *
      * @param relativePropertySourceName a {@link java.lang.String} object
-     * @param propertySource a {@link org.springframework.core.env.PropertySource} object
+     * @param propertySource             a {@link org.springframework.core.env.PropertySource} object
      */
     public void addAfter(String relativePropertySourceName, PropertySource<?> propertySource) {
         if (isAllowed(propertySource)) {
@@ -103,12 +100,12 @@ public class EnvCopy {
     /**
      * <p>replace.</p>
      *
-     * @param name a {@link java.lang.String} object
+     * @param name           a {@link java.lang.String} object
      * @param propertySource a {@link org.springframework.core.env.PropertySource} object
      */
     public void replace(String name, PropertySource<?> propertySource) {
-        if(isAllowed(propertySource)) {
-            if(copy.getPropertySources().contains(name)) {
+        if (isAllowed(propertySource)) {
+            if (copy.getPropertySources().contains(name)) {
                 final PropertySource<?> original = getOriginal(propertySource);
                 copy.getPropertySources().replace(name, original);
             }

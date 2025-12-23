@@ -7,6 +7,7 @@ import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableEnumerablePropertyS
 import com.ulisesbocchio.jasyptspringboot.wrapper.OriginTrackedCompositePropertySource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -51,7 +52,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
 
     private static final String CONFIGURATION_CLASS_ATTRIBUTE =
             Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
-    private ConfigurableEnvironment env;
+    private final ConfigurableEnvironment env;
 
     /**
      * <p>Constructor for EncryptablePropertySourceBeanFactoryPostProcessor.</p>
@@ -62,9 +63,11 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
         this.env = env;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
         ResourceLoader ac = new DefaultResourceLoader();
         MutablePropertySources propertySources = env.getPropertySources();
         Stream<AnnotationAttributes> encryptablePropertySourcesMetadata = getEncryptablePropertySourcesMetadata(beanFactory);
@@ -81,7 +84,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
     private void loadEncryptablePropertySource(AnnotationAttributes encryptablePropertySource, ConfigurableEnvironment env, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, MutablePropertySources propertySources, List<PropertySourceLoader> loaders) throws BeansException {
         try {
             log.info("Loading Encryptable Property Source '{}'", encryptablePropertySource.getString("name"));
-            PropertySource ps = createPropertySource(encryptablePropertySource, env, resourceLoader, resolver, propertyFilter, loaders);
+            PropertySource<?> ps = createPropertySource(encryptablePropertySource, env, resourceLoader, resolver, propertyFilter, loaders);
             propertySources.addLast(ps);
             log.info("Created Encryptable Property Source '{}' from locations: {}", ps.getName(), Arrays.asList(encryptablePropertySource.getStringArray("value")));
         } catch (Exception e) {
@@ -89,7 +92,7 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
         }
     }
 
-    private PropertySource createPropertySource(AnnotationAttributes attributes, ConfigurableEnvironment environment, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, List<PropertySourceLoader> loaders) throws Exception {
+    private PropertySource<?> createPropertySource(AnnotationAttributes attributes, ConfigurableEnvironment environment, ResourceLoader resourceLoader, EncryptablePropertyResolver resolver, EncryptablePropertyFilter propertyFilter, List<PropertySourceLoader> loaders) throws Exception {
         String name = generateName(attributes.getString("name"));
         String[] locations = attributes.getStringArray("value");
         boolean ignoreResourceNotFound = attributes.getBoolean("ignoreResourceNotFound");
@@ -163,7 +166,9 @@ public class EncryptablePropertySourceBeanFactoryPostProcessor implements BeanFa
                 .hasText(StringUtils.getFilenameExtension(resource.getFilename()));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 100;

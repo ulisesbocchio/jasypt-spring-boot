@@ -26,21 +26,27 @@ public class SimplePBEStringEncryptor implements PBEStringEncryptor {
         this.delegate = delegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public String encrypt(String message) {
         return Base64.getEncoder().encodeToString(delegate.encrypt(message.getBytes(StandardCharsets.UTF_8)));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public String decrypt(String encryptedMessage) {
         return new String(delegate.decrypt(Base64.getDecoder().decode(encryptedMessage)), StandardCharsets.UTF_8);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SneakyThrows
     public void setPassword(String password) {

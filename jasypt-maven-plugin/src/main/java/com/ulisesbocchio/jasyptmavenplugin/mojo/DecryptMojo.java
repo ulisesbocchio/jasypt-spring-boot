@@ -18,7 +18,9 @@ import java.nio.file.Path;
 @Slf4j
 public class DecryptMojo extends AbstractFileJasyptMojo {
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void run(final EncryptionService service, final Path path, String encryptPrefix, String encryptSuffix, String decryptPrefix, String decryptSuffix) throws
             MojoExecutionException {

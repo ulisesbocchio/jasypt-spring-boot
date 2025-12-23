@@ -1,14 +1,9 @@
 package com.ulisesbocchio.jasyptspringboot.annotation;
 
-import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesConfiguration;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptablePropertySourceWrapper;
-import org.jasypt.encryption.StringEncryptor;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertySource;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -44,11 +39,11 @@ import java.lang.annotation.Target;
  * </p>
  *
  * @author Ulises Bocchio
+ * @version $Id: $Id
  * @see EnableEncryptablePropertiesConfiguration
  * @see EnableEncryptablePropertiesBeanFactoryPostProcessor
  * @see EncryptablePropertySourceWrapper
  * @see org.springframework.context.annotation.PropertySource
- * @version $Id: $Id
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

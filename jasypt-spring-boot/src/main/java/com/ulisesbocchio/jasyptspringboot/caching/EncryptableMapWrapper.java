@@ -1,8 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.caching;
 
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -78,6 +77,11 @@ public class EncryptableMapWrapper implements Map<String, Object> {
         };
     }
 
+    @Override
+    public void forEach(BiConsumer<? super String, ? super Object> action) {
+        delegate.forEach((k, v) -> action.accept(k, cachingResolver.resolveProperty(k)));
+    }
+
     private class DecoratingEntryIterator implements Iterator<Entry<String, Object>> {
         private final Iterator<Entry<String, Object>> delegate;
 
@@ -95,11 +99,6 @@ public class EncryptableMapWrapper implements Map<String, Object> {
             Entry<String, Object> entry = delegate.next();
             return new AbstractMap.SimpleEntry<>(entry.getKey(), cachingResolver.resolveProperty(entry.getKey()));
         }
-    }
-
-    @Override
-    public void forEach(BiConsumer<? super String, ? super Object> action) {
-        delegate.forEach((k, v) -> action.accept(k, cachingResolver.resolveProperty(k)));
     }
 
     private class DecoratingEntryValueIterator implements Iterator<Object> {

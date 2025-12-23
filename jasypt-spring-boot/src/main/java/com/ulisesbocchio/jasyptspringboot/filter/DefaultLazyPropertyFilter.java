@@ -21,15 +21,15 @@ import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 @Slf4j
 public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
 
-    private Singleton<EncryptablePropertyFilter> singleton;
+    private final Singleton<EncryptablePropertyFilter> singleton;
 
     /**
      * <p>Constructor for DefaultLazyPropertyFilter.</p>
      *
-     * @param e a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param e                    a {@link org.springframework.core.env.ConfigurableEnvironment} object
      * @param customFilterBeanName a {@link java.lang.String} object
-     * @param isCustom a boolean
-     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @param isCustom             a boolean
+     * @param bf                   a {@link org.springframework.beans.factory.BeanFactory} object
      */
     public DefaultLazyPropertyFilter(ConfigurableEnvironment e, String customFilterBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
@@ -63,7 +63,9 @@ public class DefaultLazyPropertyFilter implements EncryptablePropertyFilter {
                 filterConfig.getIncludeNames(), filterConfig.getExcludeNames());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean shouldInclude(PropertySource<?> source, String name) {
         return singleton.get().shouldInclude(source, name);

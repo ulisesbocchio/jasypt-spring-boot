@@ -55,7 +55,7 @@ public class AsymmetricCryptography {
      * <p>getPrivateKey.</p>
      *
      * @param resourceLocation a {@link java.lang.String} object
-     * @param format a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
+     * @param format           a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
      * @return a {@link java.security.PrivateKey} object
      */
     @SneakyThrows
@@ -67,7 +67,7 @@ public class AsymmetricCryptography {
      * <p>getPrivateKey.</p>
      *
      * @param resource a {@link org.springframework.core.io.Resource} object
-     * @param format a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
+     * @param format   a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
      * @return a {@link java.security.PrivateKey} object
      */
     @SneakyThrows
@@ -85,7 +85,7 @@ public class AsymmetricCryptography {
      * <p>getPublicKey.</p>
      *
      * @param resourceLocation a {@link java.lang.String} object
-     * @param format a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
+     * @param format           a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
      * @return a {@link java.security.PublicKey} object
      */
     @SneakyThrows
@@ -97,7 +97,7 @@ public class AsymmetricCryptography {
      * <p>getPublicKey.</p>
      *
      * @param resource a {@link org.springframework.core.io.Resource} object
-     * @param format a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
+     * @param format   a {@link com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat} object
      * @return a {@link java.security.PublicKey} object
      */
     @SneakyThrows

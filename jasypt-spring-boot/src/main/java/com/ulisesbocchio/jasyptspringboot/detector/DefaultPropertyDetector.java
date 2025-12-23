@@ -34,7 +34,9 @@ public class DefaultPropertyDetector implements EncryptablePropertyDetector {
         this.suffix = suffix;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEncrypted(String property) {
         if (property == null) {
@@ -45,7 +47,9 @@ public class DefaultPropertyDetector implements EncryptablePropertyDetector {
                 trimmedValue.endsWith(suffix));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String unwrapEncryptedValue(String property) {
         return property.substring(

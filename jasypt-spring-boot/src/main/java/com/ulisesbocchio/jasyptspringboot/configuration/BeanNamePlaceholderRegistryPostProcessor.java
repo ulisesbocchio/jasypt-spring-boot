@@ -1,6 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -20,15 +21,17 @@ import java.util.stream.Stream;
 @Slf4j
 class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, Ordered {
 
-    private Environment environment;
+    private final Environment environment;
 
     BeanNamePlaceholderRegistryPostProcessor(Environment environment) {
         this.environment = environment;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry registry) throws BeansException {
         DefaultListableBeanFactory bf = (DefaultListableBeanFactory) registry;
         Stream.of(bf.getBeanDefinitionNames())
                 //Look for beans with placeholders name format: '${placeholder}' or '${placeholder:defaultValue}'
@@ -42,13 +45,17 @@ class BeanNamePlaceholderRegistryPostProcessor implements BeanDefinitionRegistry
                 });
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 1;

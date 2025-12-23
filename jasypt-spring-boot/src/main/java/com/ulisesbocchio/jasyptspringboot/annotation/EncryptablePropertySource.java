@@ -9,8 +9,8 @@ import java.lang.annotation.*;
  * Encryptable version of Spring {@link org.springframework.context.annotation.PropertySource}
  *
  * @author Ulises Bocchio
- * @see org.springframework.context.annotation.PropertySource
  * @version $Id: $Id
+ * @see org.springframework.context.annotation.PropertySource
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

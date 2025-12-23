@@ -16,7 +16,7 @@ public class Collections {
      *
      * @param listOne a {@link java.util.List} object
      * @param listTwo a {@link java.util.List} object
-     * @param <T> a T class
+     * @param <T>     a T class
      * @return a {@link java.util.List} object
      */
     public static <T> List<T> concat(List<T> listOne, List<T> listTwo) {

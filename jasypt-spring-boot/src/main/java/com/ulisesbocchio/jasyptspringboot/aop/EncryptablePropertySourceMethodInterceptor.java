@@ -1,10 +1,11 @@
 package com.ulisesbocchio.jasyptspringboot.aop;
 
-import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
+import com.ulisesbocchio.jasyptspringboot.caching.CachingDelegateEncryptablePropertySource;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.PropertySource;
 
 /**
@@ -20,15 +21,17 @@ public class EncryptablePropertySourceMethodInterceptor<T> extends CachingDelega
      *
      * @param delegate a {@link org.springframework.core.env.PropertySource} object
      * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param filter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
      */
     public EncryptablePropertySourceMethodInterceptor(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate, resolver, filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
+    public Object invoke(@NonNull MethodInvocation invocation) throws Throwable {
         if (isRefreshCall(invocation)) {
             refresh();
             return null;

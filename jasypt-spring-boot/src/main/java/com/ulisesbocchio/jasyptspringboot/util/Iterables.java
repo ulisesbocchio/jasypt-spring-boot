@@ -1,5 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.util;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -16,11 +18,11 @@ public class Iterables {
     /**
      * <p>decorate.</p>
      *
-     * @param source a {@link java.lang.Iterable} object
+     * @param source    a {@link java.lang.Iterable} object
      * @param transform a {@link java.util.function.Function} object
-     * @param filter a {@link java.util.function.Predicate} object
-     * @param <U> a U class
-     * @param <T> a T class
+     * @param filter    a {@link java.util.function.Predicate} object
+     * @param <U>       a U class
+     * @param <T>       a T class
      * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
      */
     static public <U, T> IterableDecorator<U, T> decorate(Iterable<U> source, Function<U, T> transform, Predicate<U> filter) {
@@ -30,10 +32,10 @@ public class Iterables {
     /**
      * <p>transform.</p>
      *
-     * @param source a {@link java.lang.Iterable} object
+     * @param source    a {@link java.lang.Iterable} object
      * @param transform a {@link java.util.function.Function} object
-     * @param <U> a U class
-     * @param <T> a T class
+     * @param <U>       a U class
+     * @param <T>       a T class
      * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
      */
     static public <U, T> IterableDecorator<U, T> transform(Iterable<U> source, Function<U, T> transform) {
@@ -45,7 +47,7 @@ public class Iterables {
      *
      * @param source a {@link java.lang.Iterable} object
      * @param filter a {@link java.util.function.Predicate} object
-     * @param <T> a T class
+     * @param <T>    a T class
      * @return a {@link com.ulisesbocchio.jasyptspringboot.util.Iterables.IterableDecorator} object
      */
     static public <T> IterableDecorator<T, T> filter(Iterable<T> source, Predicate<T> filter) {
@@ -63,6 +65,7 @@ public class Iterables {
             this.filter = filter;
         }
 
+        @NonNull
         @Override
         public Iterator<T> iterator() {
             return new IteratorDecorator<>(this.source.iterator(), this.transform, this.filter);

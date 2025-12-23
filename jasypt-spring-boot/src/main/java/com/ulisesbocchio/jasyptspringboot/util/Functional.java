@@ -16,7 +16,7 @@ public class Functional {
      * <p>tap.</p>
      *
      * @param consumer a {@link java.util.function.Consumer} object
-     * @param <T> a T class
+     * @param <T>      a T class
      * @return a {@link java.util.function.Function} object
      */
     public static <T> Function<T, T> tap(Consumer<T> consumer) {

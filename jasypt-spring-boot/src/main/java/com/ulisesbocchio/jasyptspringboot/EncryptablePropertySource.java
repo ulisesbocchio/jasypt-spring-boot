@@ -27,13 +27,15 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
      */
     default Object getProperty(String name) {
         return getDelegate().getProperty(name);
-    };
+    }
+
+    ;
 
     /**
      * <p>refresh.</p>
      */
     default void refresh() {
-        if(getDelegate() instanceof EncryptablePropertySource) {
+        if (getDelegate() instanceof EncryptablePropertySource) {
             ((EncryptablePropertySource<?>) getDelegate()).refresh();
         }
     }
@@ -42,9 +44,9 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
      * <p>getProperty.</p>
      *
      * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
-     * @param source a {@link org.springframework.core.env.PropertySource} object
-     * @param name a {@link java.lang.String} object
+     * @param filter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param source   a {@link org.springframework.core.env.PropertySource} object
+     * @param name     a {@link java.lang.String} object
      * @return a {@link java.lang.Object} object
      */
     default Object getProperty(EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter, PropertySource<T> source, String name) {
@@ -56,31 +58,15 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
         return value;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     default Origin getOrigin(String key) {
-        if(getDelegate() instanceof OriginLookup) {
+        if (getDelegate() instanceof OriginLookup) {
             return ((OriginLookup<String>) getDelegate()).getOrigin(key);
         }
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default boolean isImmutable() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).isImmutable();
-        }
-        return OriginLookup.super.isImmutable();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default String getPrefix() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).getPrefix();
-        }
-        return OriginLookup.super.getPrefix();
     }
 }

@@ -2,8 +2,10 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 
 import com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitializer;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.EnvironmentPostProcessor;
+import org.springframework.cloud.bootstrap.BootstrapConfigFileApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -18,14 +20,16 @@ import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitiali
  * This listener detects the custom environment created by {@link EnvironmentInitializer} and re-initializes the logging environment property sources
  * which would have been populated without the encryptable wrapper.
  * The {@link EnableEncryptablePropertiesBeanFactoryPostProcessor} then effectively re-initializes the logging {@link org.springframework.boot.logging.LoggingSystem}
+ *
  * @see EnvironmentInitializer
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 13)
 @Slf4j
 public class EncryptableLoggingEnvironmentListener implements EnvironmentPostProcessor {
     public static final String BOOTSTRAP_PROPERTY_SOURCE_NAME = "bootstrap";
+
     @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+    public void postProcessEnvironment(ConfigurableEnvironment environment, @NonNull SpringApplication application) {
         // Wrap property sources here
         log.info("Found Environment: {}", environment.getClass().getName());
 

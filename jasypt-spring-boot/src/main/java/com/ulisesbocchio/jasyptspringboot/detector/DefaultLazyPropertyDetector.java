@@ -21,15 +21,15 @@ import static com.ulisesbocchio.jasyptspringboot.util.Functional.tap;
 @Slf4j
 public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector {
 
-    private Singleton<EncryptablePropertyDetector> singleton;
+    private final Singleton<EncryptablePropertyDetector> singleton;
 
     /**
      * <p>Constructor for DefaultLazyPropertyDetector.</p>
      *
-     * @param environment a {@link org.springframework.core.env.ConfigurableEnvironment} object
+     * @param environment            a {@link org.springframework.core.env.ConfigurableEnvironment} object
      * @param customDetectorBeanName a {@link java.lang.String} object
-     * @param isCustom a boolean
-     * @param bf a {@link org.springframework.beans.factory.BeanFactory} object
+     * @param isCustom               a boolean
+     * @param bf                     a {@link org.springframework.beans.factory.BeanFactory} object
      */
     public DefaultLazyPropertyDetector(ConfigurableEnvironment environment, String customDetectorBeanName, boolean isCustom, BeanFactory bf) {
         singleton = new Singleton<>(() ->
@@ -38,7 +38,7 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
                         .map(name -> (EncryptablePropertyDetector) bf.getBean(name))
                         .map(tap(bean -> log.info("Found Custom Detector Bean {} with name: {}", bean, customDetectorBeanName)))
                         .orElseGet(() -> {
-                            if(isCustom) {
+                            if (isCustom) {
                                 throw new IllegalStateException(String.format("Property Detector custom Bean not found with name '%s'", customDetectorBeanName));
                             }
                             log.info("Property Detector custom Bean not found with name '{}'. Initializing Default Property Detector", customDetectorBeanName);
@@ -60,13 +60,17 @@ public class DefaultLazyPropertyDetector implements EncryptablePropertyDetector 
         return new DefaultPropertyDetector(props.getProperty().getPrefix(), props.getProperty().getSuffix());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEncrypted(String property) {
         return singleton.get().isEncrypted(property);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String unwrapEncryptedValue(String property) {
         return singleton.get().unwrapEncryptedValue(property);

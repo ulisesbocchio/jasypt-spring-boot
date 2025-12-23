@@ -3,11 +3,10 @@ package com.ulisesbocchio.jasyptspringboot.caching;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
-
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.PropertySource;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -28,7 +27,7 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
      *
      * @param delegate a {@link org.springframework.core.env.PropertySource} object
      * @param resolver a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver} object
-     * @param filter a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
+     * @param filter   a {@link com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter} object
      */
     public CachingDelegateEncryptablePropertySource(PropertySource<T> delegate, EncryptablePropertyResolver resolver, EncryptablePropertyFilter filter) {
         super(delegate.getName(), delegate.getSource());
@@ -37,33 +36,41 @@ public class CachingDelegateEncryptablePropertySource<T> extends PropertySource<
         Assert.notNull(filter, "EncryptablePropertyFilter cannot be null");
         this.delegate = delegate;
         this.cachingResolver = new CachingResolver(
-            resolver,
-            filter,
-            delegate
+                resolver,
+                filter,
+                delegate
         );
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PropertySource<T> getDelegate() {
         return delegate;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public Object getProperty(@NonNull String name) {
         return cachingResolver.resolveProperty(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void refresh() {
         log.info("Property Source {} refreshed", delegate.getName());
         cachingResolver.refresh();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public T getSource() {

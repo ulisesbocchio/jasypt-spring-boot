@@ -2,7 +2,7 @@ package com.ulisesbocchio.jasyptspringboot.caching;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;

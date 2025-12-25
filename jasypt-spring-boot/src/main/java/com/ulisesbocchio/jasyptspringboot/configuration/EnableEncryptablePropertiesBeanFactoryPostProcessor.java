@@ -1,27 +1,23 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.bootstrap.DefaultBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.LoggingSystemProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.StandardEnvironment;
 
 /**
  * <p>{@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
@@ -71,7 +67,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
             for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
                 System.clearProperty(property.getEnvironmentVariableName());
             }
-            loggingListener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(null, springApplication, null, environment));
+            loggingListener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(new DefaultBootstrapContext(), springApplication, new String[0], environment));
             log.info("Logging System re-initialized by LoggingApplicationListener");
         }
     }

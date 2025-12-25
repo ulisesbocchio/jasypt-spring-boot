@@ -1,6 +1,8 @@
 package com.ulisesbocchio.jasyptspringbootstarter;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,10 @@ public class EnvironmentVariablesLoadTest {
     @Autowired
     private MyProperties myProperties;
 
+    @Getter
     @SystemStub
-    private EnvironmentVariables environmentVariables =
+    private final EnvironmentVariables environmentVariables =
             new EnvironmentVariables("TEST_ENV_FOOSTRING", "test1", "TEST_ENV_BAR_STRING", "test2", "TEST_ENV_FOOLIST", "a1,b1", "TEST_ENV_BAR_LIST", "a2,b2", "TEST_ENV_STRINGMAP_K1", "v1", "TEST_ENV_LISTMAP_K2", "v2");
-
-    @EnableEncryptableProperties
-    @EnableConfigurationProperties(EnvironmentVariablesLoadTest.MyProperties.class)
-    public static class TestConfig {
-    }
 
     @Test
     public void environmentVariables_shouldBeLoaded_whenSetInBothFormats() {
@@ -52,6 +50,13 @@ public class EnvironmentVariablesLoadTest {
         assertEquals("{k2=[v2]}", myProperties.getListMap().toString());
     }
 
+    @EnableEncryptableProperties
+    @EnableConfigurationProperties(EnvironmentVariablesLoadTest.MyProperties.class)
+    public static class TestConfig {
+    }
+
+    @Setter
+    @Getter
     @ConfigurationProperties(prefix = "test.env")
     static class MyProperties {
 
@@ -62,52 +67,5 @@ public class EnvironmentVariablesLoadTest {
         private Map<String, String> stringMap;
         private Map<String, List<String>> listMap;
 
-        public String getFooString() {
-            return fooString;
-        }
-
-        public void setFooString(String fooString) {
-            this.fooString = fooString;
-        }
-
-        public String getBarString() {
-            return barString;
-        }
-
-        public void setBarString(String barString) {
-            this.barString = barString;
-        }
-
-        public List<String> getFooList() {
-            return fooList;
-        }
-
-        public void setFooList(List<String> fooList) {
-            this.fooList = fooList;
-        }
-
-        public List<String> getBarList() {
-            return barList;
-        }
-
-        public void setBarList(List<String> barList) {
-            this.barList = barList;
-        }
-
-        public Map<String, String> getStringMap() {
-            return stringMap;
-        }
-
-        public void setStringMap(Map<String, String> stringMap) {
-            this.stringMap = stringMap;
-        }
-
-        public Map<String, List<String>> getListMap() {
-            return listMap;
-        }
-
-        public void setListMap(Map<String, List<String>> listMap) {
-            this.listMap = listMap;
-        }
     }
 }

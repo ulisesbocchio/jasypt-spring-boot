@@ -3,9 +3,10 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 import com.ulisesbocchio.jasyptspringboot.caching.EncryptableMapWrapper;
 import com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableSystemEnvironmentPropertySourceWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
-import org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor;
+import org.springframework.boot.EnvironmentPostProcessor;
+import org.springframework.boot.support.SystemEnvironmentPropertySourceEnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
@@ -13,11 +14,12 @@ import org.springframework.core.env.StandardEnvironment;
 
 /**
  * This class initializes {@link com.ulisesbocchio.jasyptspringboot.wrapper.EncryptableSystemEnvironmentPropertySourceWrapper} after
- * {@link org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor} to enable the wrapping of `getSource`
+ * {@link org.springframework.boot.support.SystemEnvironmentPropertySourceEnvironmentPostProcessor} to enable the wrapping of `getSource`
  * to a {@link EncryptableMapWrapper}. This can't be done before because Spring, of course.
  * Spring for some unknown reason converts immediately after environment initialization the system environment property source to a
  * OriginAwareSystemEnvironmentPropertySource (a private inner class).
- * @see org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor
+ *
+ * @see org.springframework.boot.support.SystemEnvironmentPropertySourceEnvironmentPostProcessor
  */
 @Slf4j
 public class EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEnvironmentListener implements EnvironmentPostProcessor, Ordered {
@@ -34,17 +36,17 @@ public class EncryptableSystemEnvironmentPropertySourceWrapperGetSourceWrapperEn
         log.info("Attempting to bootstrap EncryptableSystemEnvironmentPropertySourceWrapper");
         if (propertySource instanceof EncryptableSystemEnvironmentPropertySourceWrapper) {
             log.info("EncryptableSystemEnvironmentPropertySourceWrapper found! Bootstrapping...");
-            ((EncryptableSystemEnvironmentPropertySourceWrapper)propertySource).setWrapGetSource(true);
+            ((EncryptableSystemEnvironmentPropertySourceWrapper) propertySource).setWrapGetSource(true);
         }
     }
 
     @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+    public void postProcessEnvironment(@NonNull ConfigurableEnvironment environment, @NonNull SpringApplication application) {
         enableGetSourceWrapping(environment);
     }
 
     @Override
     public int getOrder() {
-        return SystemEnvironmentPropertySourceEnvironmentPostProcessor.DEFAULT_ORDER +1;
+        return SystemEnvironmentPropertySourceEnvironmentPostProcessor.DEFAULT_ORDER + 1;
     }
 }

@@ -1,9 +1,11 @@
 name: Java CI
 
-on: [push]
+# CHANGE 1: allow PRs (including forks)
+on: [push, pull_request]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # CHANGE 2: better concurrency key for PRs (optional but safe)
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -16,20 +18,27 @@ jobs:
     name: Java ${{ matrix.java }} ${{ matrix.distribution }} build
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Java ${{ matrix.java }} ${{ matrix.distribution }}
       uses: actions/setup-java@v4
       with:
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java }}
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
     - name: Install artifact locally
       run: mvn -B install -DskipTests --file pom.xml
+
     - name: Extract branch name
       id: extract_branch
       run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+
+    # CHANGE 3: only attempt PAT checkout when secrets are available
     - name: Checkout jasypt-spring-boot-samples on branch ${{ steps.extract_branch.outputs.branch }}
       id: checkout_samples_branch
+      if: github.event_name == 'push'
       uses: actions/checkout@v4
       with:
         repository: ulisesbocchio/jasypt-spring-boot-samples
@@ -37,16 +46,28 @@ jobs:
         ref: ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.CHECKOUT_PAT }}
       continue-on-error: true
+
     - name: Checkout jasypt-spring-boot-samples on main branch (fallback)
-      if: steps.checkout_samples_branch.outcome == 'failure'
+      if: github.event_name == 'push' && steps.checkout_samples_branch.outcome == 'failure'
       uses: actions/checkout@v4
       with:
         repository: ulisesbocchio/jasypt-spring-boot-samples
         path: jasypt-spring-boot-samples
         ref: master
         token: ${{ secrets.CHECKOUT_PAT }}
+
+    # CHANGE 4: PR-safe checkout (no secrets)
+    - name: Checkout jasypt-spring-boot-samples on main branch (PR)
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v4
+      with:
+        repository: ulisesbocchio/jasypt-spring-boot-samples
+        path: jasypt-spring-boot-samples
+        ref: master
+
     - name: Test sample projects
-      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
+      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml \
+        -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
 
   # Optional: Trigger release workflow after successful CI on master
   release-ready:
@@ -60,7 +81,7 @@ jobs:
           echo "🚀 Ready to release: https://github.com/${{ github.repository }}/actions/workflows/release.yml"
           echo ""
           echo "To trigger release, visit the link above and click 'Run workflow'"
-      
+
       # Create a deployment status to show release button in GitHub UI
       - name: Create deployment
         uses: actions/github-script@v7

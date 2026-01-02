@@ -27,7 +27,7 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
      */
     default Object getProperty(String name) {
         return getDelegate().getProperty(name);
-    };
+    }
 
     /**
      * <p>refresh.</p>
@@ -64,23 +64,5 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
             return ((OriginLookup<String>) getDelegate()).getOrigin(key);
         }
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default boolean isImmutable() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).isImmutable();
-        }
-        return OriginLookup.super.isImmutable();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default String getPrefix() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).getPrefix();
-        }
-        return OriginLookup.super.getPrefix();
     }
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.ulisesbocchio</groupId>
     <artifactId>jasypt-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.4-SNAPSHOT</version>
+    <version>4.0.4</version>
     <name>Jasypt Spring Boot Parent</name>
     <description>Jasypt Spring Boot Parent</description>
     <url>https://github.com/ulisesbocchio/jasypt-spring-boot</url>
@@ -13,10 +14,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <spring.boot.version>3.5.0</spring.boot.version>
-        <spring.cloud.version>2023.0.2</spring.cloud.version>
+        <spring.boot.version>4.0.1</spring.boot.version>
+        <spring.cloud.version>2025.1.0</spring.cloud.version>
         <jasypt.version>1.9.3</jasypt.version>
-        <maven.compiler.version>3.13.0</maven.compiler.version>
+        <maven.compiler.version>3.14.1</maven.compiler.version>
         <system.rules.version>1.19.0</system.rules.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
     </properties>
@@ -90,7 +91,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.3.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -127,7 +128,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.4</version>
+                        <version>3.2.8</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- Prevent gpg from using pinentry programs -->
@@ -149,7 +150,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.4.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -162,7 +163,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.1</version>
+                        <version>3.12.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>

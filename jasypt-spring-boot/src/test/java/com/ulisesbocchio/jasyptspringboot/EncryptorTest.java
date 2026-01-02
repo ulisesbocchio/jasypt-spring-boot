@@ -7,7 +7,6 @@ import org.jasypt.salt.RandomSaltGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
@@ -15,14 +14,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,6 +59,18 @@ public class EncryptorTest {
         gcmKey = SimpleGCMByteEncryptor.generateBase64EncodedSecretKey();
         System.out.println("GCM KEY");
         System.out.println(gcmKey);
+    }
+
+    private static String getProviderDetails(Provider provider) {
+        final String serviceName = "Cipher";
+        final String type = "PBE";
+        return provider.getName() + "\n\t"
+                + provider.keySet().stream()
+                .map(k -> ((String) k).toUpperCase())
+                .filter(k -> k.startsWith(serviceName.toUpperCase()) && !k.contains(" "))
+                .map(k -> k.substring(serviceName.length() + 1))
+                .filter(k -> k.startsWith(type))
+                .collect(Collectors.joining("\n\t"));
     }
 
     @BeforeEach
@@ -178,18 +186,6 @@ public class EncryptorTest {
         keyStringPemEncryptor = new SimpleAsymmetricStringEncryptor(config);
     }
 
-    private static String getProviderDetails(Provider provider) {
-        final String serviceName = "Cipher";
-        final String type = "PBE";
-        return provider.getName() + "\n\t"
-                + provider.keySet().stream()
-                .map(k -> ((String) k).toUpperCase())
-                .filter(k -> k.startsWith(serviceName.toUpperCase()) && !k.contains(" "))
-                .map(k -> k.substring(serviceName.length() + 1))
-                .filter(k -> k.startsWith(type))
-                .collect(Collectors.joining("\n\t"));
-    }
-
     private void setup_stringEncryptor() {
         stringEncryptor = new SimplePBEStringEncryptor(_PBEWITHHMACSHA512ANDAES_256);
     }
@@ -211,7 +207,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyFileEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -221,7 +217,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyResourceEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -231,7 +227,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyStringEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -241,7 +237,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyFilePemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -251,7 +247,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyResourcePemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test
@@ -261,7 +257,7 @@ public class EncryptorTest {
         System.out.println(encrypted);
         final String decrypted = keyStringPemEncryptor.decrypt(encrypted);
         System.out.println(decrypted);
-        assertEquals(decrypted, message);
+        assertEquals(message, decrypted);
     }
 
     @Test

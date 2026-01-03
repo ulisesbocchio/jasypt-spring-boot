@@ -66,7 +66,8 @@ jobs:
         ref: master
 
     - name: Test sample projects
-      run: mvn -B test --file jasypt-spring-boot-samples/pom.xml \
+      run: >
+        mvn -B test --file jasypt-spring-boot-samples/pom.xml
         -Djasypt.spring.boot.version=$(mvn --file pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
 
   # Optional: Trigger release workflow after successful CI on master

@@ -25,14 +25,14 @@ import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitiali
 public class BootstrapSpringApplicationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
     public static final String BOOTSTRAP_PROPERTY_SOURCE_NAME = "bootstrap";
     @Getter
-    private static SpringApplication springApplication;
+    private static ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent;
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
         ConfigurableEnvironment environment = event.getEnvironment();
         // Wrap property sources here
         log.info("Found Environment: {}", environment.getClass().getName());
-        springApplication = event.getSpringApplication();
+        applicationEnvironmentPreparedEvent = event;
 
         // listen to events in a bootstrap context
         if (environment.getPropertySources().contains(BOOTSTRAP_PROPERTY_SOURCE_NAME)) {

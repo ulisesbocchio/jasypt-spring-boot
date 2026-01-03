@@ -63,15 +63,15 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
                 .findFirst()
                 .orElse(null);
 
-        SpringApplication springApplication = BootstrapSpringApplicationListener.getSpringApplication();
-        if (loggingListener != null && springApplication != null) {
-            LoggingSystem loggingSystem = LoggingSystem.get(springApplication.getClassLoader());
+        ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent = BootstrapSpringApplicationListener.getApplicationEnvironmentPreparedEvent();
+        if (loggingListener != null && applicationEnvironmentPreparedEvent != null) {
+            LoggingSystem loggingSystem = LoggingSystem.get(applicationEnvironmentPreparedEvent.getSpringApplication().getClassLoader());
             // Reset logging system
             loggingSystem.cleanUp();
             for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
                 System.clearProperty(property.getEnvironmentVariableName());
             }
-            loggingListener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(null, springApplication, null, environment));
+            loggingListener.onApplicationEvent(applicationEnvironmentPreparedEvent);
             log.info("Logging System re-initialized by LoggingApplicationListener");
         }
     }

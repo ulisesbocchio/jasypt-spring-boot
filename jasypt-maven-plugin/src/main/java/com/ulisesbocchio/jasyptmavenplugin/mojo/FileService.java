@@ -1,11 +1,12 @@
 package com.ulisesbocchio.jasyptmavenplugin.mojo;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * A service for operating on files.
@@ -14,6 +15,12 @@ import java.util.Properties;
  * @version $Id: $Id
  */
 public class FileService {
+  
+    private static final Charset CHARSET;
+    static {
+        String charset = System.getProperty("file.encoding",  "UTF-8");
+        CHARSET = Charset.forName(charset);
+    }
     /**
      * Read a file.
      *
@@ -23,7 +30,7 @@ public class FileService {
      */
     public static String read(final Path path) throws MojoExecutionException {
         try {
-            return new String(Files.readAllBytes(path));
+            return new String(Files.readAllBytes(path), CHARSET);
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to read file " + path, e);
         }
@@ -38,7 +45,7 @@ public class FileService {
      */
     public static void write(final Path path, final String contents) throws MojoExecutionException {
         try {
-            Files.write(path, contents.getBytes());
+            Files.write(path, contents.getBytes(CHARSET));
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to write file " + path, e);
         }

@@ -27,6 +27,10 @@ public class EncryptMojo extends AbstractFileJasyptMojo {
         try {
             String contents = FileService.read(path);
             String encryptedContents = service.encrypt(contents, encryptPrefix, encryptSuffix, decryptPrefix, decryptSuffix);
+            if (contents.equals(encryptedContents)) {
+                LOGGER.warn("Encrypting file:{} not changed!", path);
+                return;
+            }
             FileService.write(path, encryptedContents);
 
         } catch (Exception e) {

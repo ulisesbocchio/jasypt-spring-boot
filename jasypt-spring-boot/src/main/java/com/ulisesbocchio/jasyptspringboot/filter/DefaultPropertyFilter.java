@@ -4,6 +4,8 @@ import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
 import org.springframework.core.env.PropertySource;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Default Strategy for contemplating properties for decryption based on the following constructor args:
@@ -17,19 +19,19 @@ import java.util.List;
  */
 public class DefaultPropertyFilter implements EncryptablePropertyFilter {
 
-    private final List<String> includeSourceNames;
-    private final List<String> excludeSourceNames;
-    private final List<String> includePropertyNames;
-    private final List<String> excludePropertyNames;
+    private final List<Pattern> includeSourcePatterns;
+    private final List<Pattern> excludeSourcePatterns;
+    private final List<Pattern> includePropertyPatterns;
+    private final List<Pattern> excludePropertyPatterns;
 
     /**
      * <p>Constructor for DefaultPropertyFilter.</p>
      */
     public DefaultPropertyFilter() {
-        includeSourceNames = null;
-        includePropertyNames = null;
-        excludeSourceNames = null;
-        excludePropertyNames = null;
+        includeSourcePatterns = null;
+        includePropertyPatterns = null;
+        excludeSourcePatterns = null;
+        excludePropertyPatterns = null;
     }
 
     /**
@@ -41,10 +43,10 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
      * @param excludePropertyNames a {@link java.util.List} object
      */
     public DefaultPropertyFilter(List<String> includeSourceNames, List<String> excludeSourceNames, List<String> includePropertyNames, List<String> excludePropertyNames) {
-        this.includeSourceNames = includeSourceNames;
-        this.excludeSourceNames = excludeSourceNames;
-        this.includePropertyNames = includePropertyNames;
-        this.excludePropertyNames = excludePropertyNames;
+        this.includeSourcePatterns = includeSourceNames == null ? null : includeSourceNames.stream().map(Pattern::compile).collect(Collectors.toList());
+        this.excludeSourcePatterns = excludeSourceNames == null ? null : excludeSourceNames.stream().map(Pattern::compile).collect(Collectors.toList());
+        this.includePropertyPatterns = includePropertyNames == null ? null : includePropertyNames.stream().map(Pattern::compile).collect(Collectors.toList());
+        this.excludePropertyPatterns = excludePropertyNames == null ? null : excludePropertyNames.stream().map(Pattern::compile).collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
@@ -54,11 +56,11 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
             return true;
         }
 
-        if (isMatch(source.getName(), excludeSourceNames) || isMatch(name, excludePropertyNames)) {
+        if (isMatch(source.getName(), excludeSourcePatterns) || isMatch(name, excludePropertyPatterns)) {
             return false;
         }
 
-        return isIncludeUnset() || isMatch(source.getName(), includeSourceNames) || isMatch(name, includePropertyNames);
+        return isIncludeUnset() || isMatch(source.getName(), includeSourcePatterns) || isMatch(name, includePropertyPatterns);
 
     }
 
@@ -67,18 +69,18 @@ public class DefaultPropertyFilter implements EncryptablePropertyFilter {
     }
 
     private boolean isIncludeUnset() {
-        return isEmpty(includeSourceNames) && isEmpty(includePropertyNames);
+        return isEmpty(includeSourcePatterns) && isEmpty(includePropertyPatterns);
     }
 
     private boolean isExcludeUnset() {
-        return isEmpty(excludeSourceNames) && isEmpty(excludePropertyNames);
+        return isEmpty(excludeSourcePatterns) && isEmpty(excludePropertyPatterns);
     }
 
-    private boolean isEmpty(List<String> patterns) {
+    private boolean isEmpty(List<Pattern> patterns) {
         return patterns == null || patterns.isEmpty();
     }
 
-    private boolean isMatch(String name, List<String> patterns) {
-        return name != null && !isEmpty(patterns) && patterns.stream().anyMatch(name::matches);
+    private boolean isMatch(String name, List<Pattern> patterns) {
+        return name != null && !isEmpty(patterns) && patterns.stream().anyMatch(p -> p.matcher(name).matches());
     }
 }

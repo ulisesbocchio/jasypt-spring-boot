@@ -1,6 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.properties;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyFilter;
+import com.ulisesbocchio.jasyptspringboot.configuration.EnableEncryptablePropertiesBeanFactoryPostProcessor;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleAsymmetricConfig;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimpleGCMConfig;
 import com.ulisesbocchio.jasyptspringboot.util.AsymmetricCryptography.KeyFormat;
@@ -256,6 +257,13 @@ public class JasyptEncryptorConfigurationProperties {
      * @see SimpleGCMConfig#getSecretKeyAlgorithm() ()
      */
     private String gcmSecretKeyAlgorithm = "PBKDF2WithHmacSHA256";
+
+    /**
+     * Specify if the logging system should be reset, which is needed if encrypted properties are used in its configuration
+     *
+     * @see EnableEncryptablePropertiesBeanFactoryPostProcessor
+     */
+    private String resetLoggingSystem = "true";
 
     @NestedConfigurationProperty
     private PropertyConfigurationProperties property = new PropertyConfigurationProperties();

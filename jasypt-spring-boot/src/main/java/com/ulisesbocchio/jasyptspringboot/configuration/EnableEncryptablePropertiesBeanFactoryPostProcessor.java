@@ -1,27 +1,21 @@
 package com.ulisesbocchio.jasyptspringboot.configuration;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySourceConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.LoggingSystemProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.StandardEnvironment;
 
 /**
  * <p>{@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} that wraps all {@link org.springframework.core.env.PropertySource} defined in the {@link org.springframework.core.env.Environment}
@@ -53,9 +47,11 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
     }
 
     private void reinitializeLoggingSystem() {
-        log.info("Re-initializing Logging System");
-        // Reinitialize logging system to pick up any encrypted properties used in logging configuration
-        LoggingApplicationListener loggingListener = ((AbstractApplicationContext) this.applicationContext)
+        String enabled = environment.getProperty("jasypt.encryptor.reset-logging-system");
+        if (enabled == null || Boolean.parseBoolean(enabled)) {
+            log.info("Re-initializing Logging System");
+            // Reinitialize logging system to pick up any encrypted properties used in logging configuration
+            LoggingApplicationListener loggingListener = ((AbstractApplicationContext) this.applicationContext)
                 .getApplicationListeners()
                 .stream()
                 .filter(LoggingApplicationListener.class::isInstance)
@@ -63,16 +59,17 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
                 .findFirst()
                 .orElse(null);
 
-        ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent = BootstrapSpringApplicationListener.getApplicationEnvironmentPreparedEvent();
-        if (loggingListener != null && applicationEnvironmentPreparedEvent != null) {
-            LoggingSystem loggingSystem = LoggingSystem.get(applicationEnvironmentPreparedEvent.getSpringApplication().getClassLoader());
-            // Reset logging system
-            loggingSystem.cleanUp();
-            for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
-                System.clearProperty(property.getEnvironmentVariableName());
+            ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent = BootstrapSpringApplicationListener.getApplicationEnvironmentPreparedEvent();
+            if (loggingListener != null && applicationEnvironmentPreparedEvent != null) {
+                LoggingSystem loggingSystem = LoggingSystem.get(applicationEnvironmentPreparedEvent.getSpringApplication().getClassLoader());
+                // Reset logging system
+                loggingSystem.cleanUp();
+                for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
+                    System.clearProperty(property.getEnvironmentVariableName());
+                }
+                loggingListener.onApplicationEvent(applicationEnvironmentPreparedEvent);
+                log.info("Logging System re-initialized by LoggingApplicationListener");
             }
-            loggingListener.onApplicationEvent(applicationEnvironmentPreparedEvent);
-            log.info("Logging System re-initialized by LoggingApplicationListener");
         }
     }
 

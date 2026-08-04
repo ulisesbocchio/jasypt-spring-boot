@@ -71,6 +71,7 @@ public class EnableEncryptablePropertiesBeanFactoryPostProcessor implements Bean
             for (LoggingSystemProperty property : LoggingSystemProperty.values()) {
                 System.clearProperty(property.getEnvironmentVariableName());
             }
+            loggingSystem.beforeInitialize();
             loggingListener.onApplicationEvent(applicationEnvironmentPreparedEvent);
             log.info("Logging System re-initialized by LoggingApplicationListener");
         }

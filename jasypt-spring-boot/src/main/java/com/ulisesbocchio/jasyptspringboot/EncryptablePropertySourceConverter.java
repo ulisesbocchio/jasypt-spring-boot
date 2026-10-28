@@ -33,7 +33,8 @@ public class EncryptablePropertySourceConverter {
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     private static final List<String> DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES = Arrays.asList(
             "org.springframework.core.env.PropertySource$StubPropertySource",
-            "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource"
+            "org.springframework.boot.context.properties.source.ConfigurationPropertySourcesPropertySource",
+            "org.springframework.test.context.support.DynamicValuesPropertySource"
     );
     private final InterceptionMode interceptionMode;
     private final List<Class<PropertySource<?>>> skipPropertySourceClasses;
@@ -56,7 +57,11 @@ public class EncryptablePropertySourceConverter {
     }
 
     static List<Class<PropertySource<?>>> defaultSkipPropertySourceClasses() {
-        return DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES.stream().map(EncryptablePropertySourceConverter::getPropertiesClass).collect(toList());
+        return DEFAULT_SKIP_PROPERTY_SOURCE_CLASSES.stream()
+                // spring-test is optional and is normally absent from production applications.
+                .filter(className -> org.springframework.util.ClassUtils.isPresent(className, EncryptablePropertySourceConverter.class.getClassLoader()))
+                .map(EncryptablePropertySourceConverter::getPropertiesClass)
+                .collect(toList());
     }
 
     /**

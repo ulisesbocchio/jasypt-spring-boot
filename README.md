@@ -393,6 +393,10 @@ wrapped/proxied by this plugin and thereby properties contained in them won't be
 ```properties
 jasypt.encryptor.skip-property-sources=org.springframework.boot.env.RandomValuePropertySource,org.springframework.boot.ansi.AnsiPropertySource
 ```
+
+Spring's `DynamicValuesPropertySource`, used by `@DynamicPropertySource` and `DynamicPropertyRegistrar`, is skipped by default.
+This preserves Spring's dynamic property registration and supplier evaluation; values from this source are not decrypted.
+
 ## Encryptable Properties cache refresh
 Encrypted properties are cached within your application and in certain scenarios, like when using externalized configuration
 from a config server the properties need to be refreshed when they changed. For this `jasypt-spring-boot` registers a

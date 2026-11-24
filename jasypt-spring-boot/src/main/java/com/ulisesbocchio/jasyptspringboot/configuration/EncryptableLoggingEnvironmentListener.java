@@ -3,7 +3,7 @@ package com.ulisesbocchio.jasyptspringboot.configuration;
 import com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -19,6 +19,7 @@ import static com.ulisesbocchio.jasyptspringboot.environment.EnvironmentInitiali
  * which would have been populated without the encryptable wrapper.
  * The {@link EnableEncryptablePropertiesBeanFactoryPostProcessor} then effectively re-initializes the logging {@link org.springframework.boot.logging.LoggingSystem}
  * @see EnvironmentInitializer
+ * @author 24.11.2026 by Viktor Muth - Adapted the environment processor to Spring Boot 4.
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 13)
 @Slf4j

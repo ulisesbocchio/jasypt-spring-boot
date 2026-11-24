@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.ulisesbocchio</groupId>
         <artifactId>jasypt-spring-boot-parent</artifactId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>jasypt-spring-boot-starter</artifactId>
@@ -24,11 +24,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-rsa</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

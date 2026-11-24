@@ -5,10 +5,12 @@ import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.PropertySource;
 
 /**
- * <p>EncryptablePropertySource interface.</p>
+ * <p>EncryptablePropertySource interface. Spring Boot 4's {@link OriginLookup} exposes only origin lookup;
+ * the removed immutability and prefix methods must not be delegated here.</p>
  *
  * @author Ulises Bocchio
  * @version $Id: $Id
+ * @author 24.11.2026 by Viktor Muth - Adapted origin lookup to Spring Boot 4.
  */
 public interface EncryptablePropertySource<T> extends OriginLookup<String> {
 
@@ -66,21 +68,4 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    default boolean isImmutable() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).isImmutable();
-        }
-        return OriginLookup.super.isImmutable();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default String getPrefix() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).getPrefix();
-        }
-        return OriginLookup.super.getPrefix();
-    }
 }

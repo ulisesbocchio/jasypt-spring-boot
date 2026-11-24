@@ -20,8 +20,9 @@ import java.util.Optional;
 public class DefaultPropertyResolver implements EncryptablePropertyResolver {
 
     private final Environment environment;
-    private StringEncryptor encryptor;
-    private EncryptablePropertyDetector detector;
+    private final StringEncryptor encryptor;
+    private final EncryptablePropertyDetector detector;
+    private final ThreadLocal<Boolean> isResolving = ThreadLocal.withInitial(() -> false);
 
     /**
      * <p>Constructor for DefaultPropertyResolver.</p>
@@ -51,19 +52,27 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
     /** {@inheritDoc} */
     @Override
     public String resolvePropertyValue(String value) {
-        return Optional.ofNullable(value)
-                .map(environment::resolvePlaceholders)
-                .filter(detector::isEncrypted)
-                .map(resolvedValue -> {
-                    try {
-                        String unwrappedProperty = detector.unwrapEncryptedValue(resolvedValue.trim());
-                        String resolvedProperty = environment.resolvePlaceholders(unwrappedProperty);
-                        return encryptor.decrypt(resolvedProperty);
-                    } catch (EncryptionOperationNotPossibleException e) {
-                        throw new DecryptionException("Unable to decrypt property: " + value + " resolved to: " + resolvedValue + ". Decryption of Properties failed,  make sure encryption/decryption " +
-                                "passwords match", e);
-                    }
-                })
-                .orElse(value);
+        if (isResolving.get()) {
+            return value;
+        }
+        try {
+            isResolving.set(true);
+            return Optional.ofNullable(value)
+                    .map(environment::resolvePlaceholders)
+                    .filter(detector::isEncrypted)
+                    .map(resolvedValue -> {
+                        try {
+                            String unwrappedProperty = detector.unwrapEncryptedValue(resolvedValue.trim());
+                            String resolvedProperty = environment.resolvePlaceholders(unwrappedProperty);
+                            return encryptor.decrypt(resolvedProperty);
+                        } catch (EncryptionOperationNotPossibleException e) {
+                            throw new DecryptionException("Unable to decrypt property: " + value + " resolved to: " + resolvedValue + ". Decryption of Properties failed,  make sure encryption/decryption " +
+                                    "passwords match", e);
+                        }
+                    })
+                    .orElse(value);
+        } finally {
+            isResolving.remove();
+        }
     }
 }

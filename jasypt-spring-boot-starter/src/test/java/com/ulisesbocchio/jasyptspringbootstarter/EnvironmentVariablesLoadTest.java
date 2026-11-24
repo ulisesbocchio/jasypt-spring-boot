@@ -18,15 +18,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SystemStubsExtension.class)
-@SpringBootTest(classes = EnvironmentVariablesLoadTest.TestConfig.class)
+@SpringBootTest(
+        classes = {
+                EnvironmentVariablesLoadTest.TestConfig.class,
+        },
+        properties = {
+                "spring.application.name=test-application"
+        }
+)
 public class EnvironmentVariablesLoadTest {
 
     @Autowired
     private MyProperties myProperties;
 
     @SystemStub
-    private EnvironmentVariables environmentVariables =
-            new EnvironmentVariables("TEST_ENV_FOOSTRING", "test1", "TEST_ENV_BAR_STRING", "test2", "TEST_ENV_FOOLIST", "a1,b1", "TEST_ENV_BAR_LIST", "a2,b2", "TEST_ENV_STRINGMAP_K1", "v1", "TEST_ENV_LISTMAP_K2", "v2");
+    private final EnvironmentVariables environmentVariables = new EnvironmentVariables(
+            "TEST_ENV_FOOSTRING", "test1",
+            "TEST_ENV_BAR_STRING", "test2",
+            "TEST_ENV_FOOLIST", "a1,b1",
+            "TEST_ENV_BAR_LIST", "a2,b2",
+            "TEST_ENV_STRINGMAP_K1", "v1",
+            "TEST_ENV_LISTMAP_K2", "v2",
+            "TEST_ENV_APPLICATION_NAME", "${spring.application.name:unknown}",
+            "TEST_ENV_MY_VALUE", "${my-value:unknown}",
+            "TEST_ENV_MY_SECRET", "${my-secret:unknown}");
 
     @EnableEncryptableProperties
     @EnableConfigurationProperties(EnvironmentVariablesLoadTest.MyProperties.class)
@@ -50,6 +65,10 @@ public class EnvironmentVariablesLoadTest {
 
         assertNotNull(myProperties.getListMap());
         assertEquals("{k2=[v2]}", myProperties.getListMap().toString());
+
+        assertEquals("test-application", myProperties.getApplicationName());
+        assertEquals("foobar", myProperties.getMyValue());
+        assertEquals("mypassword", myProperties.getMySecret());
     }
 
     @ConfigurationProperties(prefix = "test.env")
@@ -61,6 +80,9 @@ public class EnvironmentVariablesLoadTest {
         private List<String> barList;
         private Map<String, String> stringMap;
         private Map<String, List<String>> listMap;
+        private String applicationName;
+        private String myValue;
+        private String mySecret;
 
         public String getFooString() {
             return fooString;
@@ -108,6 +130,30 @@ public class EnvironmentVariablesLoadTest {
 
         public void setListMap(Map<String, List<String>> listMap) {
             this.listMap = listMap;
+        }
+
+        public String getApplicationName() {
+            return applicationName;
+        }
+
+        public void setApplicationName(String applicationName) {
+            this.applicationName = applicationName;
+        }
+
+        public String getMyValue() {
+            return myValue;
+        }
+
+        public void setMyValue(String myValue) {
+            this.myValue = myValue;
+        }
+
+        public String getMySecret() {
+            return mySecret;
+        }
+
+        public void setMySecret(String mySecret) {
+            this.mySecret = mySecret;
         }
     }
 }

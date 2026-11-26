@@ -1,5 +1,7 @@
 package com.ulisesbocchio.jasyptspringboot.resolver;
 
+import static java.util.Objects.requireNonNull;
+
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyResolver;
 import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
@@ -7,7 +9,6 @@ import com.ulisesbocchio.jasyptspringboot.exception.DecryptionException;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.springframework.core.env.Environment;
-import org.springframework.util.Assert;
 
 import java.util.Optional;
 
@@ -20,8 +21,9 @@ import java.util.Optional;
 public class DefaultPropertyResolver implements EncryptablePropertyResolver {
 
     private final Environment environment;
-    private StringEncryptor encryptor;
-    private EncryptablePropertyDetector detector;
+    private final StringEncryptor encryptor;
+    private final EncryptablePropertyDetector detector;
+    private final ThreadLocal<Boolean> isResolving = ThreadLocal.withInitial(() -> false);
 
     /**
      * <p>Constructor for DefaultPropertyResolver.</p>
@@ -41,18 +43,16 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
      * @param environment a {@link org.springframework.core.env.Environment} object
      */
     public DefaultPropertyResolver(StringEncryptor encryptor, EncryptablePropertyDetector detector, Environment environment) {
-        this.environment = environment;
-        Assert.notNull(encryptor, "String encryptor can't be null");
-        Assert.notNull(detector, "Encryptable Property detector can't be null");
-        this.encryptor = encryptor;
-        this.detector = detector;
+        this.encryptor = requireNonNull(encryptor, "encryptor can't be null");
+        this.detector = requireNonNull(detector, "detector can't be null");
+        this.environment = requireNonNull(environment, "environment can't be null");
     }
 
     /** {@inheritDoc} */
     @Override
     public String resolvePropertyValue(String value) {
         return Optional.ofNullable(value)
-                .map(environment::resolvePlaceholders)
+                .map(this::resolvePlaceholders)
                 .filter(detector::isEncrypted)
                 .map(resolvedValue -> {
                     try {
@@ -65,5 +65,23 @@ public class DefaultPropertyResolver implements EncryptablePropertyResolver {
                     }
                 })
                 .orElse(value);
+    }
+
+    /**
+     * Resolves placeholders only outside an active environment lookup.
+     * <p>
+     * Boot 4 may enumerate the system environment while resolving a placeholder.
+     * Nested resolution would re-enter that enumeration indefinitely.
+     */
+    private String resolvePlaceholders(String value) {
+        if (!value.contains("${") || isResolving.get()) {
+            return value;
+        }
+        try {
+            isResolving.set(true);
+            return environment.resolvePlaceholders(value);
+        } finally {
+            isResolving.remove();
+        }
     }
 }

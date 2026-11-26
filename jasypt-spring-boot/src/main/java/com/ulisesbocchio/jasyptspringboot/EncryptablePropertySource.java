@@ -1,5 +1,6 @@
 package com.ulisesbocchio.jasyptspringboot;
 
+import org.springframework.boot.env.PropertySourceInfo;
 import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.PropertySource;
@@ -10,7 +11,7 @@ import org.springframework.core.env.PropertySource;
  * @author Ulises Bocchio
  * @version $Id: $Id
  */
-public interface EncryptablePropertySource<T> extends OriginLookup<String> {
+public interface EncryptablePropertySource<T> extends OriginLookup<String>, PropertySourceInfo {
 
     /**
      * <p>getDelegate.</p>
@@ -69,18 +70,18 @@ public interface EncryptablePropertySource<T> extends OriginLookup<String> {
     /** {@inheritDoc} */
     @Override
     default boolean isImmutable() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).isImmutable();
+        if(getDelegate() instanceof PropertySourceInfo) {
+            return ((PropertySourceInfo) getDelegate()).isImmutable();
         }
-        return OriginLookup.super.isImmutable();
+        return PropertySourceInfo.super.isImmutable();
     }
 
     /** {@inheritDoc} */
     @Override
     default String getPrefix() {
-        if(getDelegate() instanceof OriginLookup) {
-            return ((OriginLookup<?>) getDelegate()).getPrefix();
+        if(getDelegate() instanceof PropertySourceInfo) {
+            return ((PropertySourceInfo) getDelegate()).getPrefix();
         }
-        return OriginLookup.super.getPrefix();
+        return PropertySourceInfo.super.getPrefix();
     }
 }
